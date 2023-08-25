@@ -1,0 +1,19 @@
+<div id="nickname-div" hx-target="#nickname-form">
+    {% if request.session.get("nickname") %}
+    <p>Twój nick: {{request.session["nickname"]}}</p>
+    {% else %}
+    <form method="post" id="nickname-from" onsubmit="return validateNickname()" hx-swap="outerHTML">
+        <label for="nickname">Podaj nick</label>
+        <input type="text" id="nickname" name="nickname" placeholder="Jacuś" required>
+        <button type="submit" hx-post="/post_nickname" hx-trigger="click" hx-target="#nickname-div">Zapisz</button>
+    </form>
+    {% endif %}
+</div>
+
+<script>
+    function validateNickname() {
+        const nicknameInput = document.getElementById("nickname");
+        const nickname = nicknameInput.value.trim();
+        return nickname !== "";
+    }
+</script>

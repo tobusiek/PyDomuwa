@@ -1,4 +1,3 @@
-from typing import List
 from pydantic import BaseModel
 
 
@@ -7,7 +6,7 @@ class PlayerBase(BaseModel):
 
 
 class PlayerCreate(PlayerBase):
-    pass
+    ...
 
 
 class Player(PlayerBase):
@@ -15,27 +14,7 @@ class Player(PlayerBase):
     score: int
 
     class Config:
-        orm_mode = True
-
-
-class QuestionBase(BaseModel):
-    text: str
-
-
-class QuestionCreate(QuestionBase):
-    pass
-
-
-class QuestionUpdate(QuestionBase):
-    correct_answer_idx: int
-
-
-class Question(QuestionBase):
-    id: int
-    answers: List["Answer"] = []
-
-    class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class AnswerBase(BaseModel):
@@ -44,11 +23,11 @@ class AnswerBase(BaseModel):
 
 
 class AnswerCreate(AnswerBase):
-    pass
+    ...
 
 
 class AnswerUpdate(AnswerBase):
-    pass
+    ...
 
 
 class Answer(AnswerBase):
@@ -56,7 +35,27 @@ class Answer(AnswerBase):
     question_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+class QuestionBase(BaseModel):
+    text: str
+
+
+class QuestionCreate(QuestionBase):
+    ...
+
+
+class QuestionUpdate(QuestionBase):
+    correct_answer_idx: int
+
+
+class Question(QuestionBase):
+    id: int
+    answers: list[Answer] = []
+
+    class Config:
+        from_attributes = True
 
 
 class GameBase(BaseModel):
@@ -64,13 +63,13 @@ class GameBase(BaseModel):
 
 
 class GameCreate(GameBase):
-    pass
+    ...
 
 
 class Game(GameBase):
     id: int
-    players: List[Player] = []
-    questions: List[Question] = []
+    players: list[Player] = []
+    questions: list[Question] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True

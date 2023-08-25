@@ -1,0 +1,17 @@
+<div id="active-games">
+    <h2>Aktywne gry</h2>
+    {% if active_games %}
+    <ul>
+        {% for game in active_games %}
+        <li>
+            {{game.name}}
+            <form hx-post="/games/join_game/{{game.id}}" hx-target="#game-list">
+                <button type="submit">Dołącz</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Brak aktywnych gier</p>
+    {% endif %}
+</div>

@@ -1,0 +1,12 @@
+<div id="create-game">
+    <h2>Stwórz nową grę</h2>
+    <form method="post" id="create-game-form" hx-post="/games/create_game" hx-target="#active-games"
+          hx-swap="outerHTML">
+        <label for="game_name">Wybierz typ gry:</label>
+        <select id="game_name" name="game_name" required>
+            <option value="ego" selected>Ego</option>
+            <option value="whos-most-likely">Who's most likely? (nie działa)</option>
+        </select>
+        <button type="submit">Stwórz grę</button>
+    </form>
+</div>
