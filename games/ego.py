@@ -1,12 +1,12 @@
 from enum import Enum
 
-from db.models import Game
+from db.models.game import Game
 
 
 class EgoCategory(Enum):
-    SFW = 'SFW'
-    NSFW = 'NSFW'
-    MIXED = 'MIXED'
+    SFW = "SFW"
+    NSFW = "NSFW"
+    MIXED = "MIXED"
 
 
 def parse(category: str) -> EgoCategory:
@@ -15,6 +15,7 @@ def parse(category: str) -> EgoCategory:
 
 class EgoGame(Game):
     def __init__(self, name: str, category: EgoCategory):
+        super().__init__(name)
         self.name = name
         self.category = category
 
