@@ -4,8 +4,8 @@
     <ul>
         {% for game in active_games %}
         <li>
-            {{game.name}}
             <form hx-post="/games/join_game/{{game.id}}" hx-target="#game-list">
+                {{game.name}}
                 <button type="submit">Dołącz</button>
             </form>
         </li>

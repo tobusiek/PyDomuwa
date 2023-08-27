@@ -83,7 +83,7 @@ class Player(DbModel):
         SELECT name, id, score, game_id FROM {cls.table_name};
         """
         players_data = execute_query(select_players).fetchall()
-        players = [Player(**player_data) for player_data in players_data]
+        players = [Player(*player_data) for player_data in players_data]
         return players
 
     @classmethod
@@ -95,7 +95,7 @@ class Player(DbModel):
         player_data = execute_query(select_player, query_params).fetchone()
         if not player_data:
             return None
-        return Player(**player_data)
+        return Player(*player_data)
 
     @classmethod
     def get_by_name(cls, name: str) -> Optional["Player"]:
@@ -106,4 +106,4 @@ class Player(DbModel):
         player_data = execute_query(select_player, query_params).fetchone()
         if not player_data:
             return None
-        return Player(**player_data)
+        return Player(*player_data)

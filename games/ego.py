@@ -9,15 +9,14 @@ class EgoCategory(Enum):
     MIXED = "MIXED"
 
 
-def parse(category: str) -> EgoCategory:
+def parse_ego_category(category: str) -> EgoCategory:
     return EgoCategory[category]
 
 
 class EgoGame(Game):
-    def __init__(self, name: str, category: EgoCategory):
-        super().__init__(name)
-        self.name = name
-        self.category = category
+    def __init__(self, category: str):
+        super().__init__("Ego")
+        self.category = parse_ego_category(category)
 
     def start_game(self):
         raise NotImplemented()

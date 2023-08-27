@@ -1,4 +1,3 @@
-import db.schemas as schemas
 from db.models.answer import Answer
 from db.models.game import Game
 from db.models.player import Player
@@ -6,6 +5,7 @@ from db.models.question import Question
 
 
 def initialize_tables():
+    Game.delete_all()
     Game.create_table()
     Player.create_table()
     Question.create_table()
@@ -24,8 +24,8 @@ def get_active_games() -> list[Game]:
     return Game.get_all()
 
 
-def create_game(game: schemas.GameCreate) -> Game:
-    db_game = Game(name=game.name)
+def create_game(name: str, category: str, rounds: int) -> Game:
+    db_game = Game(name, category=category, rounds=rounds)
     db_game.save()
     return db_game
 

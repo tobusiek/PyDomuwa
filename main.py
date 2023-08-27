@@ -22,8 +22,10 @@ templates = Jinja2Templates(directory="resources/templates")
 
 
 @app.get("/")
-async def get_home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def get_home(request: Request) -> _TemplateResponse:
+    context = {"request": request,
+               "active_games": crud.get_active_games()}
+    return templates.TemplateResponse("index.html", context)
 
 
 @app.post("/post_nickname")
@@ -46,12 +48,16 @@ async def get_active_games(request: Request) -> _TemplateResponse:
 
 
 @app.post("/games/create_game", response_model=schemas.Game)
-async def create_game(request: Request, game_name: str = Form(...)) -> templates.TemplateResponse:
-    logger.debug(f"{game_name=}")
-    game = schemas.GameCreate(**{"name": game_name})
-    logger.debug(f"{game=}")
-    context = {'request': request,
-               'game': crud.create_game(game)}
+async def create_game(
+        request: Request,
+        game_name: str = Form(...),
+        game_category: str = Form(...),
+        game_rounds: int = Form(...)
+) -> _TemplateResponse:
+    logger.debug(f"{game_name=} {game_category=}")
+    db_game = crud.create_game(game_name, game_category, game_rounds)
+    context = {"request": request,
+               "active_games": crud.get_active_games()}
     return templates.TemplateResponse("active-games.html", context)
 
 

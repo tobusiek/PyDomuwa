@@ -1,12 +1,38 @@
 <div id="create-game">
     <h2>Stwórz nową grę</h2>
     <form method="post" id="create-game-form" hx-post="/games/create_game" hx-target="#active-games"
-          hx-swap="outerHTML">
+          hx-swap="outerHTML" onchange="gameRounds()">
         <label for="game_name">Wybierz typ gry:</label>
         <select id="game_name" name="game_name" required>
             <option value="ego" selected>Ego</option>
             <option value="whos-most-likely">Who's most likely? (nie działa)</option>
-        </select>
+        </select> <br>
+
+        <label for="game_category">Wybierz kategorię:</label>
+        <select id="game_category" name="game_category" required>
+            <option value="SFW">SFW</option>
+            <option value="NSFW">NSFW</option>
+            <option value="MIXED" selected>Mixed</option>
+        </select> <br>
+
+        <label for="game_rounds" id="game_rounds_label" hidden>Wybierz liczbę rund:</label>
+        <input type="number" name="game_rounds" id="game_rounds" min="1" max="20" value="5" hidden> <br>
+
         <button type="submit">Stwórz grę</button>
     </form>
 </div>
+
+<script type="text/javascript">
+    function gameRounds() {
+        const gameName = document.getElementById("game_name")
+        const gameRoundsLabel = document.getElementById("game_rounds_label")
+        const gameRoundsInput = document.getElementById("game_rounds")
+        if (gameName.value === "whos-most-likely") {
+            gameRoundsLabel.hidden = false
+            gameRoundsInput.hidden = false
+        } else {
+            gameRoundsLabel.hidden = true
+            gameRoundsInput.hidden = true
+        }
+    }
+</script>

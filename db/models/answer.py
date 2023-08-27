@@ -54,7 +54,8 @@ class Answer(DbModel):
     @classmethod
     def create_foreign_key(cls, question_table_name: str) -> None:
         create_foreign_key = f"""
-        ALTER TABLE {cls.table_name} ADD COLUMN question_id INTEGER REFERENCES {question_table_name}(id);
+        ALTER TABLE {cls.table_name} ADD COLUMN question_id INTEGER REFERENCES {question_table_name}(id)
+        ON DELETE CASCADE;
         """
         try:
             execute_query_and_commit(create_foreign_key)
@@ -74,7 +75,7 @@ class Answer(DbModel):
         SELECT text, question_id, id, points FROM {cls.table_name};
         """
         answers_data = execute_query(select_answers).fetchall()
-        answers = [Answer(**answer_data) for answer_data in answers_data]
+        answers = [Answer(*answer_data) for answer_data in answers_data]
         return answers
 
     @classmethod
@@ -86,7 +87,7 @@ class Answer(DbModel):
         answer_data = execute_query(select_answer, query_params).fetchone()
         if not answer_data:
             return None
-        return Answer(**answer_data)
+        return Answer(*answer_data)
 
     @classmethod
     def get_by_question_id(cls, question_id: int) -> list["Answer"]:
@@ -95,5 +96,5 @@ class Answer(DbModel):
         """
         query_params = (question_id,)
         answers_data = execute_query(select_answers, query_params).fetchall()
-        answers = [Answer(**answer_data) for answer_data in answers_data]
+        answers = [Answer(*answer_data) for answer_data in answers_data]
         return answers

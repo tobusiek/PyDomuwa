@@ -58,7 +58,7 @@ class Question(DbModel):
         SELECT game_name, text, id, correct_answer_id FROM {cls.table_name};
         """
         questions_data = execute_query(select_questions).fetchall()
-        questions = [Question(**question_data) for question_data in questions_data]
+        questions = [Question(*question_data) for question_data in questions_data]
         return questions
 
     @classmethod
@@ -70,7 +70,7 @@ class Question(DbModel):
         question_data = execute_query(select_question, query_params).fetchone()
         if not question_data:
             return None
-        return Question(**question_data)
+        return Question(*question_data)
 
     @classmethod
     def get_by_game_name(cls, game_name: str) -> list["Question"]:
@@ -79,5 +79,5 @@ class Question(DbModel):
         """
         query_params = (game_name,)
         questions_data = execute_query(select_questions, query_params).fetchall()
-        questions = [Question(**question_data) for question_data in questions_data]
+        questions = [Question(*question_data) for question_data in questions_data]
         return questions

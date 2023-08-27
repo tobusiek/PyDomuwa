@@ -60,6 +60,7 @@ class Question(QuestionBase):
 
 class GameBase(BaseModel):
     name: str
+    category: str
 
 
 class GameCreate(GameBase):
