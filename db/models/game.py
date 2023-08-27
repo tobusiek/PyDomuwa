@@ -14,11 +14,11 @@ class Game(DbModel):
     @classmethod
     def create_table(cls) -> None:
         create_game_table = f"""
-            CREATE TABLE IF NOT EXISTS {cls.table_name} (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL
-            );
-            """
+        CREATE TABLE IF NOT EXISTS {cls.table_name} (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL
+        );
+        """
         execute_query_and_commit(create_game_table)
 
     def save(self) -> None:

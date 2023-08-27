@@ -12,6 +12,14 @@ def initialize_tables():
     Answer.create_table()
 
 
+def create_constraints():
+    Player.create_index()
+    Player.create_foreign_key(Game.table_name)
+    Question.create_index()
+    Question.create_foreign_key(Answer.table_name)
+    Answer.create_foreign_key(Question.table_name)
+
+
 def get_active_games() -> list[Game]:
     return Game.get_all()
 

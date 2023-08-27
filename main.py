@@ -14,6 +14,7 @@ from utils.get_computer_ip import get_ip_address
 
 logging.config.fileConfig(os.path.join(os.getcwd(), "resources", "logging.ini"), disable_existing_loggers=False)
 logger = logging.getLogger("fastapi")
+logging.getLogger("multipart.multipart").setLevel(logging.INFO)
 
 app = FastAPI(debug=True)
 app.add_middleware(SessionMiddleware, secret_key="guccitrip")
@@ -45,13 +46,13 @@ async def get_active_games(request: Request) -> _TemplateResponse:
 
 
 @app.post("/games/create_game", response_model=schemas.Game)
-async def create_game(request: Request, game_name: str = Form(...)) -> RedirectResponse:
+async def create_game(request: Request, game_name: str = Form(...)) -> templates.TemplateResponse:
     logger.debug(f"{game_name=}")
     game = schemas.GameCreate(**{"name": game_name})
     logger.debug(f"{game=}")
     context = {'request': request,
                'game': crud.create_game(game)}
-    return RedirectResponse(url=request.url.path)
+    return templates.TemplateResponse("active-games.html", context)
 
 
 # @app.post("/games/join_game/{game_id}")
@@ -98,4 +99,5 @@ if __name__ == "__main__":
           " do której jest podłączony komputer.")
     print(f"Teraz niech każdy na swoim telefonie wpisze w przeglądarkę adres: {get_ip_address(port)}:{port}")
     crud.initialize_tables()
+    crud.create_constraints()
     uvicorn.run(app, host=address, port=port)
