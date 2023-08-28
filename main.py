@@ -2,7 +2,7 @@ import logging.config
 import os
 
 import uvicorn
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Form, HTTPException
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
@@ -10,6 +10,9 @@ from starlette.responses import RedirectResponse
 from starlette.templating import _TemplateResponse
 
 from db import schemas, crud
+from db.models.game import Game
+from db.models.player import Player
+from games.ego import EgoGame
 from utils.get_computer_ip import get_ip_address
 
 logging.config.fileConfig(os.path.join(os.getcwd(), "resources", "logging.ini"), disable_existing_loggers=False)
@@ -61,33 +64,45 @@ async def create_game(
     return templates.TemplateResponse("active-games.html", context)
 
 
-# @app.post("/games/join_game/{game_id}")
-# async def join_game(game_id: int, request: Request):
-#     nickname = request.session.get("nickname")
-#     logger.debug(f"{nickname=}")
-#     if not nickname:
-#         raise HTTPException(status_code=420, detail="Proszę wpisać nick, debilu")
-#
-#     game = crud.get_game_by_id(game_id)
-#     logger.debug(f"{game=}")
-#     if not game:
-#         raise HTTPException(status_code=420, detail="Ta gra nie istnieje")
-#
-#     player = crud.get_player_by_nickname(nickname)
-#     logger.debug(f"{player=}")
-#     if not player:
-#         player = crud.create_player(schemas.PlayerCreate(name=nickname))
-#
-#     game.players.append(player)
-#
-#     return {"message": "Dołączasz do gry!"}
-#
-#
-# @app.post("/games/add_player/{game_id}/players/", response_model=schemas.Player)
-# async def add_player_to_game(game_id: int, player: schemas.PlayerCreate):
-#     return crud.add_player_to_game(game_id, player)
-#
-#
+@app.post("/games/join_game/{game_id}")
+async def join_game(request: Request, game_id: int):
+    nickname = request.session.get("nickname")
+    logger.debug(f"{nickname=}")
+    if not nickname:
+        raise HTTPException(status_code=420, detail="Proszę wpisać nick, debilu")
+
+    game = crud.get_game_by_id(game_id)
+    logger.debug(f"{game=}")
+    if not game:
+        raise HTTPException(status_code=420, detail="Ta gra nie istnieje")
+
+    player = crud.get_player_by_nickname(nickname)
+    logger.debug(f"{player=}")
+    if not player:
+        player = crud.create_player(nickname)
+        logger.debug(f"{player=}")
+
+    player.set_game_id(game_id)
+
+    context = {"request": request,
+               "game": game,
+               "game_players": Player.get_by_game_id(game_id)}
+    return templates.TemplateResponse("game-room.html", context=context)
+
+
+@app.post("/games/start_game/{game_id}")
+async def start_game(game_id: int):
+    db_game = Game.get_by_id(game_id)
+    if not db_game:
+        raise HTTPException(status_code=420, detail="Ta gra nie istnieje")
+    if db_game.name == "ego":
+        game = EgoGame(db_game.category)
+    elif db_game.name == "whos-most-likely":
+        # game = WhosMostLikelyGame()
+        raise HTTPException(status_code=420, detail="Ta gra nie działa")
+    game.start()
+
+
 # @app.put("/questions/{question_id}/", response_model=schemas.Question)
 # async def update_question(question_id: int, question: schemas.QuestionUpdate):
 #     return crud.update_question(question_id, question)
@@ -101,9 +116,10 @@ async def create_game(
 if __name__ == "__main__":
     address = "0.0.0.0"
     port = 42069
-    print("Serwer uruchomiony. Żeby dołączyć do gry, połącz się do tej samej sieci WiFi,"
-          " do której jest podłączony komputer.")
-    print(f"Teraz niech każdy na swoim telefonie wpisze w przeglądarkę adres: {get_ip_address(port)}:{port}")
+    print("Serwer uruchomiony. Żeby dołączyć do gry, połącz się do tej samej sieci WiFi, "
+          "do której jest podłączony komputer.\n "
+          "Teraz niech każdy na swoim telefonie wpisze w przeglądarkę adres "
+          f"{get_ip_address(port)}:{port}")
     crud.initialize_tables()
     crud.create_constraints()
     uvicorn.run(app, host=address, port=port)

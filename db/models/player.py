@@ -11,7 +11,7 @@ logger = logging.getLogger("db_connector")
 class Player(DbModel):
     table_name = "player"
 
-    def __init__(self, name: str, player_id: int = 0, score: float = 0.0, game_id: int = None):
+    def __init__(self, name: str, player_id: int = None, score: float = 0.0, game_id: int = None):
         super().__init__(player_id)
         self.name = name
         self.score = score
@@ -33,7 +33,7 @@ class Player(DbModel):
         query_params = (self.score, self.id)
         execute_query_and_commit(clear_player_score, query_params)
 
-    def set_game_id(self, game_id: int) -> None:
+    def set_game_id(self, game_id: int | None) -> None:
         self.game_id = game_id
         set_game_id = f"""
         UPDATE {self.table_name} SET game_id = ? WHERE id = ?;
@@ -107,3 +107,13 @@ class Player(DbModel):
         if not player_data:
             return None
         return Player(*player_data)
+
+    @classmethod
+    def get_by_game_id(cls, game_id: int) -> list["Player"]:
+        select_players = f"""
+        SELECT name, id, score, game_id FROM {cls.table_name} WHERE game_id = ?;
+        """
+        query_params = (game_id,)
+        players_data = execute_query(select_players, query_params).fetchall()
+        players = [Player(*player_data) for player_data in players_data]
+        return players
