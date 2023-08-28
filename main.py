@@ -12,6 +12,7 @@ from starlette.templating import _TemplateResponse
 from db import schemas, crud
 from db.models.game import Game
 from db.models.player import Player
+from db.models.question import Question
 from games.ego import EgoGame
 from utils.get_computer_ip import get_ip_address
 
@@ -101,6 +102,15 @@ async def start_game(game_id: int):
         # game = WhosMostLikelyGame()
         raise HTTPException(status_code=420, detail="Ta gra nie działa")
     game.start()
+
+
+@app.post("/questions")
+async def get_questions_for_game(request: Request, game_to_edit: str = Form(...)):
+    questions = Question.get_by_game_type(game_to_edit, "MIXED")
+    questions.append(Question("ego", "mixed", "text", 1, 0))
+    context = {"request": request,
+               "game_questions": questions}
+    return templates.TemplateResponse("update-questions.html", context=context)
 
 
 # @app.put("/questions/{question_id}/", response_model=schemas.Question)
