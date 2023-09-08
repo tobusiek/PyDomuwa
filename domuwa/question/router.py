@@ -19,12 +19,12 @@ async def create_question(game_name: str, category: str, author: str, text: str,
     return await services.create_question(question, db)
 
 
-@router.get("/")
+@router.get("/{question_id}")
 async def get_question_by_id(question_id: int, db: Session = Depends(get_db)):
     return await get_obj_of_type_by_id(question_id, Question, "Question", db)
 
 
-@router.get("/", response_model=list[Type[Question]])
+@router.get("/")
 async def get_all_questions(db: Session = Depends(get_db)):
     return await get_all_objs_of_type(Question, db)
 

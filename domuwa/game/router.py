@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from domuwa.database import db_obj_delete, get_all_objs_of_type, get_db, get_obj_of_type_by_id
+from domuwa.database import get_all_objs_of_type, get_db, get_obj_of_type_by_id
 from domuwa.game import services
 from domuwa.game.model import Game
 from domuwa.game.schema import GameCreate, GameView
@@ -28,7 +28,7 @@ async def get_game_by_id(game_id: int, db: Session = Depends(get_db)):
     return create_game_view(game)
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=list[GameView])
+@router.get("/")
 async def get_all_games(db: Session = Depends(get_db)):
     games = await get_all_objs_of_type(Game, db)
     return [create_game_view(game) for game in games]
@@ -54,7 +54,7 @@ async def remove_players(game_id: int, db: Session = Depends(get_db)):
 
 @router.delete("/", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
 async def delete_game(game_id: int, db: Session = Depends(get_db)):
-    return await db_obj_delete(game_id, Game, "Game", db)
+    return await services.delete_game(game_id, db)
 
 
 def create_game_view(game: Game | Type[Game]) -> GameView:

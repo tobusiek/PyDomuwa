@@ -14,9 +14,15 @@ router = APIRouter(prefix="/answer", tags=["Answer"])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_answer(author: str, text: str, points: float, correct, question_id: int,
-                        db: Session = Depends(get_db)):
-    answer = validate_answer_data(author, text, points, question_id)
+async def create_answer(
+        author: str,
+        text: str,
+        points: float,
+        correct: bool,
+        question_id: int,
+        db: Session = Depends(get_db)
+):
+    answer = validate_answer_data(author, text, points, correct, question_id)
     db_answer = await services.create_answer(answer, db)
     return create_answer_view_with_question(db_answer)
 
@@ -27,13 +33,13 @@ async def get_answer_by_id(answer_id: int, db: Session = Depends(get_db)):
     return create_answer_view_with_question(answer)
 
 
-@router.get("/", response_model=list[Type[AnswerViewWithQuestion]])
+@router.get("/")
 async def get_all_answers(db: Session = Depends(get_db)):
     answers = await get_all_objs_of_type(Answer, db)
     return [create_answer_view_with_question(answer) for answer in answers]
 
 
-@router.get("/{question_id}", response_model=list[Type[AnswerView]])
+@router.get("/for_question/{question_id}")
 async def get_answers_for_question(question_id: int, db: Session = Depends(get_db)):
     answers = await services.get_answers_for_question(question_id, db)
     return [create_answer_view(answer) for answer in answers]

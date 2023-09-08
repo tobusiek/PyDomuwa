@@ -26,13 +26,13 @@ async def get_player_by_id(player_id: int, db: Session = Depends(get_db)):
     return create_player_view(player)
 
 
-@router.get("/", response_model=list[PlayerView])
+@router.get("/")
 async def get_all_players(db: Session = Depends(get_db)):
     players = await get_all_objs_of_type(Player, db)
     return [create_player_view(player) for player in players]
 
 
-@router.get("/{game_id}", response_model=list[Type[PlayerView]])
+@router.get("/from_game/{game_id}")
 async def get_all_players_from_game(game_id: int, db: Session = Depends(get_db)):
     players = await services.get_all_players_from_game(game_id, db)
     return [create_player_view(player) for player in players]
