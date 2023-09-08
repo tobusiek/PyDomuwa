@@ -1,8 +1,14 @@
-from sqlalchemy import Integer, Column, String, Float
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Column, Float, Integer, String
 from sqlalchemy.orm import Mapped, relationship
 
-from api.database import Base
-from api.game.model import Game
+from domuwa.database import Base
+
+if TYPE_CHECKING:
+    from domuwa.game.model import Game
 
 
 class Player(Base):
