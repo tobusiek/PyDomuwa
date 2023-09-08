@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 import config
 
-ORMModel = TypeVar("ORMModel")
+ORM = TypeVar("ORM")
 
 engine = create_engine(
     config.DATABASE_URL,
@@ -17,7 +17,7 @@ engine = create_engine(
 )
 SessionLocal = sessionmaker(autoflush=True, bind=engine)
 
-Base: ORMModel = declarative_base()
+Base: ORM = declarative_base()
 
 
 def init_db():
@@ -25,8 +25,8 @@ def init_db():
 
 
 async def get_db() -> AsyncGenerator[Session, None]:
+    db = SessionLocal()
     try:
-        db = SessionLocal()
         yield db
     finally:
         db.close()
@@ -34,21 +34,21 @@ async def get_db() -> AsyncGenerator[Session, None]:
 
 async def get_obj_of_type_by_id(
         obj_id: int,
-        obj_model_type: ORMModel,
+        obj_model_type: ORM,
         obj_model_type_name: str,
         db: Session = Depends(get_db)
-) -> ORMModel:
+) -> ORM:
     obj = db.query(obj_model_type).get(obj_id)
     if not obj:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"{obj_model_type_name} of id={obj_id} not found")
     return obj
 
 
-async def get_all_objs_of_type(obj_model: ORMModel, db: Session = Depends(get_db)) -> list[ORMModel]:
+async def get_all_objs_of_type(obj_model: ORM, db: Session = Depends(get_db)) -> list[ORM]:
     return db.query(obj_model).all()
 
 
-async def db_obj_save(obj_model: ORMModel | Type[ORMModel], db: Session = Depends(get_db)) -> ORMModel:
+async def db_obj_save(obj_model: ORM | Type[ORM], db: Session = Depends(get_db)) -> ORM:
     db.add(obj_model)
     db.commit()
     db.refresh(obj_model)
@@ -57,7 +57,7 @@ async def db_obj_save(obj_model: ORMModel | Type[ORMModel], db: Session = Depend
 
 async def db_obj_delete(
         obj_id: int,
-        obj_model_type: ORMModel,
+        obj_model_type: ORM,
         obj_model_type_name: str,
         db: Session = Depends(get_db)
 ) -> None:

@@ -13,28 +13,23 @@ from domuwa.question.schema import QuestionCreate, QuestionView
 router = APIRouter(prefix="/question", tags=["Question"])
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=QuestionView)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_question(game_name: str, category: str, author: str, text: str, db: Session = Depends(get_db)):
     question = validate_question_data(game_name, category, author, text)
     return await services.create_question(question, db)
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=QuestionView)
+@router.get("/")
 async def get_question_by_id(question_id: int, db: Session = Depends(get_db)):
     return await get_obj_of_type_by_id(question_id, Question, "Question", db)
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=list[Type[Question]])
+@router.get("/", response_model=list[Type[Question]])
 async def get_all_questions(db: Session = Depends(get_db)):
     return await get_all_objs_of_type(Question, db)
 
 
-@router.put("/", status_code=status.HTTP_200_OK, response_model=QuestionView)
-async def mark_correct_answer(question_id: int, answer_id: int, db: Session = Depends(get_db)):
-    return await services.mark_correct_answer(question_id, answer_id, db)
-
-
-@router.put("/", status_code=status.HTTP_200_OK, response_model=QuestionView)
+@router.put("/")
 async def update_question(
         question_id: int,
         game_name: str,

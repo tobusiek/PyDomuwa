@@ -7,7 +7,6 @@ from pydantic import BaseModel, ConfigDict, field_validator
 
 if TYPE_CHECKING:
     from domuwa.player.schema import PlayerView
-    from domuwa.question.schema import QuestionView
 
 
 class GameCategory(Enum):
@@ -33,7 +32,6 @@ class GameCreate(GameBase):
 
 class GameView(GameBase):
     id: int
-    questions: list[QuestionView]
     model_config = ConfigDict(from_attributes=True)
 
 

@@ -13,6 +13,7 @@ async def create_answer(answer: AnswerCreate, db: Session = Depends(get_db)) -> 
         author=answer.author,
         text=answer.text,
         points=answer.points,
+        correct=answer.correct,
         question_id=answer.question_id,
     )
     return await db_obj_save(db_answer, db)
@@ -27,4 +28,5 @@ async def update_answer(answer_id: int, modified_answer: AnswerCreate, db: Sessi
     answer.author = modified_answer.author
     answer.text = modified_answer.text
     answer.points = modified_answer.points
+    answer.correct = modified_answer.correct
     return await db_obj_save(answer, db)
