@@ -16,7 +16,7 @@ def rebuild_schemas() -> None:
     game_schema.GameRoomBase.model_rebuild()
     game_schema.GameRoomCreate.model_rebuild()
     game_schema.GameRoomView.model_rebuild()
-    game_schema.GameViewWithPlayers.model_rebuild()
+    game_schema.GameRoomViewWithPlayers.model_rebuild()
 
     player_schema.PlayerViewWithGame.model_rebuild()
 

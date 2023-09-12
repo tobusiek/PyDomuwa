@@ -3,8 +3,7 @@ from typing import Type, TypeVar
 
 from fastapi import Depends, HTTPException, status
 from sqlalchemy import StaticPool, create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session, sessionmaker, declarative_base
 
 from domuwa import config
 

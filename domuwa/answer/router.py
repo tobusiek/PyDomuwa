@@ -17,12 +17,11 @@ router = APIRouter(prefix="/answer", tags=["Answer"])
 async def create_answer(
         author: str,
         text: str,
-        points: float,
-        correct: bool,
         question_id: int,
+        correct: bool = False,
         db: Session = Depends(get_db)
 ):
-    answer = validate_answer_data(author, text, points, correct, question_id)
+    answer = validate_answer_data(author, text, correct, question_id)
     db_answer = await services.create_answer(answer, db)
     return create_answer_view_with_question(db_answer)
 
@@ -50,12 +49,11 @@ async def update_answer(
         answer_id: int,
         author: str,
         text: str,
-        points: float,
         correct: bool,
         question_id: int,
         db: Session = Depends(get_db)
 ):
-    modified_answer = validate_answer_data(author, text, points, correct, question_id)
+    modified_answer = validate_answer_data(author, text, correct, question_id)
     answer = await services.update_answer(answer_id, modified_answer, db)
     return create_answer_view_with_question(answer)
 
@@ -65,9 +63,9 @@ async def delete_answer(answer_id: int, db: Session = Depends(get_db)):
     return await db_obj_delete(answer_id, Answer, "Answer", db)
 
 
-def validate_answer_data(author: str, text: str, points: float, correct: bool, question_id: int) -> AnswerCreate:
+def validate_answer_data(author: str, text: str, correct: bool, question_id: int) -> AnswerCreate:
     try:
-        answer = AnswerCreate(author=author, text=text, points=points, correct=correct, question_id=question_id)
+        answer = AnswerCreate(author=author, text=text, correct=correct, question_id=question_id)
     except ValidationError:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid data input")
     return answer

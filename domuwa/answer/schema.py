@@ -11,7 +11,6 @@ if TYPE_CHECKING:
 class AnswerBase(BaseModel):
     author: str
     text: str
-    points: float
     correct: bool
     question_id: int
 

@@ -16,8 +16,9 @@ from domuwa.player.router import router as player_router
 from domuwa.question.router import router as question_router
 from domuwa.ranking.router import router as ranking_router
 from domuwa.utils.get_computer_ip import get_ip_address
+from domuwa.utils.rebuild_schemas import rebuild_schemas
 
-# rebuild_schemas()
+rebuild_schemas()
 
 logging.config.fileConfig(os.path.join(os.getcwd(), "resources", "logging.ini"), disable_existing_loggers=False)
 logger = logging.getLogger("fastapi")

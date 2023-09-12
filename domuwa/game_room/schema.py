@@ -36,5 +36,5 @@ class GameRoomView(GameRoomBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-class GameViewWithPlayers(GameRoomView):
+class GameRoomViewWithPlayers(GameRoomView):
     players: list[PlayerView]

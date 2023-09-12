@@ -17,7 +17,6 @@ class Answer(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     author: Mapped[str] = mapped_column(String, nullable=False)
     text: Mapped[str] = mapped_column(String, nullable=False)
-    points: Mapped[float] = mapped_column(Float, nullable=True, default=0.0)
     correct: Mapped[bool] = mapped_column(Boolean, nullable=True)
     question_id: Mapped[int] = mapped_column(Integer, ForeignKey(column="question.id", ondelete="CASCADE"))
     question: Mapped[Question] = relationship("Question", back_populates="answers", foreign_keys=question_id)
