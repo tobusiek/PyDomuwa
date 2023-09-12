@@ -8,7 +8,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 from starlette.templating import _TemplateResponse
 
-import config
+from domuwa import config
 from domuwa.answer.router import router as answer_router
 from domuwa.database import init_db
 from domuwa.game_room.router import router as game_router

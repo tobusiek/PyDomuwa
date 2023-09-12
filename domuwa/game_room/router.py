@@ -9,29 +9,26 @@ from domuwa.game_room import services
 from domuwa.game_room.model import GameRoom
 from domuwa.game_room.schema import GameRoomCreate, GameRoomView
 
-router = APIRouter(prefix="/game_room", tags=["Game"])
+router = APIRouter(prefix="/game_room", tags=["Game Room"])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_game_room(name: str, category: str, db: Session = Depends(get_db)):
-    try:
-        game = GameRoomCreate(name=name, category=category)
-    except ValidationError:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid data input")
+    game = GameRoomCreate(game_name=name, game_category=category)
     db_game_room = await services.create_game_room(game, db)
     return create_game_room_view(db_game_room)
 
 
 @router.get("/{game_room_id}")
 async def get_game_room_by_id(game_room_id: int, db: Session = Depends(get_db)):
-    game = await get_obj_of_type_by_id(game_room_id, GameRoom, "Game", db)
+    game = await get_obj_of_type_by_id(game_room_id, GameRoom, "GameRoom", db)
     return create_game_room_view(game)
 
 
 @router.get("/")
 async def get_all_game_rooms(db: Session = Depends(get_db)):
-    games = await get_all_objs_of_type(GameRoom, db)
-    return [create_game_room_view(game) for game in games]
+    game_rooms = await get_all_objs_of_type(GameRoom, db)
+    return [create_game_room_view(game) for game in game_rooms]
 
 
 @router.put("/add_player")

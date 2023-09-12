@@ -18,8 +18,8 @@ class PlayerCreate(PlayerBase):
 
 class PlayerView(PlayerBase):
     id: int
-    games_played: int
-    games_won: int
+    game_rooms_played: int
+    game_rooms_won: int
     score: float
     model_config = ConfigDict(from_attributes=True)
 

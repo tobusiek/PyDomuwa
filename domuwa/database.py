@@ -6,7 +6,7 @@ from sqlalchemy import StaticPool, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 
-import config
+from domuwa import config
 
 ORM = TypeVar("ORM")
 

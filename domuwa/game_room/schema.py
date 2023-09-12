@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
 
 if TYPE_CHECKING:
     from domuwa.player.schema import PlayerView
@@ -22,7 +22,8 @@ class GameRoomBase(BaseModel):
     @field_validator("game_category")
     @classmethod
     def check_category(cls, category: str) -> str:
-        assert category in (game_cat.value for game_cat in GameCategory)
+        if category not in [game_cat.value for game_cat in GameCategory]:
+            raise ValidationError(f"Invalid {category=}")
         return category
 
 
