@@ -1,25 +1,72 @@
 ID = "id"
+QUESTION_ID = "question_id"
+GAME_NAME = "game_name"
+CATEGORY = "category"
 AUTHOR = "author"
 TEXT = "text"
-QUESTION_ID = "question_id"
+EXCLUDED = "excluded"
+ANSWERS = "answers"
+
+TEST_QUESTIONS_VALID = [
+    {
+        GAME_NAME: "ego",
+        CATEGORY: "MIXED",
+        AUTHOR: "User1",
+        TEXT: "text 1",
+        EXCLUDED: False,
+    },
+    {
+        GAME_NAME: "ego",
+        CATEGORY: "NSFW",
+        AUTHOR: "User2",
+        TEXT: "text 2",
+        EXCLUDED: True,
+    },
+    {
+        GAME_NAME: "who's most likely",
+        CATEGORY: "SFW",
+        AUTHOR: "User1",
+        TEXT: "text 3",
+        EXCLUDED: True,
+    }
+]
+
+TEST_QUESTIONS_INVALID = {
+    "game_name": {
+
+    },
+    "category": {
+
+    },
+    "author": {
+
+    },
+    "text": {
+
+    },
+    "excluded": {
+
+    }
+}
+
+ANSWER_ID = "answer_id"
 CORRECT = "correct"
+QUESTION_ID = "question_id"
+QUESTION = "question"
 
 TEST_ANSWERS_VALID = [
     {
         AUTHOR: "User1",
         TEXT: "text 1",
-        QUESTION_ID: "1"
     },
     {
         AUTHOR: "User1",
         TEXT: "text 2",
-        QUESTION_ID: 2,
         CORRECT: True,
     },
     {
         AUTHOR: "User2",
         TEXT: "text 3",
-        QUESTION_ID: 2,
         CORRECT: False,
     }
 ]
@@ -54,10 +101,6 @@ TEST_GAME_ROOMS_VALID = [
 
 TEST_PLAYERS_VALID = [
 
-]
-
-TEST_QUESTIONS_VALID = [
-    {""}
 ]
 
 TEST_RANKINGS_VALID = [

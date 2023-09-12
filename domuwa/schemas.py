@@ -26,11 +26,14 @@ class QuestionSchema(BaseModel):
 
 class QuestionView(QuestionSchema):
     id: int
-    answers: list[AnswerView]
     model_config = ConfigDict(from_attributes=True)
 
 
-class AnswerViewWithQuestion(AnswerView):
+class QuestionWithAnswersView(QuestionView):
+    answers: list[AnswerView]
+
+
+class AnswerWithQuestionView(AnswerView):
     question: QuestionView
 
 
@@ -69,9 +72,9 @@ class PlayerView(PlayerSchema):
     model_config = ConfigDict(from_attributes=True)
 
 
-class PlayerViewWithGame(PlayerView):
+class PlayerWithGameView(PlayerView):
     game: Optional[GameRoomView]
 
 
-class GameRoomViewWithPlayers(GameRoomView):
+class GameRoomWithPlayersView(GameRoomView):
     players: list[PlayerView]

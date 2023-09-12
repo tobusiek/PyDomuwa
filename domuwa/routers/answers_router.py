@@ -7,13 +7,13 @@ from starlette.responses import Response
 
 from domuwa.database import db_obj_delete, get_all_objs_of_type, get_db, get_obj_of_type_by_id
 from domuwa.models import Answer
-from domuwa.schemas import AnswerSchema, AnswerView, AnswerViewWithQuestion
+from domuwa.schemas import AnswerSchema, AnswerView, AnswerWithQuestionView, QuestionView
 from domuwa.services import answers_services as services
 
 router = APIRouter(prefix="/answer", tags=["Answer"])
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=AnswerWithQuestionView)
 async def create_answer(
         author: str,
         text: str,
@@ -26,7 +26,7 @@ async def create_answer(
     return create_answer_view_with_question(db_answer)
 
 
-@router.get("/{answer_id}")
+@router.get("/{answer_id}", response_model=AnswerWithQuestionView)
 async def get_answer_by_id(answer_id: int, db: Session = Depends(get_db)):
     answer = await get_obj_of_type_by_id(answer_id, Answer, "Answer", db)
     return create_answer_view_with_question(answer)
@@ -75,5 +75,12 @@ def create_answer_view(answer: Answer | Type[Answer]) -> AnswerView:
     return AnswerView.model_validate(answer)
 
 
-def create_answer_view_with_question(answer: Answer | Type[Answer]) -> AnswerViewWithQuestion:
-    return AnswerViewWithQuestion.model_validate(answer)
+def create_answer_view_with_question(answer: Answer | Type[Answer]) -> AnswerWithQuestionView:
+    return AnswerWithQuestionView(
+        id=answer.id,
+        author=answer.author,
+        text=answer.text,
+        correct=answer.correct,
+        question_id=answer.question_id,
+        question=QuestionView.model_validate(answer.question)
+    )

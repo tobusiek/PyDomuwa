@@ -37,7 +37,7 @@ async def get_obj_of_type_by_id(
         obj_model_type_name: str,
         db: Session = Depends(get_db)
 ) -> ORM:
-    obj = db.query(obj_model_type).get(obj_id)
+    obj = db.get(obj_model_type, obj_id)
     if not obj:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"{obj_model_type_name} of id={obj_id} not found")
     return obj
