@@ -14,7 +14,7 @@ ResponseType = dict[str, str | int | float | bool]
 
 
 @pytest.fixture
-def get_mock_question(test_question_idx: int = 0) -> Generator[int, None]:
+def get_mock_question(test_question_idx: int) -> Generator[int, None]:
     test_question = TEST_QUESTIONS_VALID[test_question_idx]
     question_response = client.post(
         QUESTIONS_PREFIX,
@@ -56,11 +56,19 @@ def test_create_answer(get_mock_question, test_question_idx):
     validate_response(answer_response.json(), test_answer)
 
 
-def test_create_answer_invalid_question_id():
+def test_create_answer_invalid_author():
     pass
 
 
-def test_create_answer_invalid_data():
+def test_create_answer_invalid_text():
+    pass
+
+
+def test_create_answer_invalid_correct():
+    pass
+
+
+def test_create_answer_invalid_question_id():
     pass
 
 
@@ -92,7 +100,19 @@ def test_update_answer_invalid_id():
     pass
 
 
-def test_update_answer_invalid_data():
+def test_update_answer_invalid_author():
+    pass
+
+
+def test_update_answer_invalid_text():
+    pass
+
+
+def test_update_answer_invalid_correct():
+    pass
+
+
+def test_update_answer_invalid_question_id():
     pass
 
 
