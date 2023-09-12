@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from domuwa.database import db_obj_save, get_db, get_obj_of_type_by_id
-from domuwa.game.model import Game
+from domuwa.game_room.model import GameRoom
 from domuwa.player.model import Player
 from domuwa.player.schema import PlayerCreate
 
@@ -20,8 +20,8 @@ async def create_player(player: PlayerCreate, db: Session = Depends(get_db)) -> 
     return db_player
 
 
-async def get_all_players_from_game(game_id: int, db: Session = Depends(get_db)) -> list[Type[Player]]:
-    return db.query(Player).filter(Player.game_id == game_id).all()
+async def get_all_players_from_game_room(game_room_id: int, db: Session = Depends(get_db)) -> list[Type[Player]]:
+    return db.query(Player).filter(Player.game_room_id == game_room_id).all()
 
 
 async def update_player_name(
@@ -46,15 +46,15 @@ async def reset_player_score(player_id: int, db: Session = Depends(get_db)) -> T
     return await db_obj_save(player, db)
 
 
-async def set_player_game(player_id: int, game: Game, db: Session = Depends(get_db)) -> Type[Player]:
+async def set_player_game_room(player_id: int, game: GameRoom, db: Session = Depends(get_db)) -> Type[Player]:
     player = await get_obj_of_type_by_id(player_id, Player, "Player", db)
-    player.game = game
-    player.game_id = game.id
+    player.game_room = game
+    player.game_room_id = game.id
     return await db_obj_save(player, db)
 
 
-async def reset_player_game(player_id: int, db: Session = Depends(get_db)) -> Type[Player]:
+async def reset_player_game_room(player_id: int, db: Session = Depends(get_db)) -> Type[Player]:
     player = await get_obj_of_type_by_id(player_id, Player, "Player", db)
-    player.game = None
-    player.game_id = None
+    player.game_room = None
+    player.game_room_id = None
     return await db_obj_save(player, db)

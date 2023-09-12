@@ -5,7 +5,7 @@ from typing import Optional, TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict
 
 if TYPE_CHECKING:
-    from domuwa.game.schema import GameView
+    from domuwa.game_room.schema import GameRoomView
 
 
 class PlayerBase(BaseModel):
@@ -25,4 +25,4 @@ class PlayerView(PlayerBase):
 
 
 class PlayerViewWithGame(PlayerView):
-    game: Optional[GameView]
+    game: Optional[GameRoomView]

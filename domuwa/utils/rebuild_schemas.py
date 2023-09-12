@@ -1,5 +1,5 @@
 import domuwa.answer.schema as answer_schema
-import domuwa.game.schema as game_schema
+import domuwa.game_room.schema as game_schema
 import domuwa.player.schema as player_schema
 import domuwa.question.schema as question_schema
 
@@ -13,9 +13,9 @@ def rebuild_schemas() -> None:
     player_schema.PlayerCreate.model_rebuild()
     player_schema.PlayerView.model_rebuild()
 
-    game_schema.GameBase.model_rebuild()
-    game_schema.GameCreate.model_rebuild()
-    game_schema.GameView.model_rebuild()
+    game_schema.GameRoomBase.model_rebuild()
+    game_schema.GameRoomCreate.model_rebuild()
+    game_schema.GameRoomView.model_rebuild()
     game_schema.GameViewWithPlayers.model_rebuild()
 
     player_schema.PlayerViewWithGame.model_rebuild()

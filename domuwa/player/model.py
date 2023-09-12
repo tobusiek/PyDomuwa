@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, relationship
 from domuwa.database import Base
 
 if TYPE_CHECKING:
-    from domuwa.game.model import Game
+    from domuwa.game_room.model import GameRoom
 
 
 class Player(Base):
@@ -19,5 +19,5 @@ class Player(Base):
     games_played: Mapped[int] = Column(Integer, nullable=False, default=0)
     games_won: Mapped[int] = Column(Integer, nullable=False, default=0)
     score: Mapped[float] = Column(Float, nullable=False, default=0.0)
-    game_id: Mapped[int] = Column(Integer, ForeignKey("games.id"), nullable=True)
-    game: Mapped[Game] = relationship("Game", back_populates="players", foreign_keys=game_id)
+    game_room_id: Mapped[int] = Column(Integer, ForeignKey("games.id"), nullable=True)
+    game_room: Mapped[GameRoom] = relationship("Game", back_populates="players", foreign_keys=game_room_id)

@@ -32,9 +32,9 @@ async def get_all_players(db: Session = Depends(get_db)):
     return [create_player_view(player) for player in players]
 
 
-@router.get("/from_game/{game_id}")
-async def get_all_players_from_game(game_id: int, db: Session = Depends(get_db)):
-    players = await services.get_all_players_from_game(game_id, db)
+@router.get("/from_game_room/{game_room_id}")
+async def get_all_players_from_game_room(game_room_id: int, db: Session = Depends(get_db)):
+    players = await services.get_all_players_from_game_room(game_room_id, db)
     return [create_player_view(player) for player in players]
 
 
@@ -51,9 +51,9 @@ async def update_player_score(player_id: int, points: float, db: Session = Depen
     return create_player_view(player)
 
 
-@router.put("/reset_game")
-async def reset_player_game(player_id: int, db: Session = Depends(get_db)):
-    player = await services.reset_player_game(player_id, db)
+@router.put("/reset_game_room")
+async def reset_player_game_room(player_id: int, db: Session = Depends(get_db)):
+    player = await services.reset_player_game_room(player_id, db)
     return create_player_view(player)
 
 

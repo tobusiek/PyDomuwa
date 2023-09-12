@@ -15,25 +15,25 @@ class GameCategory(Enum):
     MIXED = "MIXED"
 
 
-class GameBase(BaseModel):
-    name: str
-    category: str
+class GameRoomBase(BaseModel):
+    game_name: str
+    game_category: str
 
-    @field_validator("category")
+    @field_validator("game_category")
     @classmethod
     def check_category(cls, category: str) -> str:
         assert category in (game_cat.value for game_cat in GameCategory)
         return category
 
 
-class GameCreate(GameBase):
+class GameRoomCreate(GameRoomBase):
     ...
 
 
-class GameView(GameBase):
+class GameRoomView(GameRoomBase):
     id: int
     model_config = ConfigDict(from_attributes=True)
 
 
-class GameViewWithPlayers(GameView):
+class GameViewWithPlayers(GameRoomView):
     players: list[PlayerView]
