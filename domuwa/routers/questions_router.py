@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 from starlette.responses import Response
 
 from domuwa.database import db_obj_delete, get_all_objs_of_type, get_db, get_obj_of_type_by_id
-from domuwa.question import services
-from domuwa.question.model import Question
-from domuwa.question.schema import QuestionCreate, QuestionView
+from domuwa.models import Question
+from domuwa.schemas import QuestionSchema, QuestionView
+from domuwa.services import questions_services as services
 
 router = APIRouter(prefix="/question", tags=["Question"])
 
@@ -47,9 +47,9 @@ async def delete_question(question_id: int, db: Session = Depends(get_db)):
     return await db_obj_delete(question_id, Question, "Question", db)
 
 
-def validate_question_data(game_name: str, category: str, author: str, text: str) -> QuestionCreate:
+def validate_question_data(game_name: str, category: str, author: str, text: str) -> QuestionSchema:
     try:
-        question = QuestionCreate(game_name=game_name, category=category, author=author, text=text)
+        question = QuestionSchema(game_name=game_name, category=category, author=author, text=text)
     except ValidationError:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid data input")
     return question

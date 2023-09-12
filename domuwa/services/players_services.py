@@ -6,12 +6,11 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from domuwa.database import db_obj_save, get_db, get_obj_of_type_by_id
-from domuwa.game_room.model import GameRoom
-from domuwa.player.model import Player
-from domuwa.player.schema import PlayerCreate
+from domuwa.models import GameRoom, Player
+from domuwa.schemas import PlayerSchema
 
 
-async def create_player(player: PlayerCreate, db: Session = Depends(get_db)) -> Player:
+async def create_player(player: PlayerSchema, db: Session = Depends(get_db)) -> Player:
     db_player = Player(name=player.name)
     try:
         db_player = await db_obj_save(db_player, db)
@@ -26,7 +25,7 @@ async def get_all_players_from_game_room(game_room_id: int, db: Session = Depend
 
 async def update_player_name(
         player_id: int,
-        new_name_player: PlayerCreate,
+        new_name_player: PlayerSchema,
         db: Session = Depends(get_db)
 ) -> Type[Player]:
     player = await get_obj_of_type_by_id(player_id, Player, "Player", db)

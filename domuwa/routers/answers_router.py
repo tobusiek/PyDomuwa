@@ -5,10 +5,10 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 from starlette.responses import Response
 
-from domuwa.answer import services
-from domuwa.answer.model import Answer
-from domuwa.answer.schema import AnswerCreate, AnswerView, AnswerViewWithQuestion
 from domuwa.database import db_obj_delete, get_all_objs_of_type, get_db, get_obj_of_type_by_id
+from domuwa.models import Answer
+from domuwa.schemas import AnswerSchema, AnswerView, AnswerViewWithQuestion
+from domuwa.services import answers_services as services
 
 router = APIRouter(prefix="/answer", tags=["Answer"])
 
@@ -63,9 +63,9 @@ async def delete_answer(answer_id: int, db: Session = Depends(get_db)):
     return await db_obj_delete(answer_id, Answer, "Answer", db)
 
 
-def validate_answer_data(author: str, text: str, correct: bool, question_id: int) -> AnswerCreate:
+def validate_answer_data(author: str, text: str, correct: bool, question_id: int) -> AnswerSchema:
     try:
-        answer = AnswerCreate(author=author, text=text, correct=correct, question_id=question_id)
+        answer = AnswerSchema(author=author, text=text, correct=correct, question_id=question_id)
     except ValidationError:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid data input")
     return answer

@@ -3,14 +3,13 @@ from typing import Type
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-import domuwa.player.services as player_services
+import domuwa.services.players_services as player_services
 from domuwa.database import db_obj_delete, db_obj_save, get_db, get_obj_of_type_by_id
-from domuwa.game_room.model import GameRoom
-from domuwa.game_room.schema import GameRoomCreate
-from domuwa.player.model import Player
+from domuwa.models import GameRoom, Player
+from domuwa.schemas import GameRoomSchema
 
 
-async def create_game_room(game: GameRoomCreate, db: Session = Depends(get_db)) -> GameRoom:
+async def create_game_room(game: GameRoomSchema, db: Session = Depends(get_db)) -> GameRoom:
     db_game_room = GameRoom(
         game_name=game.game_name,
         game_category=game.game_category,

@@ -1,20 +1,19 @@
 from typing import Type
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
-from pydantic import ValidationError
+from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
 from domuwa.database import get_all_objs_of_type, get_db, get_obj_of_type_by_id
-from domuwa.game_room import services
-from domuwa.game_room.model import GameRoom
-from domuwa.game_room.schema import GameRoomCreate, GameRoomView
+from domuwa.models import GameRoom
+from domuwa.schemas import GameRoomSchema, GameRoomView
+from domuwa.services import game_rooms_services as services
 
 router = APIRouter(prefix="/game_room", tags=["Game Room"])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_game_room(name: str, category: str, db: Session = Depends(get_db)):
-    game = GameRoomCreate(game_name=name, game_category=category)
+    game = GameRoomSchema(game_name=name, game_category=category)
     db_game_room = await services.create_game_room(game, db)
     return create_game_room_view(db_game_room)
 

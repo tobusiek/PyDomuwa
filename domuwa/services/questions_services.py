@@ -4,11 +4,11 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from domuwa.database import db_obj_save, get_db, get_obj_of_type_by_id
-from domuwa.question.model import Question
-from domuwa.question.schema import QuestionCreate
+from domuwa.models import Question
+from domuwa.schemas import QuestionSchema
 
 
-async def create_question(question: QuestionCreate, db: Session = Depends(get_db)) -> Question:
+async def create_question(question: QuestionSchema, db: Session = Depends(get_db)) -> Question:
     db_question = Question(
         game_name=question.game_name,
         category=question.category,
@@ -20,7 +20,7 @@ async def create_question(question: QuestionCreate, db: Session = Depends(get_db
 
 async def update_question(
         question_id: int,
-        modified_question: QuestionCreate,
+        modified_question: QuestionSchema,
         db: Session = Depends(get_db)
 ) -> Type[Question]:
     question = await get_obj_of_type_by_id(question_id, Question, "Question", db)

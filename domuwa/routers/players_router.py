@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 from starlette.responses import Response
 
 from domuwa.database import db_obj_delete, get_all_objs_of_type, get_db, get_obj_of_type_by_id
-from domuwa.player import services
-from domuwa.player.model import Player
-from domuwa.player.schema import PlayerCreate, PlayerView
+from domuwa.models import Player
+from domuwa.schemas import PlayerSchema, PlayerView
+from domuwa.services import players_services as services
 
 router = APIRouter(prefix="/player", tags=["Player"])
 
@@ -68,9 +68,9 @@ async def delete_player(player_id: int, db: Session = Depends(get_db)):
     return await db_obj_delete(player_id, Player, "Player", db)
 
 
-def validate_player_data(name: str) -> PlayerCreate:
+def validate_player_data(name: str) -> PlayerSchema:
     try:
-        player = PlayerCreate(name=name)
+        player = PlayerSchema(name=name)
     except ValidationError:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid name provided")
     return player
