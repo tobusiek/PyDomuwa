@@ -1,31 +1,45 @@
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+
+MIN_ID = 1
+MIN_PLAYER_NAME_LEN = 3
+MAX_PLAYER_NAME_LEN = 25
+MIN_TEXT_LEN = 1
+MAX_TEXT_LEN = 150
+
+valid_id = Field(ge=1)
 
 
 class AnswerSchema(BaseModel):
-    author: str
-    text: str
-    correct: bool = False
-    question_id: int
+    author: str = Field(min_length=MIN_PLAYER_NAME_LEN, max_length=MAX_PLAYER_NAME_LEN)
+    text: str = Field(min_length=MIN_TEXT_LEN, max_length=MAX_TEXT_LEN)
+    correct: bool = Field(False)
+    question_id: int = Field(strict=True, ge=MIN_ID)
 
 
 class AnswerView(AnswerSchema):
-    id: int
+    id: int = valid_id
     model_config = ConfigDict(from_attributes=True)
 
 
+MIN_GAME_NAME_LEN = 3
+MAX_GAME_NAME_LEN = 15
+MIN_CATEGORY_LEN = 3
+MAX_CATEGORY_LEN = 25
+
+
 class QuestionSchema(BaseModel):
-    game_name: str
-    category: str
-    author: str
-    text: str
-    excluded: bool = False
+    game_name: str = Field(min_length=MIN_GAME_NAME_LEN, max_length=MAX_GAME_NAME_LEN)
+    category: str = Field(min_length=MIN_CATEGORY_LEN, max_length=MAX_CATEGORY_LEN)
+    author: str = Field(min_length=MIN_PLAYER_NAME_LEN, max_length=MAX_PLAYER_NAME_LEN)
+    text: str = Field(min_length=MIN_TEXT_LEN, max_length=MAX_TEXT_LEN)
+    excluded: bool = Field(False)
 
 
 class QuestionView(QuestionSchema):
-    id: int
+    id: int = valid_id
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -44,11 +58,11 @@ class GameCategory(Enum):
 
 
 class GameRoomSchema(BaseModel):
-    game_name: str
-    game_category: str
+    game_name: str = Field(min_length=MIN_GAME_NAME_LEN, max_length=MAX_GAME_NAME_LEN)
+    game_category: str = Field(min_length=MIN_CATEGORY_LEN, max_length=MAX_CATEGORY_LEN)
 
-    @field_validator("game_category")
     @classmethod
+    @field_validator("game_category")
     def check_category(cls, category: str) -> str:
         if category not in [game_cat.value for game_cat in GameCategory]:
             raise ValidationError(f"Invalid {category=}")
@@ -56,18 +70,18 @@ class GameRoomSchema(BaseModel):
 
 
 class GameRoomView(GameRoomSchema):
-    id: int
+    id: int = valid_id
     model_config = ConfigDict(from_attributes=True)
 
 
 class PlayerSchema(BaseModel):
-    name: str
+    name: str = Field(min_length=MIN_PLAYER_NAME_LEN, max_length=MAX_PLAYER_NAME_LEN)
 
 
 class PlayerView(PlayerSchema):
-    id: int
-    game_rooms_played: int
-    game_rooms_won: int
+    id: int = valid_id
+    games_played: int
+    games_won: int
     score: float
     model_config = ConfigDict(from_attributes=True)
 

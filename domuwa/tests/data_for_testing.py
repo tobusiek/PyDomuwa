@@ -1,5 +1,26 @@
+from dataclasses import dataclass
+from typing import Any
+
+
+@dataclass
+class QuestionValid:
+    game_name: str = "ego"
+    category: str = "MIXED"
+    author: str = "User"
+    text: str = "text"
+    excluded: bool = False
+
+
+@dataclass
+class QuestionInvalid:
+    game_name: Any = "ego"
+    category: Any = "MIXED"
+    author: Any = "User"
+    text: Any = "text"
+    excluded: Any = False
+
+
 ID = "id"
-QUESTION_ID = "question_id"
 GAME_NAME = "game_name"
 CATEGORY = "category"
 AUTHOR = "author"
@@ -7,93 +28,82 @@ TEXT = "text"
 EXCLUDED = "excluded"
 ANSWERS = "answers"
 
-TEST_QUESTIONS_VALID = [
-    {
-        GAME_NAME: "ego",
-        CATEGORY: "MIXED",
-        AUTHOR: "User1",
-        TEXT: "text 1",
-        EXCLUDED: False,
-    },
-    {
-        GAME_NAME: "ego",
-        CATEGORY: "NSFW",
-        AUTHOR: "User2",
-        TEXT: "text 2",
-        EXCLUDED: True,
-    },
-    {
-        GAME_NAME: "who's most likely",
-        CATEGORY: "SFW",
-        AUTHOR: "User1",
-        TEXT: "text 3",
-        EXCLUDED: True,
-    }
+TEST_QUESTIONS_VALID: list[QuestionValid] = [
+    QuestionValid(author="User1", text="text 1"),
+    QuestionValid(category="NSFW", author="User2", text="text 2", excluded=True),
+    QuestionValid(game_name="who's most likely", category="SFW", author="User1", text="text 3", excluded=True),
 ]
 
-TEST_QUESTIONS_INVALID = {
-    "game_name": {
-
-    },
-    "category": {
-
-    },
-    "author": {
-
-    },
-    "text": {
-
-    },
-    "excluded": {
-
-    }
+TEST_QUESTIONS_INVALID: dict[str, QuestionInvalid] = {
+    GAME_NAME: QuestionInvalid(game_name="invalid game"),
+    CATEGORY: QuestionInvalid(category="invalid category"),
+    AUTHOR: QuestionInvalid(author=["invalid author", 1]),
+    TEXT: QuestionInvalid(text=["invalid text", False]),
+    EXCLUDED: QuestionInvalid(excluded=5)
 }
+
+
+@dataclass
+class AnswerValid:
+    author: str = "User"
+    text: str = "text"
+    correct: bool = False
+
+    # noinspection PyAttributeOutsideInit
+    def add_question_id(self, question_id: int) -> None:
+        self.question_id = question_id
+
+
+@dataclass
+class AnswerInvalid:
+    question_id: Any = 1
+    author: Any = "User"
+    text: Any = "text"
+    correct: Any = False
+
 
 ANSWER_ID = "answer_id"
 CORRECT = "correct"
 QUESTION_ID = "question_id"
 QUESTION = "question"
 
-TEST_ANSWERS_VALID = [
-    {
-        AUTHOR: "User1",
-        TEXT: "text 1",
-    },
-    {
-        AUTHOR: "User1",
-        TEXT: "text 2",
-        CORRECT: True,
-    },
-    {
-        AUTHOR: "User2",
-        TEXT: "text 3",
-        CORRECT: False,
-    }
+TEST_ANSWERS_VALID: list[AnswerValid] = [
+    AnswerValid(author="User1", text="text 1"),
+    AnswerValid(author="User1", text="text 2", correct=True),
+    AnswerValid(author="User2", text="text 3", correct=True),
 ]
 
-TEST_ANSWERS_INVALID = {
-    AUTHOR: {
-        AUTHOR: 1,
-        TEXT: "text",
-        QUESTION_ID: 1
-    },
-    TEXT: {
-        AUTHOR: "User",
-        TEXT: False,
-        QUESTION_ID: 1,
-    },
-    CORRECT: {
-        AUTHOR: "User",
-        TEXT: "text",
-        QUESTION_ID: 1,
-        CORRECT: "null",
-    },
-    QUESTION_ID: {
-        AUTHOR: "User",
-        TEXT: "text",
-        QUESTION_ID: "null",
-    },
+TEST_ANSWERS_INVALID: dict[str, AnswerInvalid] = {
+    AUTHOR: AnswerInvalid(author=None),
+    TEXT: AnswerInvalid(text=None),
+    CORRECT: AnswerInvalid(correct="null"),
+    QUESTION_ID: AnswerInvalid(question_id=100),
 }
+
+
+@dataclass
+class GameRoomValid:
+    game_name: str = "ego"
+    game_category: str = "MIXED"
+
+
+@dataclass
+class GameRoomInvalid:
+    game_name: Any = "ego"
+    game_category: Any = "MIXED"
+
+
+@dataclass
+class PlayerValid:
+    name: str = "User"
+    score: float = 0.0
+
+
+@dataclass
+class PlayerInvalid:
+    name: Any = "User"
+    score: Any = 0.0
+
 
 TEST_GAME_ROOMS_VALID = [
 

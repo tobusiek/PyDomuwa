@@ -46,5 +46,5 @@ class Question(Base):
     category: Mapped[str] = mapped_column(String, nullable=False, index=True)
     author: Mapped[str] = mapped_column(String, nullable=False)
     text: Mapped[str] = mapped_column(String, nullable=False)
-    answers: Mapped[Answer] = relationship("Answer", back_populates="question", cascade="all, delete")
+    answers: Mapped[list[Answer]] = relationship("Answer", back_populates="question", cascade="all, delete")
     excluded: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
