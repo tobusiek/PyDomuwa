@@ -50,6 +50,10 @@ class AnswerValid:
     correct: bool = False
 
     # noinspection PyAttributeOutsideInit
+    def add_answer_id(self, answer_id: int) -> None:
+        self.answer_id = answer_id
+
+    # noinspection PyAttributeOutsideInit
     def add_question_id(self, question_id: int) -> None:
         self.question_id = question_id
 
@@ -60,6 +64,10 @@ class AnswerInvalid:
     author: Any = "User"
     text: Any = "text"
     correct: Any = False
+
+    # noinspection PyAttributeOutsideInit
+    def add_answer_id(self, answer_id: int) -> None:
+        self.answer_id = answer_id
 
 
 ANSWER_ID = "answer_id"

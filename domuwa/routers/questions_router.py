@@ -21,12 +21,14 @@ async def create_question(game_name: str, category: str, author: str, text: str,
 
 @router.get("/{question_id}")
 async def get_question_by_id(question_id: int, db: Session = Depends(get_db)):
-    return await get_obj_of_type_by_id(question_id, Question, "Question", db)
+    question = await get_obj_of_type_by_id(question_id, Question, "Question", db)
+    return create_question_view_with_answers(question)
 
 
 @router.get("/")
 async def get_all_questions(db: Session = Depends(get_db)):
-    return await get_all_objs_of_type(Question, db)
+    questions = await get_all_objs_of_type(Question, db)
+    return [create_question_view_with_answers(question) for question in questions]
 
 
 @router.put("/")

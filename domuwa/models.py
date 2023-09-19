@@ -16,6 +16,10 @@ class Answer(Base):
     question_id: Mapped[int] = mapped_column(Integer, ForeignKey(column="question.id", ondelete="CASCADE"))
     question: Mapped[Question] = relationship("Question", back_populates="answers", foreign_keys=question_id)
 
+    def __repr__(self) -> str:
+        return (f"Answer(id={self.id}, author={self.author}, text={self.text}, correct={self.correct}, "
+                f"question_id={self.question_id})")
+
 
 class GameRoom(Base):
     __tablename__ = "game_room"
@@ -48,3 +52,7 @@ class Question(Base):
     text: Mapped[str] = mapped_column(String, nullable=False)
     answers: Mapped[list[Answer]] = relationship("Answer", back_populates="question", cascade="all, delete")
     excluded: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    def __repr__(self) -> str:
+        return (f"Question(id={self.id}, game={self.game_name}, category={self.category}, author={self.author}, "
+                f"text={self.text}, excluded={self.excluded})")
