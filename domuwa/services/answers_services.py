@@ -5,9 +5,9 @@ from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette import status
 
+from domuwa.database import db_obj_save, get_db, get_obj_of_type_by_id
 from domuwa.models import Answer, Question
 from domuwa.schemas import AnswerSchema
-from domuwa.database import db_obj_save, get_db, get_obj_of_type_by_id
 
 logger = getLogger("db_connector")
 
@@ -23,7 +23,7 @@ async def create_answer(answer: AnswerSchema, db: Session = Depends(get_db)) -> 
         text=answer.text,
         correct=answer.correct,
         question_id=answer.question_id,
-        question=question
+        question=question,
     )
     question.answers.append(db_answer)
     db.add(question)

@@ -7,9 +7,9 @@ Create Date: 2023-09-12 13:18:25.275101
 """
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = 'c26daef900d2'
@@ -39,8 +39,8 @@ def downgrade() -> None:
     sa.Column('game_rooms_won', sa.INTEGER(), nullable=False),
     sa.Column('score', sa.FLOAT(), nullable=False),
     sa.Column('game_room_id', sa.INTEGER(), nullable=True),
-    sa.ForeignKeyConstraint(['game_room_id'], ['game_room.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['game_room_id'], ['game_room.id'] ),
+    sa.PrimaryKeyConstraint('id'),
     )
     op.create_index('ix_player_name', 'player', ['name'], unique=False)
     op.create_table('answer',
@@ -51,7 +51,7 @@ def downgrade() -> None:
     sa.Column('correct', sa.BOOLEAN(), nullable=True),
     sa.Column('question_id', sa.INTEGER(), nullable=True),
     sa.ForeignKeyConstraint(['question_id'], ['question.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
     )
     op.create_table('question',
     sa.Column('id', sa.INTEGER(), nullable=False),
@@ -60,7 +60,7 @@ def downgrade() -> None:
     sa.Column('author', sa.VARCHAR(), nullable=False),
     sa.Column('text', sa.VARCHAR(), nullable=False),
     sa.Column('excluded', sa.BOOLEAN(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
     )
     op.create_index('ix_question_game_name', 'question', ['game_name'], unique=False)
     op.create_index('ix_question_category', 'question', ['category'], unique=False)
@@ -68,6 +68,6 @@ def downgrade() -> None:
     sa.Column('id', sa.INTEGER(), nullable=False),
     sa.Column('game_name', sa.VARCHAR(), nullable=False),
     sa.Column('game_category', sa.VARCHAR(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
     )
     # ### end Alembic commands ###

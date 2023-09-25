@@ -1,3 +1,4 @@
+from logging import getLogger
 from typing import Type
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -10,6 +11,8 @@ from domuwa.models import Answer
 from domuwa.schemas import AnswerSchema, AnswerView, AnswerWithQuestionView, QuestionView
 from domuwa.services import answers_services as services
 
+logger = getLogger("domuwa")
+
 router = APIRouter(prefix="/answer", tags=["Answer"])
 
 
@@ -19,27 +22,28 @@ async def create_answer(
         text: str,
         question_id: int,
         correct: bool = False,
-        db: Session = Depends(get_db)
-):
+        db: Session = Depends(get_db),
+) -> AnswerWithQuestionView:
     answer = validate_answer_data(author, text, correct, question_id)
+    logger.debug(f"{answer=}")
     db_answer = await services.create_answer(answer, db)
     return create_answer_view_with_question(db_answer)
 
 
 @router.get("/{answer_id}", response_model=AnswerWithQuestionView)
-async def get_answer_by_id(answer_id: int, db: Session = Depends(get_db)):
+async def get_answer_by_id(answer_id: int, db: Session = Depends(get_db)) -> AnswerWithQuestionView:
     answer = await get_obj_of_type_by_id(answer_id, Answer, "Answer", db)
     return create_answer_view_with_question(answer)
 
 
 @router.get("/")
-async def get_all_answers(db: Session = Depends(get_db)):
+async def get_all_answers(db: Session = Depends(get_db)) -> list[AnswerWithQuestionView]:
     answers = await get_all_objs_of_type(Answer, db)
     return [create_answer_view_with_question(answer) for answer in answers]
 
 
 @router.get("/for_question/{question_id}")
-async def get_answers_for_question(question_id: int, db: Session = Depends(get_db)):
+async def get_answers_for_question(question_id: int, db: Session = Depends(get_db)) -> list[AnswerView]:
     answers = await services.get_answers_for_question(question_id, db)
     return [create_answer_view(answer) for answer in answers]
 
@@ -51,15 +55,15 @@ async def update_answer(
         text: str,
         correct: bool,
         question_id: int,
-        db: Session = Depends(get_db)
-):
+        db: Session = Depends(get_db),
+) -> AnswerWithQuestionView:
     modified_answer = validate_answer_data(author, text, correct, question_id)
     answer = await services.update_answer(answer_id, modified_answer, db)
     return create_answer_view_with_question(answer)
 
 
 @router.delete("/", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
-async def delete_answer(answer_id: int, db: Session = Depends(get_db)):
+async def delete_answer(answer_id: int, db: Session = Depends(get_db)) -> None:
     return await db_obj_delete(answer_id, Answer, "Answer", db)
 
 
@@ -82,5 +86,5 @@ def create_answer_view_with_question(answer: Answer | Type[Answer]) -> AnswerWit
         text=answer.text,
         correct=answer.correct,
         question_id=answer.question_id,
-        question=QuestionView.model_validate(answer.question)
+        question=QuestionView.model_validate(answer.question),
     )

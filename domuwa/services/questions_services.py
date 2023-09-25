@@ -21,7 +21,7 @@ async def create_question(question: QuestionSchema, db: Session = Depends(get_db
 async def update_question(
         question_id: int,
         modified_question: QuestionSchema,
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ) -> Type[Question]:
     question = await get_obj_of_type_by_id(question_id, Question, "Question", db)
     question.game_name = modified_question.game_name

@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Any
 
+ResponseType = dict[str, str | int | float | bool]
+
 
 @dataclass
 class QuestionValid:
@@ -39,7 +41,7 @@ TEST_QUESTIONS_INVALID: dict[str, QuestionInvalid] = {
     CATEGORY: QuestionInvalid(category="invalid category"),
     AUTHOR: QuestionInvalid(author=["invalid author", 1]),
     TEXT: QuestionInvalid(text=["invalid text", False]),
-    EXCLUDED: QuestionInvalid(excluded=5)
+    EXCLUDED: QuestionInvalid(excluded=5),
 }
 
 

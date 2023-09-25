@@ -9,7 +9,6 @@ from starlette.requests import Request
 from starlette.templating import _TemplateResponse
 
 from domuwa import config
-from domuwa.database import init_db
 from domuwa.routers.answers_router import router as answer_router
 from domuwa.routers.game_rooms_router import router as game_router
 from domuwa.routers.players_router import router as player_router
@@ -35,16 +34,15 @@ templates = Jinja2Templates(directory="resources/templates")
 
 @app.get("/")
 async def get_home(request: Request) -> _TemplateResponse:
-    context = {"request": request, }
+    context = {"request": request }
     return templates.TemplateResponse("index.html", context)
 
 
 if __name__ == "__main__":
-    address = config.HOST_ADDR
     port = config.PORT
+    address = get_ip_address(port)
     print("Serwer uruchomiony. Żeby dołączyć do gry, połącz się do tej samej sieci WiFi, "
           "do której jest podłączony komputer.\n"
           "Teraz niech każdy na swoim telefonie wpisze w przeglądarkę adres "
-          f"{get_ip_address(port)}:{port}")
-    init_db()
+          f"http://{address}:{port}")
     uvicorn.run(app, host=address, port=port)

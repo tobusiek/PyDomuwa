@@ -26,7 +26,7 @@ async def get_all_players_from_game_room(game_room_id: int, db: Session = Depend
 async def update_player_name(
         player_id: int,
         new_name_player: PlayerSchema,
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ) -> Type[Player]:
     player = await get_obj_of_type_by_id(player_id, Player, "Player", db)
     player.name = new_name_player.name
