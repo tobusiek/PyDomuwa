@@ -1,4 +1,4 @@
-from logging import getLogger
+from domuwa.utils.logging import get_logger
 from typing import Type
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -12,7 +12,7 @@ from domuwa.models import Question
 from domuwa.schemas import AnswerView, QuestionSchema, QuestionView, QuestionWithAnswersView
 from domuwa.services import questions_services as services
 
-logger = getLogger('domuwa')
+logger = get_logger('domuwa')
 
 router = APIRouter(prefix="/question", tags=["Question"])
 

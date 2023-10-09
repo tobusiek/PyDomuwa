@@ -3,6 +3,18 @@ from typing import Any
 
 ResponseType = dict[str, str | int | float | bool]
 
+ID = "id"
+GAME_NAME = "game_name"
+CATEGORY = "category"
+AUTHOR = "author"
+TEXT = "text"
+EXCLUDED = "excluded"
+ANSWERS = "answers"
+ANSWER_ID = "answer_id"
+CORRECT = "correct"
+QUESTION_ID = "question_id"
+QUESTION = "question"
+
 
 @dataclass
 class QuestionValid:
@@ -21,14 +33,6 @@ class QuestionInvalid:
     text: Any = "text"
     excluded: Any = False
 
-
-ID = "id"
-GAME_NAME = "game_name"
-CATEGORY = "category"
-AUTHOR = "author"
-TEXT = "text"
-EXCLUDED = "excluded"
-ANSWERS = "answers"
 
 TEST_QUESTIONS_VALID: list[QuestionValid] = [
     QuestionValid(author="User1", text="text 1"),
@@ -71,11 +75,6 @@ class AnswerInvalid:
     def add_answer_id(self, answer_id: int) -> None:
         self.answer_id = answer_id
 
-
-ANSWER_ID = "answer_id"
-CORRECT = "correct"
-QUESTION_ID = "question_id"
-QUESTION = "question"
 
 TEST_ANSWERS_VALID: list[AnswerValid] = [
     AnswerValid(author="User1", text="text 1"),

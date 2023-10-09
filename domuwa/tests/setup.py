@@ -4,6 +4,7 @@ from sqlalchemy import StaticPool, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from starlette.testclient import TestClient
 
+from domuwa import config
 from domuwa.database import Base, get_db
 from main import app
 
@@ -29,4 +30,5 @@ def override_get_db() -> Generator[Session, None]:
 
 app.dependency_overrides[get_db] = override_get_db
 
+config.TESTING = True
 client = TestClient(app)

@@ -1,5 +1,5 @@
 from collections.abc import AsyncGenerator
-from logging import getLogger
+from domuwa.utils.logging import get_logger
 from typing import Type, TypeVar
 
 from fastapi import Depends, HTTPException, status
@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 from domuwa import config
 
-logger = getLogger("db_connector")
+logger = get_logger("db_connector")
 
 ORM = TypeVar("ORM")
 

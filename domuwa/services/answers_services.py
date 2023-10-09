@@ -1,4 +1,4 @@
-from logging import getLogger
+from domuwa.utils.logging import get_logger
 from typing import Type
 
 from fastapi import Depends, HTTPException
@@ -9,7 +9,7 @@ from domuwa.database import db_obj_save, get_db, get_obj_of_type_by_id
 from domuwa.models import Answer, Question
 from domuwa.schemas import AnswerSchema
 
-logger = getLogger("db_connector")
+logger = get_logger("db_connector")
 
 
 async def create_answer(answer: AnswerSchema, db: Session = Depends(get_db)) -> Answer:

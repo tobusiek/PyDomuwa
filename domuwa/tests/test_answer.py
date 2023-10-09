@@ -5,25 +5,26 @@ from httpx import Response
 from sqlalchemy.orm import Session
 from starlette import status
 
-from domuwa.models import Question
+from domuwa.models import Answer, Question
 from domuwa.tests.data_for_testing import (
-    ANSWER_ID,
-    AUTHOR,
-    CORRECT,
-    ID,
-    QUESTION,
-    QUESTION_ID,
+    ANSWER_ID, AUTHOR, AnswerValid,
+    CORRECT, ID, QUESTION, QUESTION_ID, ResponseType,
     TEST_ANSWERS_INVALID,
     TEST_ANSWERS_VALID,
-    TEST_QUESTIONS_VALID,
-    TEXT,
-    AnswerValid,
-    ResponseType,
+    TEST_QUESTIONS_VALID, TEXT
 )
 from domuwa.tests.setup import client, override_get_db
 
 ANSWERS_PREFIX = "/answer/"
 QUESTIONS_PREFIX = "/question/"
+
+
+@pytest.fixture(autouse=True, scope="function")
+def clear_answers_from_db() -> None:
+    db = next(override_get_db())
+    db.query(Question).delete()
+    db.query(Answer).delete()
+    yield
 
 
 def create_mock_question(test_question_idx: int, db: Session) -> Question:
@@ -77,9 +78,9 @@ def assert_invalid_answer_data(invalid_key: str, expected_status: int) -> None:
     assert answer_response.status_code == expected_status, answer_response.text
 
 
-def create_valid_answer(valid_answer_idx: int, mock_question_idx: int) -> AnswerValid:
+def create_valid_answer(valid_answer_idx: int, mock_question_id: int) -> AnswerValid:
     answer = TEST_ANSWERS_VALID[valid_answer_idx]
-    answer.add_question_id(mock_question_idx)
+    answer.add_question_id(mock_question_id)
     return answer
 
 
@@ -158,7 +159,7 @@ def test_get_all_answers(mock_questions: list[Question], questions_idxs: list[in
     assert empty_answers_response.status_code == status.HTTP_200_OK, empty_answers_response.text
     empty_answers_response_data = empty_answers_response.json()
     assert isinstance(empty_answers_response_data, list)
-    assert not empty_answers_response_data  # empty list of answers
+    assert len(empty_answers_response_data) == 0
 
     mock_question1, mock_question2 = mock_questions
     mock_question1_id = mock_question1.id
@@ -180,8 +181,8 @@ def test_get_all_answers(mock_questions: list[Question], questions_idxs: list[in
     assert answers_response.status_code == status.HTTP_200_OK, answers_response.text
     answers_response_data = answers_response.json()
     assert isinstance(answers_response_data, list)
-    assert answers_response_data  # not empty list of answers
-    assert len(answers_response_data) == 3
+    assert len(answers_response_data) > 0, answers_response_data
+    assert len(answers_response_data) == 3, answers_response_data
     answer1_response, answer2_response, answer3_response = answers_response_data
 
     assert ID in answer1_response
@@ -229,7 +230,7 @@ def test_get_answers_for_question_invalid_question_id() -> None:
     assert answer_response.status_code == status.HTTP_200_OK, answer_response.text
     answer_response_data = answer_response.json()
     assert isinstance(answer_response_data, list)
-    assert not answer_response_data  # empty list
+    assert len(answer_response_data) == 0, answer_response_data
 
 
 @pytest.mark.parametrize("question_idx", [0])
@@ -240,7 +241,8 @@ def test_update_answer(mock_question: Question, question_idx: int) -> None:
     answer_response = post_valid_answer(answer.__dict__)
     answer_response_data = answer_response.json()
 
-    updated_answer = AnswerValid(author="updated_user", text="updated_text", correct=not answer_response_data[CORRECT])
+    updated_answer = AnswerValid(
+        author="updated_user", text="updated_text", correct=not answer_response_data[CORRECT])
     updated_answer.add_answer_id(answer_response_data[ID])
     updated_answer.add_question_id(mock_question_id)
     updated_answer_put_response = client.put(ANSWERS_PREFIX, params=updated_answer.__dict__)
@@ -271,7 +273,8 @@ def test_update_answer_invalid_data(mock_question: Question, question_idx: int) 
 
     put_invalid_answer(AUTHOR, answer_id, question_id=mock_question_id)  # invalid author
     put_invalid_answer(TEXT, answer_id, question_id=mock_question_id)  # invalid text
-    put_invalid_answer(CORRECT, answer_id, mock_question_id, status.HTTP_422_UNPROCESSABLE_ENTITY)  # invalid correct
+    put_invalid_answer(CORRECT, answer_id, mock_question_id,
+                       status.HTTP_422_UNPROCESSABLE_ENTITY)  # invalid correct
 
     # correct answer already exists
     correct_answer2 = create_valid_answer(0, mock_question_id)

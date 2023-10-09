@@ -3,7 +3,7 @@ from __future__ import annotations
 from sqlalchemy import Boolean, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from domuwa.database import Base
+from domuwa.database import Base, engine
 
 
 class Answer(Base):
@@ -56,3 +56,6 @@ class Question(Base):
     def __repr__(self) -> str:
         return (f"Question(id={self.id}, game={self.game_name}, category={self.category}, author={self.author}, "
                 f"text={self.text}, excluded={self.excluded})")
+
+
+Base.metadata.create_all(engine)

@@ -166,6 +166,7 @@ cython_debug/
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/PyDomuwa.iml
 /.idea/vcs.xml
+/alembic/versions/*
 
 codebase.txt
 .idea
