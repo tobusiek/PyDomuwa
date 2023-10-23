@@ -13,12 +13,21 @@ class Answer(Base):
     author: Mapped[str] = mapped_column(String, nullable=False)
     text: Mapped[str] = mapped_column(String, nullable=False)
     correct: Mapped[bool] = mapped_column(Boolean, nullable=True)
-    question_id: Mapped[int] = mapped_column(Integer, ForeignKey(column="question.id", ondelete="CASCADE"))
-    question: Mapped[Question] = relationship("Question", back_populates="answers", foreign_keys=question_id)
+    question_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey(column="question.id", ondelete="CASCADE"),
+    )
+    question: Mapped[Question] = relationship(
+        "Question",
+        back_populates="answers",
+        foreign_keys=question_id,
+    )
 
     def __repr__(self) -> str:
-        return (f"Answer(id={self.id}, author={self.author}, text={self.text}, correct={self.correct}, "
-                f"question_id={self.question_id})")
+        return (
+            f"Answer(id={self.id}, author={self.author}, text={self.text}, correct={self.correct}, "
+            f"question_id={self.question_id})"
+        )
 
 
 class GameRoom(Base):
@@ -38,8 +47,16 @@ class Player(Base):
     game_rooms_played: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     game_rooms_won: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     score: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
-    game_room_id: Mapped[int] = mapped_column(Integer, ForeignKey("game_room.id"), nullable=True)
-    game_room: Mapped[GameRoom] = relationship("GameRoom", back_populates="players", foreign_keys=game_room_id)
+    game_room_id: Mapped[int] | None = mapped_column(
+        Integer,
+        ForeignKey("game_room.id"),
+        nullable=True,
+    )
+    game_room: Mapped[GameRoom] | None = relationship(
+        "GameRoom",
+        back_populates="players",
+        foreign_keys=game_room_id,
+    )
 
 
 class Question(Base):
@@ -50,12 +67,18 @@ class Question(Base):
     category: Mapped[str] = mapped_column(String, nullable=False, index=True)
     author: Mapped[str] = mapped_column(String, nullable=False)
     text: Mapped[str] = mapped_column(String, nullable=False)
-    answers: Mapped[list[Answer]] = relationship("Answer", back_populates="question", cascade="all, delete")
+    answers: Mapped[list[Answer]] = relationship(
+        "Answer",
+        back_populates="question",
+        cascade="all, delete",
+    )
     excluded: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     def __repr__(self) -> str:
-        return (f"Question(id={self.id}, game={self.game_name}, category={self.category}, author={self.author}, "
-                f"text={self.text}, excluded={self.excluded})")
+        return (
+            f"Question(id={self.id}, game={self.game_name}, category={self.category}, author={self.author}, "
+            f"text={self.text}, excluded={self.excluded})"
+        )
 
 
 Base.metadata.create_all(engine)

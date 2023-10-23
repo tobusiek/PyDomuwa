@@ -5,7 +5,7 @@ from starlette import status
 from domuwa.models import Question
 from domuwa.tests.data_for_testing import (
     AUTHOR, CATEGORY,
-    EXCLUDED, GAME_NAME, ID, TEST_QUESTIONS_VALID,
+    EXCLUDED, GAME_NAME, ID, TEST_QUESTIONS_INVALID, TEST_QUESTIONS_VALID,
     ResponseType, TEXT,
 )
 from domuwa.tests.setup import client, override_get_db
@@ -47,7 +47,9 @@ def test_create_question() -> None:
 
 
 def test_create_question_invalid_data() -> None:
-    pass
+    invalid_question = TEST_QUESTIONS_INVALID[GAME_NAME]
+    question_response = client.post(QUESTIONS_PREFIX, params=invalid_question.__dict__)
+    assert question_response.status_code == status.HTTP_400_BAD_REQUEST, question_response.text
 
 
 def test_get_question_invalid_id() -> None:

@@ -1,16 +1,15 @@
 from collections.abc import AsyncGenerator
-from domuwa.utils.logging import get_logger
-from typing import Type, TypeVar
+from typing import Any, Type
 
 from fastapi import Depends, HTTPException, status
 from sqlalchemy import StaticPool, create_engine
-from sqlalchemy.orm import Session, declarative_base, sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import decl_api
 
 from domuwa import config
+from domuwa.utils.logging import get_logger
 
 logger = get_logger("db_connector")
-
-ORM = TypeVar("ORM")
 
 engine = create_engine(
     config.DATABASE_URL,
@@ -19,7 +18,9 @@ engine = create_engine(
 )
 SessionLocal = sessionmaker(autoflush=True, bind=engine)
 
-Base: ORM = declarative_base()
+
+class Base(metaclass=decl_api.DeclarativeMeta):
+    __abstract__ = True
 
 
 async def get_db() -> AsyncGenerator[Session, None]:
@@ -31,23 +32,31 @@ async def get_db() -> AsyncGenerator[Session, None]:
 
 
 async def get_obj_of_type_by_id(
-        obj_id: int,
-        obj_model_type: ORM,
-        obj_model_type_name: str,
-        db: Session = Depends(get_db),
-) -> ORM:
+    obj_id: int,
+    obj_model_type: Any,
+    obj_model_type_name: str,
+    db: Session = Depends(get_db),
+) -> Any:
     obj = db.get(obj_model_type, obj_id)
     if not obj:
         logger.warning(f"{obj_model_type_name} of id={obj_id} not found")
-        raise HTTPException(status.HTTP_404_NOT_FOUND, f"{obj_model_type_name} of id={obj_id} not found")
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND, f"{obj_model_type_name} of id={obj_id} not found"
+        )
     return obj
 
 
-async def get_all_objs_of_type(obj_model: ORM, db: Session = Depends(get_db)) -> list[ORM]:
+async def get_all_objs_of_type(
+    obj_model: Any,
+    db: Session = Depends(get_db),
+) -> list[Any]:
     return db.query(obj_model).all()
 
 
-async def db_obj_save(obj_model: ORM | Type[ORM], db: Session = Depends(get_db)) -> ORM:
+async def db_obj_save(
+    obj_model: Any,
+    db: Session = Depends(get_db),
+) -> Any:
     db.add(obj_model)
     db.commit()
     db.refresh(obj_model)
@@ -55,10 +64,10 @@ async def db_obj_save(obj_model: ORM | Type[ORM], db: Session = Depends(get_db))
 
 
 async def db_obj_delete(
-        obj_id: int,
-        obj_model_type: ORM,
-        obj_model_type_name: str,
-        db: Session = Depends(get_db),
+    obj_id: int,
+    obj_model_type: Any,
+    obj_model_type_name: str,
+    db: Session = Depends(get_db),
 ) -> None:
     obj = await get_obj_of_type_by_id(obj_id, obj_model_type, obj_model_type_name, db)
     db.delete(obj)

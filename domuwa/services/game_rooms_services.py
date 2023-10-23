@@ -14,7 +14,7 @@ async def create_game_room(game: GameRoomSchema, db: Session = Depends(get_db)) 
         game_name=game.game_name,
         game_category=game.game_category,
         players=[],
-    )
+    )  # type: ignore
     return await db_obj_save(db_game_room, db)
 
 
@@ -52,4 +52,3 @@ async def delete_game_room(game_room_id: int, db: Session = Depends(get_db)) -> 
     players = db.query(Player).filter(Player.game_room_id == game_room_id).all()
     for player in players:
         await player_services.reset_player_game_room(player.id, db)
-    return

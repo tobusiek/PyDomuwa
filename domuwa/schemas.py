@@ -3,6 +3,10 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
+from domuwa.utils.logging import get_logger
+
+logger = get_logger("validator")
+
 MIN_ID = 1
 MIN_PLAYER_NAME_LEN = 3
 MAX_PLAYER_NAME_LEN = 25
@@ -36,6 +40,15 @@ class QuestionSchema(BaseModel):
     author: str = Field(min_length=MIN_PLAYER_NAME_LEN, max_length=MAX_PLAYER_NAME_LEN)
     text: str = Field(min_length=MIN_TEXT_LEN, max_length=MAX_TEXT_LEN)
     excluded: bool = Field(False)
+
+    @classmethod
+    @field_validator("game_name", mode="before")
+    def check_game_name(cls, game_name: str) -> str:
+        if game_name not in ("ego", "who's-most-likely"):
+            logger.warning("Invalid data")
+            raise ValidationError(f"Invalid game name={game_name}")
+        logger.info("valid data")
+        return game_name
 
 
 class QuestionView(QuestionSchema):

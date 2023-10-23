@@ -24,13 +24,13 @@ async def create_answer(answer: AnswerSchema, db: Session = Depends(get_db)) -> 
         correct=answer.correct,
         question_id=answer.question_id,
         question=question,
-    )
+    )  # type: ignore
     question.answers.append(db_answer)
     db.add(question)
     return await db_obj_save(db_answer, db)
 
 
-async def get_answers_for_question(question_id: int, db: Session = Depends(get_db)) -> list[Type[Answer]]:
+async def get_answers_for_question(question_id: int, db: Session = Depends(get_db)) -> list[Answer]:
     return db.query(Answer).filter(Answer.question_id == question_id).all()
 
 

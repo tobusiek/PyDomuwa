@@ -14,7 +14,7 @@ async def create_question(question: QuestionSchema, db: Session = Depends(get_db
         category=question.category,
         author=question.author,
         text=question.text,
-    )
+    )  # type: ignore
     return await db_obj_save(db_question, db)
 
 
