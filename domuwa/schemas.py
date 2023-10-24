@@ -41,8 +41,8 @@ class QuestionSchema(BaseModel):
     text: str = Field(min_length=MIN_TEXT_LEN, max_length=MAX_TEXT_LEN)
     excluded: bool = Field(False)
 
-    @classmethod
     @field_validator("game_name", mode="before")
+    @classmethod
     def check_game_name(cls, game_name: str) -> str:
         if game_name not in ("ego", "who's-most-likely"):
             logger.warning("Invalid data")
@@ -74,8 +74,8 @@ class GameRoomSchema(BaseModel):
     game_name: str = Field(min_length=MIN_GAME_NAME_LEN, max_length=MAX_GAME_NAME_LEN)
     game_category: str = Field(min_length=MIN_CATEGORY_LEN, max_length=MAX_CATEGORY_LEN)
 
-    @classmethod
     @field_validator("game_category")
+    @classmethod
     def check_category(cls, category: str) -> str:
         if category not in [game_cat.value for game_cat in GameCategory]:
             raise ValidationError(f"Invalid {category=}")

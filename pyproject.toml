@@ -7,5 +7,3 @@ line-length = 120
 [tool.ruff.isort]
 case-sensitive = true
 
-# [mypy]
-# plugins = sqlmypy

@@ -116,28 +116,39 @@ async def update_player_score(
 
 @router.put("/reset_game_room")
 async def reset_player_game_room(
-    player_id: int, db: Session = Depends(get_db)
-) -> PlayerView:
+    request: Request,
+    player_id: int,
+    db: Session = Depends(get_db),
+) -> PlayerView | templating._TemplateResponse:
     player = await services.reset_player_game_room(player_id, db)
+    player_view = create_player_view(player)
     if config.TESTING:
-        return create_player_view(player)
+        return player_view
+    ctx = {"request": request, "player": player_view.model_dump()}
+    return templates.TemplateResponse("update_player.html", ctx)
 
 
 @router.put("/reset_score")
 async def reset_player_score(
-    player_id: int, db: Session = Depends(get_db)
-) -> PlayerView:
+    request: Request,
+    player_id: int,
+    db: Session = Depends(get_db),
+) -> PlayerView | templating._TemplateResponse:
     player = await services.reset_player_score(player_id, db)
+    player_view = create_player_view(player)
     if config.TESTING:
-        return create_player_view(player)
+        return player_view
+    ctx = {"request": request, "player": player_view.model_dump()}
+    return templates.TemplateResponse("update_player.html", ctx)
 
 
 @router.delete(
-    "/delete", status_code=status.HTTP_204_NO_CONTENT, response_class=Response
+    "/delete",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
 )
 async def delete_player(player_id: int, db: Session = Depends(get_db)) -> None:
-    if config.TESTING:
-        return await db_obj_delete(player_id, Player, "Player", db)
+    await db_obj_delete(player_id, Player, "Player", db)
 
 
 def validate_player_data(name: str) -> PlayerSchema:
