@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from domuwa.utils.logging import get_logger
 
@@ -46,7 +46,7 @@ class QuestionSchema(BaseModel):
     def check_game_name(cls, game_name: str) -> str:
         if game_name not in ("ego", "who's-most-likely"):
             logger.warning("Invalid data")
-            raise ValidationError(f"Invalid game name={game_name}")
+            raise ValueError(f"Invalid game name={game_name}")
         logger.info("valid data")
         return game_name
 
@@ -78,7 +78,7 @@ class GameRoomSchema(BaseModel):
     @classmethod
     def check_category(cls, category: str) -> str:
         if category not in [game_cat.value for game_cat in GameCategory]:
-            raise ValidationError(f"Invalid {category=}")
+            raise ValueError(f"Invalid {category=}")
         return category
 
 

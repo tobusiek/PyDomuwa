@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session, sessionmaker
 from starlette.testclient import TestClient
 
 from domuwa import config
-from domuwa.database import Base, get_db
+from domuwa.database import get_db
+from domuwa import models
 from main import app
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
@@ -16,11 +17,10 @@ engine = create_engine(
     poolclass=StaticPool,
 )
 TestingSessionLocal = sessionmaker(autoflush=False, bind=engine)
+models.Base.metadata.create_all(engine)
 
-Base.metadata.create_all(bind=engine)
 
-
-def override_get_db() -> Generator[Session, None]:
+def override_get_db() -> Generator[Session, None, None]:
     db = TestingSessionLocal()
     try:
         yield db
@@ -31,4 +31,5 @@ def override_get_db() -> Generator[Session, None]:
 app.dependency_overrides[get_db] = override_get_db
 
 config.TESTING = True
+
 client = TestClient(app)

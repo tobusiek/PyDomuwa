@@ -37,7 +37,13 @@ class QuestionInvalid:
 TEST_QUESTIONS_VALID: list[QuestionValid] = [
     QuestionValid(author="User1", text="text 1"),
     QuestionValid(category="NSFW", author="User2", text="text 2", excluded=True),
-    QuestionValid(game_name="who's most likely", category="SFW", author="User1", text="text 3", excluded=True),
+    QuestionValid(
+        game_name="who's most likely",
+        category="SFW",
+        author="User1",
+        text="text 3",
+        excluded=True,
+    ),
 ]
 
 TEST_QUESTIONS_INVALID: dict[str, QuestionInvalid] = {
@@ -114,14 +120,8 @@ class PlayerInvalid:
     score: Any = 0.0
 
 
-TEST_GAME_ROOMS_VALID = [
+TEST_GAME_ROOMS_VALID = []
 
-]
+TEST_PLAYERS_VALID = []
 
-TEST_PLAYERS_VALID = [
-
-]
-
-TEST_RANKINGS_VALID = [
-
-]
+TEST_RANKINGS_VALID = []

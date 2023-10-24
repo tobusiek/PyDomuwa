@@ -3,8 +3,8 @@ from typing import Type
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
-from starlette.responses import Response
 from starlette import templating
+from starlette.responses import Response
 
 from domuwa import config
 from domuwa.database import (
@@ -29,7 +29,7 @@ router = APIRouter(prefix="/answer", tags=["Answer"])
 templates = templating.Jinja2Templates(directory="resources/templates")
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=None)
 async def create_answer(
     request: Request,
     author: str,
@@ -48,7 +48,7 @@ async def create_answer(
     return templates.TemplateResponse("create_answer.html", ctx)
 
 
-@router.get("/{answer_id}", response_model=AnswerWithQuestionView)
+@router.get("/{answer_id}", response_model=None)
 async def get_answer_by_id(
     request: Request,
     answer_id: int,
@@ -62,7 +62,7 @@ async def get_answer_by_id(
     return templates.TemplateResponse("get_answer.html", ctx)
 
 
-@router.get("/")
+@router.get("/", response_model=None)
 async def get_all_answers(
     request: Request,
     db: Session = Depends(get_db),
@@ -78,7 +78,7 @@ async def get_all_answers(
     return templates.TemplateResponse("get_all_answers.html", ctx)
 
 
-@router.get("/for_question/{question_id}")
+@router.get("/for_question/{question_id}", response_model=None)
 async def get_answers_for_question(
     request: Request,
     question_id: int,
@@ -95,7 +95,7 @@ async def get_answers_for_question(
     return templates.TemplateResponse("get_answers_for_question.html", ctx)
 
 
-@router.put("/")
+@router.put("/", response_model=None)
 async def update_answer(
     request: Request,
     answer_id: int,

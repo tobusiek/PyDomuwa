@@ -21,7 +21,7 @@ router = APIRouter(prefix="/player", tags=["Player"])
 templates = templating.Jinja2Templates(directory="resources/templates")
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=None)
 async def create_player(
     request: Request,
     name: str,
@@ -36,7 +36,7 @@ async def create_player(
     return templates.TemplateResponse("create_player.html", ctx)
 
 
-@router.get("/{player_id}")
+@router.get("/{player_id}", response_model=None)
 async def get_player_by_id(
     request: Request,
     player_id: int,
@@ -50,7 +50,7 @@ async def get_player_by_id(
     return templates.TemplateResponse("get_player.html", ctx)
 
 
-@router.get("/")
+@router.get("/", response_model=None)
 async def get_all_players(
     request: Request,
     db: Session = Depends(get_db),
@@ -66,7 +66,7 @@ async def get_all_players(
     return templates.TemplateResponse("get_all_players.html", ctx)
 
 
-@router.get("/from_game_room/{game_room_id}")
+@router.get("/from_game_room/{game_room_id}", response_model=None)
 async def get_all_players_from_game_room(
     request: Request,
     game_room_id: int,
@@ -83,7 +83,7 @@ async def get_all_players_from_game_room(
     return templates.TemplateResponse("get_all_players_from_game.html", ctx)
 
 
-@router.put("/update_name")
+@router.put("/update_name", response_model=None)
 async def update_player_name(
     request: Request,
     player_id: int,
@@ -99,7 +99,7 @@ async def update_player_name(
     return templates.TemplateResponse("update_player.html", ctx)
 
 
-@router.put("/update_score")
+@router.put("/update_score", response_model=None)
 async def update_player_score(
     request: Request,
     player_id: int,
@@ -114,7 +114,7 @@ async def update_player_score(
     return templates.TemplateResponse("update_player.html", ctx)
 
 
-@router.put("/reset_game_room")
+@router.put("/reset_game_room", response_model=None)
 async def reset_player_game_room(
     request: Request,
     player_id: int,
@@ -128,7 +128,7 @@ async def reset_player_game_room(
     return templates.TemplateResponse("update_player.html", ctx)
 
 
-@router.put("/reset_score")
+@router.put("/reset_score", response_model=None)
 async def reset_player_score(
     request: Request,
     player_id: int,
@@ -146,6 +146,7 @@ async def reset_player_score(
     "/delete",
     status_code=status.HTTP_204_NO_CONTENT,
     response_class=Response,
+    response_model=None,
 )
 async def delete_player(player_id: int, db: Session = Depends(get_db)) -> None:
     await db_obj_delete(player_id, Player, "Player", db)

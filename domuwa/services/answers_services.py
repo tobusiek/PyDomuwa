@@ -1,4 +1,3 @@
-from domuwa.utils.logging import get_logger
 from typing import Type
 
 from fastapi import Depends, HTTPException
@@ -8,6 +7,7 @@ from starlette import status
 from domuwa.database import db_obj_save, get_db, get_obj_of_type_by_id
 from domuwa.models import Answer, Question
 from domuwa.schemas import AnswerSchema
+from domuwa.utils.logging import get_logger
 
 logger = get_logger("db_connector")
 

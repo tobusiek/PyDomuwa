@@ -45,6 +45,6 @@ if __name__ == "__main__":
         "Serwer uruchomiony. Żeby dołączyć do gry, połącz się do tej samej sieci WiFi, "
         "do której jest podłączony komputer.\n"
         "Teraz niech każdy na swoim telefonie wpisze w przeglądarkę adres "
-        f"http://{address}:{port}"
+        f"http://{address}:{port}",
     )
     uvicorn.run(app, host=address, port=port)

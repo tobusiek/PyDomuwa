@@ -1,5 +1,5 @@
 #!/bin/bash
 
-ruff check .
+ruff check --fix --no-cache .
 
-pytest .
+pytest -n auto

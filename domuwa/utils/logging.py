@@ -11,7 +11,7 @@ def get_logger(logger_name: str) -> Logger:
         "INFO": "green",
         "WARNING": "yellow",
         "ERROR": "red",
-        "CRITICAL": "bold_red"
+        "CRITICAL": "bold_red",
     }
     handler.setFormatter(ColoredFormatter(logger_fmt, log_colors=log_colors))
     logger = getLogger(logger_name)

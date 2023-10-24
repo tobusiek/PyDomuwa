@@ -4,25 +4,35 @@ from starlette import status
 
 from domuwa.models import Question
 from domuwa.tests.data_for_testing import (
-    AUTHOR, CATEGORY,
-    EXCLUDED, GAME_NAME, ID, TEST_QUESTIONS_INVALID, TEST_QUESTIONS_VALID,
-    ResponseType, TEXT,
+    AUTHOR,
+    CATEGORY,
+    EXCLUDED,
+    GAME_NAME,
+    ID,
+    TEST_QUESTIONS_INVALID,
+    TEST_QUESTIONS_VALID,
+    TEXT,
+    ResponseType,
 )
 from domuwa.tests.setup import client, override_get_db
 
 QUESTIONS_PREFIX = "/question/"
 
 
-def post_valid_question(valid_question_idx: int) -> Generator[Question, None]:
+def post_valid_question(valid_question_idx: int) -> Generator[dict, None, None]:
     question = TEST_QUESTIONS_VALID[valid_question_idx]
     question_response = client.post(QUESTIONS_PREFIX, params=question.__dict__)
-    assert question_response.status_code == status.HTTP_201_CREATED, question_response.text
+    assert (
+        question_response.status_code == status.HTTP_201_CREATED
+    ), question_response.text
     question_response_data = question_response.json()
     assert ID in question_response_data
     yield question_response_data
 
     db = next(override_get_db())
-    db.get(Question, question_response_data[ID]).delete()
+    db_question = db.get(Question, question_response_data[ID])
+    if db_question is not None:
+        db.delete(db_question)
     db.commit()
 
 
@@ -49,12 +59,16 @@ def test_create_question() -> None:
 def test_create_question_invalid_data() -> None:
     invalid_question = TEST_QUESTIONS_INVALID[GAME_NAME]
     question_response = client.post(QUESTIONS_PREFIX, params=invalid_question.__dict__)
-    assert question_response.status_code == status.HTTP_400_BAD_REQUEST, question_response.text
+    assert (
+        question_response.status_code == status.HTTP_400_BAD_REQUEST
+    ), question_response.text
 
 
 def test_get_question_invalid_id() -> None:
     question_response = client.get(QUESTIONS_PREFIX + str(999))
-    assert question_response.status_code == status.HTTP_404_NOT_FOUND, question_response.text
+    assert (
+        question_response.status_code == status.HTTP_404_NOT_FOUND
+    ), question_response.text
 
 
 def test_get_all_questions() -> None:

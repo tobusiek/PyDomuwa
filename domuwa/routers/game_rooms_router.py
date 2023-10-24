@@ -14,7 +14,7 @@ router = APIRouter(prefix="/game_room", tags=["Game Room"])
 templates = templating.Jinja2Templates(directory="resources/templates")
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=None)
 async def create_game_room(
     request: Request,
     name: str,
@@ -30,7 +30,7 @@ async def create_game_room(
     return templates.TemplateResponse("create_game_room.html", ctx)
 
 
-@router.get("/{game_room_id}")
+@router.get("/{game_room_id}", response_model=None)
 async def get_game_room_by_id(
     request: Request,
     game_room_id: int,
@@ -44,7 +44,7 @@ async def get_game_room_by_id(
     return templates.TemplateResponse("get_game_room.html", ctx)
 
 
-@router.get("/")
+@router.get("/", response_model=None)
 async def get_all_game_rooms(
     request: Request,
     db: Session = Depends(get_db),
@@ -62,7 +62,7 @@ async def get_all_game_rooms(
     return templates.TemplateResponse("get_all_game_rooms.html", ctx)
 
 
-@router.put("/add_player")
+@router.put("/add_player", response_model=None)
 async def add_player(
     request: Request,
     game_room_id: int,
@@ -77,7 +77,7 @@ async def add_player(
     return templates.TemplateResponse("game_room_add_player.html", ctx)
 
 
-@router.put("/remove_player")
+@router.put("/remove_player", response_model=None)
 async def remove_player(
     request: Request,
     game_room_id: int,
@@ -92,7 +92,7 @@ async def remove_player(
     return templates.TemplateResponse("game_room_add_player.html", ctx)
 
 
-@router.put("/remove_player")
+@router.put("/remove_player", response_model=None)
 async def remove_players(
     request: Request,
     game_room_id: int,
@@ -106,7 +106,12 @@ async def remove_players(
     return templates.TemplateResponse("game_room_remove_player.html", ctx)
 
 
-@router.delete("/", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
+@router.delete(
+    "/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    response_model=None,
+)
 async def delete_game_room(game_room_id: int, db: Session = Depends(get_db)) -> None:
     await services.delete_game_room(game_room_id, db)
 

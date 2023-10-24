@@ -1,10 +1,9 @@
 from typing import Type
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from pydantic import ValidationError
 from sqlalchemy.orm import Session
-from starlette.responses import Response
 from starlette import templating
+from starlette.responses import Response
 
 from domuwa import config
 from domuwa.database import (
@@ -29,7 +28,7 @@ router = APIRouter(prefix="/question", tags=["Question"])
 templates = templating.Jinja2Templates(directory="resources/templates")
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=None)
 async def create_question(
     request: Request,
     game_name: str,
@@ -47,7 +46,7 @@ async def create_question(
     return templates.TemplateResponse("create_question.html", ctx)
 
 
-@router.get("/{question_id}")
+@router.get("/{question_id}", response_model=None)
 async def get_question_by_id(
     request: Request,
     question_id: int,
@@ -61,7 +60,7 @@ async def get_question_by_id(
     return templates.TemplateResponse("get_question.html", ctx)
 
 
-@router.get("/")
+@router.get("/", response_model=None)
 async def get_all_questions(
     request: Request,
     db: Session = Depends(get_db),
@@ -79,7 +78,7 @@ async def get_all_questions(
     return templates.TemplateResponse("get_all_questions.html", ctx)
 
 
-@router.put("/")
+@router.put("/", response_model=None)
 async def update_question(
     request: Request,
     question_id: int,
@@ -98,7 +97,7 @@ async def update_question(
     return templates.TemplateResponse("update_question.html", ctx)
 
 
-@router.put("/excluding")
+@router.put("/excluding", response_model=None)
 async def update_question_excluded(
     request: Request,
     question_id: int,
@@ -113,7 +112,12 @@ async def update_question_excluded(
     return templates.TemplateResponse("update_question.html", ctx)
 
 
-@router.delete("/", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
+@router.delete(
+    "/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    response_model=None,
+)
 async def delete_question(question_id: int, db: Session = Depends(get_db)) -> None:
     await db_obj_delete(question_id, Question, "Question", db)
 
@@ -133,7 +137,7 @@ def validate_question_data(
             text=text,
             excluded=excluded,
         )
-    except ValidationError:
+    except ValueError:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid data input")
     return question
 
@@ -146,11 +150,11 @@ def create_question_view_with_answers(
     question: Question | Type[Question],
 ) -> QuestionWithAnswersView:
     return QuestionWithAnswersView(
-        id=question.id,
-        game_name=question.game_name,
-        category=question.category,
-        author=question.author,
-        text=question.text,
-        excluded=question.excluded,
+        id=question.id,  # type: ignore
+        game_name=question.game_name,  # type: ignore
+        category=question.category,  # type: ignore
+        author=question.author,  # type: ignore
+        text=question.text,  # type: ignore
+        excluded=question.excluded,  # type: ignore
         answers=[AnswerView.model_validate(answer) for answer in question.answers],
     )

@@ -5,26 +5,25 @@ from httpx import Response
 from sqlalchemy.orm import Session
 from starlette import status
 
-from domuwa.models import Answer, Question
+from domuwa.models import Question
 from domuwa.tests.data_for_testing import (
-    ANSWER_ID, AUTHOR, AnswerValid,
-    CORRECT, ID, QUESTION, QUESTION_ID, ResponseType,
+    ANSWER_ID,
+    AUTHOR,
+    CORRECT,
+    ID,
+    QUESTION,
+    QUESTION_ID,
     TEST_ANSWERS_INVALID,
     TEST_ANSWERS_VALID,
-    TEST_QUESTIONS_VALID, TEXT
+    TEST_QUESTIONS_VALID,
+    TEXT,
+    AnswerValid,
+    ResponseType,
 )
 from domuwa.tests.setup import client, override_get_db
 
 ANSWERS_PREFIX = "/answer/"
 QUESTIONS_PREFIX = "/question/"
-
-
-@pytest.fixture(autouse=True, scope="function")
-def clear_answers_from_db() -> None:
-    db = next(override_get_db())
-    db.query(Question).delete()
-    db.query(Answer).delete()
-    yield
 
 
 def create_mock_question(test_question_idx: int, db: Session) -> Question:
@@ -44,7 +43,7 @@ def create_mock_question(test_question_idx: int, db: Session) -> Question:
 
 # TODO: not a fixture for each test, but at the start of the answer's tests (if possible)
 @pytest.fixture()
-def mock_question(question_idx: int) -> Generator[Question, None]:
+def mock_question(question_idx: int) -> Generator[Question, None, None]:
     db = next(override_get_db())
     db_question = create_mock_question(question_idx, db)
     yield db_question
@@ -53,7 +52,7 @@ def mock_question(question_idx: int) -> Generator[Question, None]:
 
 
 @pytest.fixture()
-def mock_questions(questions_idxs: list[int]) -> Generator[list[Question], None]:
+def mock_questions(questions_idxs: list[int]) -> Generator[list[Question], None, None]:
     questions = []
     db = next(override_get_db())
     for question_idx in questions_idxs:
@@ -94,16 +93,19 @@ def post_valid_answer(answer_data: dict) -> Response:
 
 
 def put_invalid_answer(
-        invalid_key: str,
-        answer_id: int,
-        question_id: int = None,
-        expected_status: int = status.HTTP_400_BAD_REQUEST,
+    invalid_key: str,
+    answer_id: int,
+    question_id: int | None = None,
+    expected_status: int = status.HTTP_400_BAD_REQUEST,
 ) -> None:
     invalid_answer = TEST_ANSWERS_INVALID[invalid_key]
     invalid_answer.add_answer_id(answer_id)
     if question_id:
         invalid_answer.question_id = question_id
-    invalid_text_answer_response = client.put(ANSWERS_PREFIX, params=invalid_answer.__dict__)
+    invalid_text_answer_response = client.put(
+        ANSWERS_PREFIX,
+        params=invalid_answer.__dict__,
+    )
     assert invalid_text_answer_response.status_code == expected_status
 
 
@@ -122,7 +124,8 @@ def test_create_answer(mock_question: Question, question_idx: int) -> None:
     validate_response(answer_data, answer_response.json())
 
     db = next(override_get_db())
-    db_question = db.get(Question, mock_question_id)
+    db_question: Question | None = db.get(Question, mock_question_id)
+    assert db_question is not None
     assert answer_id in [answer.id for answer in db_question.answers]
 
 
@@ -131,11 +134,17 @@ def test_create_answer_invalid_data(mock_question: Question, question_idx: int) 
     assert_invalid_answer_data(AUTHOR, status.HTTP_400_BAD_REQUEST)
     assert_invalid_answer_data(TEXT, status.HTTP_400_BAD_REQUEST)
     assert_invalid_answer_data(QUESTION_ID, status.HTTP_404_NOT_FOUND)
-    assert_invalid_answer_data(CORRECT, status.HTTP_422_UNPROCESSABLE_ENTITY)  # cannot convert to bool
+    assert_invalid_answer_data(
+        CORRECT,
+        status.HTTP_422_UNPROCESSABLE_ENTITY,
+    )  # cannot convert to bool
 
 
 @pytest.mark.parametrize("question_idx", [0])
-def test_create_answer_correct_answer_already_exists(mock_question: Question, question_idx: int) -> None:
+def test_create_answer_correct_answer_already_exists(
+    mock_question: Question,
+    question_idx: int,
+) -> None:
     mock_question_id = mock_question.id
 
     correct_answer1 = create_valid_answer(1, mock_question_id)
@@ -143,20 +152,32 @@ def test_create_answer_correct_answer_already_exists(mock_question: Question, qu
 
     correct_answer2 = TEST_ANSWERS_VALID[2]
     correct_answer2.add_question_id(mock_question_id)
-    correct_answer2_response = client.post(ANSWERS_PREFIX, params=correct_answer2.__dict__)
-    assert correct_answer2_response.status_code == status.HTTP_400_BAD_REQUEST, correct_answer2_response.text
+    correct_answer2_response = client.post(
+        ANSWERS_PREFIX,
+        params=correct_answer2.__dict__,
+    )
+    assert (
+        correct_answer2_response.status_code == status.HTTP_400_BAD_REQUEST
+    ), correct_answer2_response.text
 
 
 @pytest.mark.parametrize("question_idx", [0])
 def test_get_answer_invalid_id(mock_question: Question, question_idx: int) -> None:
     answer_response = client.get(ANSWERS_PREFIX + str(-1))
-    assert answer_response.status_code == status.HTTP_404_NOT_FOUND, answer_response.text
+    assert (
+        answer_response.status_code == status.HTTP_404_NOT_FOUND
+    ), answer_response.text
 
 
 @pytest.mark.parametrize("questions_idxs", [[0, 1]])
-def test_get_all_answers(mock_questions: list[Question], questions_idxs: list[int]) -> None:
+def test_get_all_answers(
+    mock_questions: list[Question],
+    questions_idxs: list[int],
+) -> None:
     empty_answers_response = client.get(ANSWERS_PREFIX)
-    assert empty_answers_response.status_code == status.HTTP_200_OK, empty_answers_response.text
+    assert (
+        empty_answers_response.status_code == status.HTTP_200_OK
+    ), empty_answers_response.text
     empty_answers_response_data = empty_answers_response.json()
     assert isinstance(empty_answers_response_data, list)
     assert len(empty_answers_response_data) == 0
@@ -242,17 +263,28 @@ def test_update_answer(mock_question: Question, question_idx: int) -> None:
     answer_response_data = answer_response.json()
 
     updated_answer = AnswerValid(
-        author="updated_user", text="updated_text", correct=not answer_response_data[CORRECT])
+        author="updated_user",
+        text="updated_text",
+        correct=not answer_response_data[CORRECT],
+    )
     updated_answer.add_answer_id(answer_response_data[ID])
     updated_answer.add_question_id(mock_question_id)
-    updated_answer_put_response = client.put(ANSWERS_PREFIX, params=updated_answer.__dict__)
+    updated_answer_put_response = client.put(
+        ANSWERS_PREFIX,
+        params=updated_answer.__dict__,
+    )
     updated_answer_put_response_data = updated_answer_put_response.json()
     assert ID in updated_answer_put_response_data
 
-    updated_answer_get_response = client.get(ANSWERS_PREFIX + str(answer_response_data[ID]))
+    updated_answer_get_response = client.get(
+        ANSWERS_PREFIX + str(answer_response_data[ID]),
+    )
     updated_answer_get_response_data = updated_answer_get_response.json()
     assert ID in updated_answer_get_response_data
-    validate_response(updated_answer_put_response_data, updated_answer_get_response_data)
+    validate_response(
+        updated_answer_put_response_data,
+        updated_answer_get_response_data,
+    )
 
 
 @pytest.mark.parametrize("question_idx", [0])
@@ -269,12 +301,22 @@ def test_update_answer_invalid_data(mock_question: Question, question_idx: int) 
     invalid_id_answer[ANSWER_ID] = -1
     del invalid_id_answer[QUESTION]
     invalid_id_answer_response = client.put(ANSWERS_PREFIX, params=invalid_id_answer)
-    assert invalid_id_answer_response.status_code == status.HTTP_404_NOT_FOUND, invalid_id_answer_response.text
+    assert (
+        invalid_id_answer_response.status_code == status.HTTP_404_NOT_FOUND
+    ), invalid_id_answer_response.text
 
-    put_invalid_answer(AUTHOR, answer_id, question_id=mock_question_id)  # invalid author
+    put_invalid_answer(
+        AUTHOR,
+        answer_id,
+        question_id=mock_question_id,
+    )  # invalid author
     put_invalid_answer(TEXT, answer_id, question_id=mock_question_id)  # invalid text
-    put_invalid_answer(CORRECT, answer_id, mock_question_id,
-                       status.HTTP_422_UNPROCESSABLE_ENTITY)  # invalid correct
+    put_invalid_answer(
+        CORRECT,
+        answer_id,
+        mock_question_id,
+        status.HTTP_422_UNPROCESSABLE_ENTITY,
+    )  # invalid correct
 
     # correct answer already exists
     correct_answer2 = create_valid_answer(0, mock_question_id)
@@ -284,12 +326,17 @@ def test_update_answer_invalid_data(mock_question: Question, question_idx: int) 
     del correct_answer2_response_data[QUESTION]
     correct_answer2_id = correct_answer2_response_data.pop(ID)
     correct_answer2_response_data[ANSWER_ID] = correct_answer2_id
-    correct_answer2_response = client.put(ANSWERS_PREFIX, params=correct_answer2_response_data)
-    assert correct_answer2_response.status_code == status.HTTP_400_BAD_REQUEST, correct_answer2_response.text
+    correct_answer2_response = client.put(
+        ANSWERS_PREFIX,
+        params=correct_answer2_response_data,
+    )
+    assert (
+        correct_answer2_response.status_code == status.HTTP_400_BAD_REQUEST
+    ), correct_answer2_response.text
 
 
 @pytest.mark.parametrize("question_idx", [0])
-def test_delete_answer(mock_question: Question, question_idx: int) -> None:
+def test_delete_answer(mock_question: Question) -> None:
     mock_question_id = mock_question.id
 
     answer = create_valid_answer(0, mock_question_id)
@@ -298,10 +345,14 @@ def test_delete_answer(mock_question: Question, question_idx: int) -> None:
     answer_id = answer_response_data[ID]
 
     delete_response = client.delete(ANSWERS_PREFIX, params={"answer_id": answer_id})
-    assert delete_response.status_code == status.HTTP_204_NO_CONTENT, delete_response.text
+    assert (
+        delete_response.status_code == status.HTTP_204_NO_CONTENT
+    ), delete_response.text
 
     answer_response = client.get(ANSWERS_PREFIX + str(answer_id))
-    assert answer_response.status_code == status.HTTP_404_NOT_FOUND, answer_response.text
+    assert (
+        answer_response.status_code == status.HTTP_404_NOT_FOUND
+    ), answer_response.text
 
 
 def test_delete_answer_invalid_id() -> None:
@@ -309,4 +360,6 @@ def test_delete_answer_invalid_id() -> None:
     get_response = client.get(ANSWERS_PREFIX + str(invalid_id))
     assert get_response.status_code == status.HTTP_404_NOT_FOUND, get_response.text
     delete_response = client.delete(ANSWERS_PREFIX, params={"answer_id": invalid_id})
-    assert delete_response.status_code == status.HTTP_404_NOT_FOUND, delete_response.text
+    assert (
+        delete_response.status_code == status.HTTP_404_NOT_FOUND
+    ), delete_response.text

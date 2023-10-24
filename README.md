@@ -46,5 +46,5 @@ Then go to http address printed in console
 ### Test app
 
 ```console
-pytest - n auto
+pytest -n auto
 ```

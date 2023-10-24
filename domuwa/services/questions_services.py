@@ -9,7 +9,7 @@ from domuwa.schemas import QuestionSchema
 
 
 async def create_question(
-    question: QuestionSchema, db: Session = Depends(get_db)
+    question: QuestionSchema, db: Session = Depends(get_db),
 ) -> Question:
     db_question = Question(
         game_name=question.game_name,
