@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+import dataclasses
 from typing import Any
 
 ResponseType = dict[str, str | int | float | bool]
@@ -16,7 +16,7 @@ QUESTION_ID = "question_id"
 QUESTION = "question"
 
 
-@dataclass
+@dataclasses.dataclass
 class QuestionValid:
     game_name: str = "ego"
     category: str = "MIXED"
@@ -25,7 +25,7 @@ class QuestionValid:
     excluded: bool = False
 
 
-@dataclass
+@dataclasses.dataclass
 class QuestionInvalid:
     game_name: Any = "ego"
     category: Any = "MIXED"
@@ -55,7 +55,7 @@ TEST_QUESTIONS_INVALID: dict[str, QuestionInvalid] = {
 }
 
 
-@dataclass
+@dataclasses.dataclass
 class AnswerValid:
     author: str = "User"
     text: str = "text"
@@ -70,7 +70,7 @@ class AnswerValid:
         self.question_id = question_id
 
 
-@dataclass
+@dataclasses.dataclass
 class AnswerInvalid:
     question_id: Any = 1
     author: Any = "User"
@@ -96,25 +96,25 @@ TEST_ANSWERS_INVALID: dict[str, AnswerInvalid] = {
 }
 
 
-@dataclass
+@dataclasses.dataclass
 class GameRoomValid:
     game_name: str = "ego"
     game_category: str = "MIXED"
 
 
-@dataclass
+@dataclasses.dataclass
 class GameRoomInvalid:
     game_name: Any = "ego"
     game_category: Any = "MIXED"
 
 
-@dataclass
+@dataclasses.dataclass
 class PlayerValid:
     name: str = "User"
     score: float = 0.0
 
 
-@dataclass
+@dataclasses.dataclass
 class PlayerInvalid:
     name: Any = "User"
     score: Any = 0.0

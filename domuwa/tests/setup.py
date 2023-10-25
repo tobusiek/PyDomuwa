@@ -19,7 +19,7 @@ TestingSessionLocal = orm.sessionmaker(autoflush=False, bind=engine)
 models.Base.metadata.create_all(engine)
 
 
-def override_get_db() -> Generator[orm.Session, None, None]:
+def override_get_db_session() -> Generator[orm.Session, None, None]:
     db = TestingSessionLocal()
     try:
         yield db
@@ -27,7 +27,7 @@ def override_get_db() -> Generator[orm.Session, None, None]:
         db.close()
 
 
-main.app.dependency_overrides[db.get_db_session] = override_get_db
+main.app.dependency_overrides[db.get_db_session] = override_get_db_session
 
 config.TESTING = True
 
