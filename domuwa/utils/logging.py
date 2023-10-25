@@ -1,11 +1,12 @@
-from logging import Logger
+import logging
 
-from colorlog import ColoredFormatter, StreamHandler, getLogger
+import colorlog
 
 
-def get_logger(logger_name: str) -> Logger:
-    handler = StreamHandler()
-    logger_fmt = "%(log_color)s%(asctime)s [%(name)s:%(levelname)s] %(funcName)s() %(message)s"
+def get_logger(logger_name: str) -> logging.Logger:
+    logger_fmt = (
+        "%(log_color)s%(asctime)s [%(name)s:%(levelname)s] %(funcName)s() %(message)s"
+    )
     log_colors = {
         "DEBUG": "cyan",
         "INFO": "green",
@@ -13,7 +14,8 @@ def get_logger(logger_name: str) -> Logger:
         "ERROR": "red",
         "CRITICAL": "bold_red",
     }
-    handler.setFormatter(ColoredFormatter(logger_fmt, log_colors=log_colors))
-    logger = getLogger(logger_name)
+    handler = colorlog.StreamHandler()
+    handler.setFormatter(colorlog.ColoredFormatter(logger_fmt, log_colors=log_colors))
+    logger = colorlog.getLogger(logger_name)
     logger.addHandler(handler)
     return logger

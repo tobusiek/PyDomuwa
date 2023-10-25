@@ -1,45 +1,45 @@
 import logging.config
 
+import fastapi
 import uvicorn
-from fastapi import FastAPI
-from fastapi.templating import Jinja2Templates
-from starlette.middleware.sessions import SessionMiddleware
-from starlette.requests import Request
-from starlette.templating import _TemplateResponse
+from starlette import requests, templating
+from starlette.middleware import sessions
 
 from domuwa import config
-from domuwa.routers.answers_router import router as answer_router
-from domuwa.routers.game_rooms_router import router as game_router
-from domuwa.routers.players_router import router as player_router
-from domuwa.routers.questions_router import router as question_router
-from domuwa.utils.get_computer_ip import get_ip_address
-from domuwa.utils.logging import get_logger
+from domuwa.routers import (
+    answers_router,
+    game_rooms_router,
+    players_router,
+    questions_router,
+)
+from domuwa.utils import get_computer_ip
+from domuwa.utils import logging as app_logging
 
-logger = get_logger("fastapi")
+logger = app_logging.get_logger("fastapi")
 logging.getLogger("multipart.multipart").setLevel(logging.INFO)
 logging.getLogger("asyncio").setLevel(logging.INFO)
 
-app = FastAPI(debug=True)
+app = fastapi.FastAPI(debug=True)
 
-app.include_router(answer_router)
-app.include_router(game_router)
-app.include_router(player_router)
-app.include_router(question_router)
+app.include_router(answers_router.router)
+app.include_router(game_rooms_router.router)
+app.include_router(players_router.router)
+app.include_router(questions_router.router)
 
-app.add_middleware(SessionMiddleware, secret_key="guccitrip")
+app.add_middleware(sessions.SessionMiddleware, secret_key="guccitrip")
 
-templates = Jinja2Templates(directory="resources/templates")
+templates = templating.Jinja2Templates(directory="resources/templates")
 
 
 @app.get("/")
-async def get_home(request: Request) -> _TemplateResponse:
+async def get_home(request: requests.Request) -> templating._TemplateResponse:
     context = {"request": request}
     return templates.TemplateResponse("index.html", context)
 
 
 if __name__ == "__main__":
     port = config.PORT
-    address = get_ip_address(port)
+    address = get_computer_ip.get_ip_address(port)
     # noinspection SpellCheckingInspection,HttpUrlsUsage
     print(
         "Serwer uruchomiony. Żeby dołączyć do gry, połącz się do tej samej sieci WiFi, "

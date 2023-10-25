@@ -3,7 +3,7 @@ from __future__ import annotations
 import sqlalchemy
 from sqlalchemy import orm
 
-from domuwa.database import engine
+from domuwa import database
 
 
 class Base(orm.DeclarativeBase):
@@ -86,12 +86,12 @@ class Player(Base):
         nullable=False,
         default=0.0,
     )
-    game_room_id: orm.Mapped[int] = orm.mapped_column(
+    game_room_id: orm.Mapped[int | None] = orm.mapped_column(
         sqlalchemy.Integer,
         sqlalchemy.ForeignKey("game_room.id"),
         nullable=True,
     )
-    game_room: orm.Mapped[GameRoom] = orm.relationship(
+    game_room: orm.Mapped[GameRoom | None] = orm.relationship(
         "GameRoom",
         back_populates="players",
         foreign_keys=game_room_id,
@@ -136,4 +136,4 @@ class Question(Base):
         )
 
 
-Base.metadata.create_all(engine)
+Base.metadata.create_all(database.engine)

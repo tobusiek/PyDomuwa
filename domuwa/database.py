@@ -1,26 +1,27 @@
 from collections.abc import AsyncGenerator
-from typing import Any, Type
+from typing import Type, TypeVar
 
-from fastapi import Depends, HTTPException, status
-from sqlalchemy import StaticPool, create_engine
-from sqlalchemy.orm import Session, sessionmaker
+import fastapi
+import sqlalchemy
+from fastapi import status
+from sqlalchemy import orm
 
 from domuwa import config
-from domuwa.utils.logging import get_logger
+from domuwa.utils import logging
 
-logger = get_logger("db_connector")
+logger = logging.get_logger("db_connector")
 
-engine = create_engine(
+engine = sqlalchemy.create_engine(
     config.DATABASE_URL,
     connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
+    poolclass=sqlalchemy.StaticPool,
 )
-SessionLocal = sessionmaker(autoflush=True, bind=engine)
+SessionLocal = orm.sessionmaker(autoflush=True, bind=engine)
 
-DbModel = Type[Any]
+T = TypeVar("T")
 
 
-async def get_db() -> AsyncGenerator[Session, None]:
+async def get_db_session() -> AsyncGenerator[orm.Session, None]:
     db = SessionLocal()
     try:
         yield db
@@ -30,14 +31,14 @@ async def get_db() -> AsyncGenerator[Session, None]:
 
 async def get_obj_of_type_by_id(
     obj_id: int,
-    obj_model_type: DbModel,
+    obj_model_type: Type[T],
     obj_model_type_name: str,
-    db: Session = Depends(get_db),
-) -> DbModel:
+    db: orm.Session = fastapi.Depends(get_db_session),
+) -> T:
     obj = db.get(obj_model_type, obj_id)
     if not obj:
         logger.warning(f"{obj_model_type_name} of id={obj_id} not found")
-        raise HTTPException(
+        raise fastapi.HTTPException(
             status.HTTP_404_NOT_FOUND,
             f"{obj_model_type_name} of id={obj_id} not found",
         )
@@ -45,16 +46,16 @@ async def get_obj_of_type_by_id(
 
 
 async def get_all_objs_of_type(
-    obj_model: DbModel,
-    db: Session = Depends(get_db),
-) -> list[DbModel]:
+    obj_model: Type[T],
+    db: orm.Session = fastapi.Depends(get_db_session),
+) -> list[T]:
     return db.query(obj_model).all()
 
 
 async def db_obj_save(
-    obj_model: DbModel,
-    db: Session = Depends(get_db),
-) -> DbModel:
+    obj_model: T,
+    db: orm.Session = fastapi.Depends(get_db_session),
+) -> T:
     db.add(obj_model)
     db.commit()
     db.refresh(obj_model)
@@ -63,9 +64,9 @@ async def db_obj_save(
 
 async def db_obj_delete(
     obj_id: int,
-    obj_model_type: DbModel,
+    obj_model_type: Type[T],  # type: ignore
     obj_model_type_name: str,
-    db: Session = Depends(get_db),
+    db: orm.Session = fastapi.Depends(get_db_session),
 ) -> None:
     obj = await get_obj_of_type_by_id(obj_id, obj_model_type, obj_model_type_name, db)
     db.delete(obj)

@@ -1,7 +1,7 @@
-from enum import Enum
+import enum
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+import pydantic
 
 from domuwa.utils.logging import get_logger
 
@@ -13,19 +13,21 @@ MAX_PLAYER_NAME_LEN = 25
 MIN_TEXT_LEN = 1
 MAX_TEXT_LEN = 150
 
-valid_id = Field(ge=1)
+valid_id = pydantic.Field(ge=1)
 
 
-class AnswerSchema(BaseModel):
-    author: str = Field(min_length=MIN_PLAYER_NAME_LEN, max_length=MAX_PLAYER_NAME_LEN)
-    text: str = Field(min_length=MIN_TEXT_LEN, max_length=MAX_TEXT_LEN)
-    correct: bool = Field(False)
-    question_id: int = Field(strict=True, ge=MIN_ID)
+class AnswerSchema(pydantic.BaseModel):
+    author: str = pydantic.Field(
+        min_length=MIN_PLAYER_NAME_LEN, max_length=MAX_PLAYER_NAME_LEN,
+    )
+    text: str = pydantic.Field(min_length=MIN_TEXT_LEN, max_length=MAX_TEXT_LEN)
+    correct: bool = pydantic.Field(False)
+    question_id: int = pydantic.Field(strict=True, ge=MIN_ID)
 
 
 class AnswerView(AnswerSchema):
     id: int = valid_id
-    model_config = ConfigDict(from_attributes=True)
+    model_config = pydantic.ConfigDict(from_attributes=True)
 
 
 MIN_GAME_NAME_LEN = 3
@@ -34,14 +36,20 @@ MIN_CATEGORY_LEN = 3
 MAX_CATEGORY_LEN = 25
 
 
-class QuestionSchema(BaseModel):
-    game_name: str = Field(min_length=MIN_GAME_NAME_LEN, max_length=MAX_GAME_NAME_LEN)
-    category: str = Field(min_length=MIN_CATEGORY_LEN, max_length=MAX_CATEGORY_LEN)
-    author: str = Field(min_length=MIN_PLAYER_NAME_LEN, max_length=MAX_PLAYER_NAME_LEN)
-    text: str = Field(min_length=MIN_TEXT_LEN, max_length=MAX_TEXT_LEN)
-    excluded: bool = Field(False)
+class QuestionSchema(pydantic.BaseModel):
+    game_name: str = pydantic.Field(
+        min_length=MIN_GAME_NAME_LEN, max_length=MAX_GAME_NAME_LEN,
+    )
+    category: str = pydantic.Field(
+        min_length=MIN_CATEGORY_LEN, max_length=MAX_CATEGORY_LEN,
+    )
+    author: str = pydantic.Field(
+        min_length=MIN_PLAYER_NAME_LEN, max_length=MAX_PLAYER_NAME_LEN,
+    )
+    text: str = pydantic.Field(min_length=MIN_TEXT_LEN, max_length=MAX_TEXT_LEN)
+    excluded: bool = pydantic.Field(False)
 
-    @field_validator("game_name", mode="before")
+    @pydantic.field_validator("game_name", mode="before")
     @classmethod
     def check_game_name(cls, game_name: str) -> str:
         if game_name not in ("ego", "who's-most-likely"):
@@ -53,7 +61,7 @@ class QuestionSchema(BaseModel):
 
 class QuestionView(QuestionSchema):
     id: int = valid_id
-    model_config = ConfigDict(from_attributes=True)
+    model_config = pydantic.ConfigDict(from_attributes=True)
 
 
 class QuestionWithAnswersView(QuestionView):
@@ -64,17 +72,21 @@ class AnswerWithQuestionView(AnswerView):
     question: QuestionView
 
 
-class GameCategory(Enum):
+class GameCategory(enum.Enum):
     SFW = "SFW"
     NSFW = "NSFW"
     MIXED = "MIXED"
 
 
-class GameRoomSchema(BaseModel):
-    game_name: str = Field(min_length=MIN_GAME_NAME_LEN, max_length=MAX_GAME_NAME_LEN)
-    game_category: str = Field(min_length=MIN_CATEGORY_LEN, max_length=MAX_CATEGORY_LEN)
+class GameRoomSchema(pydantic.BaseModel):
+    game_name: str = pydantic.Field(
+        min_length=MIN_GAME_NAME_LEN, max_length=MAX_GAME_NAME_LEN,
+    )
+    game_category: str = pydantic.Field(
+        min_length=MIN_CATEGORY_LEN, max_length=MAX_CATEGORY_LEN,
+    )
 
-    @field_validator("game_category")
+    @pydantic.field_validator("game_category")
     @classmethod
     def check_category(cls, category: str) -> str:
         if category not in [game_cat.value for game_cat in GameCategory]:
@@ -84,11 +96,13 @@ class GameRoomSchema(BaseModel):
 
 class GameRoomView(GameRoomSchema):
     id: int = valid_id
-    model_config = ConfigDict(from_attributes=True)
+    model_config = pydantic.ConfigDict(from_attributes=True)
 
 
-class PlayerSchema(BaseModel):
-    name: str = Field(min_length=MIN_PLAYER_NAME_LEN, max_length=MAX_PLAYER_NAME_LEN)
+class PlayerSchema(pydantic.BaseModel):
+    name: str = pydantic.Field(
+        min_length=MIN_PLAYER_NAME_LEN, max_length=MAX_PLAYER_NAME_LEN,
+    )
 
 
 class PlayerView(PlayerSchema):
@@ -96,7 +110,7 @@ class PlayerView(PlayerSchema):
     games_played: int
     games_won: int
     score: float
-    model_config = ConfigDict(from_attributes=True)
+    model_config = pydantic.ConfigDict(from_attributes=True)
 
 
 class PlayerWithGameView(PlayerView):
