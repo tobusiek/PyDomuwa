@@ -143,7 +143,7 @@ async def delete_player(
     player_id: int,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> None:
-    await db.db_obj_delete(player_id, models.Player, "Player", db_sess)
+    await db.delete_obj(player_id, models.Player, "Player", db_sess)
 
 
 def validate_player_data(name: str) -> schemas.PlayerSchema:
@@ -151,7 +151,8 @@ def validate_player_data(name: str) -> schemas.PlayerSchema:
         player = schemas.PlayerSchema(name=name)
     except pydantic.ValidationError:
         raise fastapi.HTTPException(
-            status.HTTP_400_BAD_REQUEST, "Invalid name provided",
+            status.HTTP_400_BAD_REQUEST,
+            "Invalid name provided",
         )
     return player
 

@@ -52,7 +52,7 @@ async def get_all_objs_of_type(
     return db.query(obj_model).all()
 
 
-async def db_obj_save(
+async def save_obj(
     obj_model: T,
     db: orm.Session = fastapi.Depends(get_db_session),
 ) -> T:
@@ -62,7 +62,7 @@ async def db_obj_save(
     return obj_model
 
 
-async def db_obj_delete(
+async def delete_obj(
     obj_id: int,
     obj_model_type: Type[T],  # type: ignore
     obj_model_type_name: str,

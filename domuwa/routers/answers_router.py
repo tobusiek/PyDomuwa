@@ -100,13 +100,15 @@ async def update_answer(
 
 
 @router.delete(
-    "/", status_code=status.HTTP_204_NO_CONTENT, response_class=responses.Response,
+    "/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=responses.Response,
 )
 async def delete_answer(
     answer_id: int,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> None:
-    await db.db_obj_delete(answer_id, models.Answer, "Answer", db_sess)
+    await db.delete_obj(answer_id, models.Answer, "Answer", db_sess)
 
 
 def validate_answer_data(

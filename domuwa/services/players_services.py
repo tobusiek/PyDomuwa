@@ -12,7 +12,7 @@ async def create_player(
 ) -> models.Player:
     db_player = models.Player(name=player.name)
     try:
-        db_player = await db.db_obj_save(db_player, db_sess)
+        db_player = await db.save_obj(db_player, db_sess)
     except exc.IntegrityError:
         raise fastapi.HTTPException(
             status.HTTP_400_BAD_REQUEST,
@@ -39,7 +39,7 @@ async def update_player_name(
 ) -> models.Player:
     player = await db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
     player.name = new_name_player.name
-    return await db.db_obj_save(player, db_sess)
+    return await db.save_obj(player, db_sess)
 
 
 async def update_player_score(
@@ -49,7 +49,7 @@ async def update_player_score(
 ) -> models.Player:
     player = await db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
     player.score += points
-    return await db.db_obj_save(player, db_sess)
+    return await db.save_obj(player, db_sess)
 
 
 async def reset_player_score(
@@ -58,7 +58,7 @@ async def reset_player_score(
 ) -> models.Player:
     player = await db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
     player.score = 0.0
-    return await db.db_obj_save(player, db_sess)
+    return await db.save_obj(player, db_sess)
 
 
 async def set_player_game_room(
@@ -69,7 +69,7 @@ async def set_player_game_room(
     player = await db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
     player.game_room = game
     player.game_room_id = game.id
-    return await db.db_obj_save(player, db_sess)
+    return await db.save_obj(player, db_sess)
 
 
 async def reset_player_game_room(
@@ -79,4 +79,4 @@ async def reset_player_game_room(
     player = await db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
     player.game_room = None
     player.game_room_id = None
-    return await db.db_obj_save(player, db_sess)
+    return await db.save_obj(player, db_sess)

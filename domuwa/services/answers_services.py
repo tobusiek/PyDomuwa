@@ -32,7 +32,7 @@ async def create_answer(
     )  # type: ignore
     question.answers.append(db_answer)
     db_sess.add(question)
-    return await db.db_obj_save(db_answer, db_sess)
+    return await db.save_obj(db_answer, db_sess)
 
 
 async def get_answers_for_question(
@@ -60,7 +60,7 @@ async def update_answer(
     answer.author = modified_answer.author
     answer.text = modified_answer.text
     answer.correct = modified_answer.correct
-    return await db.db_obj_save(answer, db_sess)
+    return await db.save_obj(answer, db_sess)
 
 
 async def check_correct_answer_already_exists_for_question(
