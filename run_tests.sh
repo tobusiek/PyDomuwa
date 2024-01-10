@@ -2,4 +2,4 @@
 
 ruff check --fix --no-cache .
 
-pytest -n auto
+pytest -n auto --log-cli-level=INFO
