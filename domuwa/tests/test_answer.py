@@ -39,6 +39,7 @@ def mock_question(question_idx: int) -> Generator[models.Question, None, None]:
     yield db_question
     db.delete(db_question)
     db.commit()
+    db.close()
 
 
 @pytest.fixture()

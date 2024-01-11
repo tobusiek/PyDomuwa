@@ -71,12 +71,12 @@ class Player(Base):
         index=True,
         unique=True,
     )
-    game_rooms_played: orm.Mapped[int] = orm.mapped_column(
+    games_played: orm.Mapped[int] = orm.mapped_column(
         sqlalchemy.Integer,
         nullable=False,
         default=0,
     )
-    game_rooms_won: orm.Mapped[int] = orm.mapped_column(
+    games_won: orm.Mapped[int] = orm.mapped_column(
         sqlalchemy.Integer,
         nullable=False,
         default=0,

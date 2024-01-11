@@ -3,6 +3,7 @@ from typing import Any
 
 ResponseType = dict[str, str | int | float | bool]
 
+# Question fields
 ID = "id"
 GAME_NAME = "game_name"
 CATEGORY = "category"
@@ -10,10 +11,19 @@ AUTHOR = "author"
 TEXT = "text"
 EXCLUDED = "excluded"
 ANSWERS = "answers"
+
+# Answer fields
 ANSWER_ID = "answer_id"
 CORRECT = "correct"
 QUESTION_ID = "question_id"
 QUESTION = "question"
+
+# Player fields
+PLAYER_ID = "player_id"
+NAME = "name"
+SCORE = "score"
+GAMES_PLAYED = "games_played"
+GAMES_WON = "games_won"
 
 
 @dataclasses.dataclass
@@ -116,6 +126,11 @@ class GameRoomInvalid:
     game_category: Any = "MIXED"
 
 
+TEST_GAME_ROOMS_VALID: list[GameRoomValid] = []
+
+TEST_GAME_ROOMS_INVALID: dict[str, GameRoomInvalid] = {}
+
+
 @dataclasses.dataclass
 class PlayerValid:
     name: str = "User"
@@ -128,8 +143,15 @@ class PlayerInvalid:
     score: Any = 0.0
 
 
-TEST_GAME_ROOMS_VALID = []
+TEST_PLAYERS_VALID: list[PlayerValid] = [
+    PlayerValid("user1"),
+    PlayerValid("user2", 5.0),
+]
 
-TEST_PLAYERS_VALID = []
+TEST_PLAYERS_INVALID: dict[str, PlayerInvalid] = {
+    NAME: PlayerInvalid("su"),
+    SCORE: PlayerInvalid(score="five"),
+}
+
 
 TEST_RANKINGS_VALID = []
