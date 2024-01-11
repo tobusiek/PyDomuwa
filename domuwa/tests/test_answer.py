@@ -106,11 +106,11 @@ def put_invalid_answer(
     invalid_answer.add_answer_id(answer_id)
     if question_id:
         invalid_answer.question_id = question_id
-    invalid_text_answer_response = tests_setup.client.put(
+    invalid_answer_response = tests_setup.client.put(
         ANSWERS_PREFIX,
         params=invalid_answer.__dict__,
     )
-    assert invalid_text_answer_response.status_code == expected_status
+    assert invalid_answer_response.status_code == expected_status
 
 
 @pytest.mark.parametrize("question_idx", [0])
@@ -367,7 +367,10 @@ def test_update_answer_invalid_data(
 
 
 @pytest.mark.parametrize("question_idx", [0])
-def test_delete_answer(mock_question: models.Question) -> None:
+def test_delete_answer(
+    mock_question: models.Question,
+    question_idx: int,
+) -> None:
     mock_question_id = mock_question.id
 
     answer = create_valid_answer(0, mock_question_id)
@@ -377,7 +380,7 @@ def test_delete_answer(mock_question: models.Question) -> None:
 
     delete_response = tests_setup.client.delete(
         ANSWERS_PREFIX,
-        params={"answer_id": answer_id},
+        params={test_data.ANSWER_ID: answer_id},
     )
     assert (
         delete_response.status_code == status.HTTP_204_NO_CONTENT
@@ -395,7 +398,7 @@ def test_delete_answer_invalid_id() -> None:
     assert get_response.status_code == status.HTTP_404_NOT_FOUND, get_response.text
     delete_response = tests_setup.client.delete(
         ANSWERS_PREFIX,
-        params={"answer_id": invalid_id},
+        params={test_data.ANSWER_ID: invalid_id},
     )
     assert (
         delete_response.status_code == status.HTTP_404_NOT_FOUND

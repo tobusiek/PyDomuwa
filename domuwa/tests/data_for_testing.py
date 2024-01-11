@@ -24,6 +24,10 @@ class QuestionValid:
     text: str = "text"
     excluded: bool = False
 
+    # noinspection PyAttributeOutsideInit
+    def add_id(self, question_id: int) -> None:
+        self.question_id = question_id
+
 
 @dataclasses.dataclass
 class QuestionInvalid:
@@ -32,6 +36,10 @@ class QuestionInvalid:
     author: Any = "User"
     text: Any = "text"
     excluded: Any = False
+
+    # noinspection PyAttributeOutsideInit
+    def add_id(self, question_id: int) -> None:
+        self.question_id = question_id
 
 
 TEST_QUESTIONS_VALID: list[QuestionValid] = [
@@ -50,7 +58,7 @@ TEST_QUESTIONS_INVALID: dict[str, QuestionInvalid] = {
     GAME_NAME: QuestionInvalid(game_name="invalid game"),
     CATEGORY: QuestionInvalid(category="invalid category"),
     AUTHOR: QuestionInvalid(author=["invalid author", 1]),
-    TEXT: QuestionInvalid(text=["invalid text", False]),
+    TEXT: QuestionInvalid(text=""),
     EXCLUDED: QuestionInvalid(excluded=5),
 }
 

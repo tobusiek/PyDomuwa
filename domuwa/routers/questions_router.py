@@ -40,7 +40,10 @@ async def get_question_by_id(
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> schemas.QuestionWithAnswersView | templating._TemplateResponse:
     question = await db.get_obj_of_type_by_id(
-        question_id, models.Question, "Question", db_sess,
+        question_id,
+        models.Question,
+        "Question",
+        db_sess,
     )
     question_view = create_question_view_with_answers(question)
     if config.TESTING:
@@ -75,11 +78,20 @@ async def update_question(
     category: str,
     author: str,
     text: str,
+    excluded: bool,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> schemas.QuestionView | templating._TemplateResponse:
-    modified_question = validate_question_data(game_name, category, author, text)
+    modified_question = validate_question_data(
+        game_name,
+        category,
+        author,
+        text,
+        excluded,
+    )
     db_question = await services.update_question(
-        question_id, modified_question, db_sess,
+        question_id,
+        modified_question,
+        db_sess,
     )
     question_view = create_question_view(db_question)
     if config.TESTING:
@@ -109,7 +121,8 @@ async def update_question_excluded(
     response_class=fastapi.Response,
 )
 async def delete_question(
-    question_id: int, db_sess: orm.Session = fastapi.Depends(db.get_db_session),
+    question_id: int,
+    db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> None:
     await db.delete_obj(question_id, models.Question, "Question", db_sess)
 

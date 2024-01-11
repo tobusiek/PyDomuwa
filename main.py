@@ -16,7 +16,7 @@ from domuwa.utils import get_computer_ip
 from domuwa.utils import logging as app_logging
 
 logger = app_logging.get_logger("fastapi")
-logging.getLogger("multipart.multipart").setLevel(logging.INFO)
+# logging.getLogger("multipart.multipart").setLevel(logging.INFO)
 logging.getLogger("asyncio").setLevel(logging.INFO)
 
 app = fastapi.FastAPI(debug=True)
