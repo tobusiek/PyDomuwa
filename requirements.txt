@@ -10,5 +10,9 @@ pytest-asyncio
 colorlog~=6.8.0
 uvicorn~=0.25.0
 ruff
+mypy
 itsdangerous
 jinja2
+factory-boy
+types-factory-boy
+pytest-factoryboy

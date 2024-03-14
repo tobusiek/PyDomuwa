@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import Optional
+
 import sqlalchemy
 from sqlalchemy import orm
 
 from domuwa import database
+
+# TODO: make GameType and GameCategory separate models
 
 
 class Base(orm.DeclarativeBase):
@@ -21,9 +25,10 @@ class Answer(Base):
     author: orm.Mapped[str] = orm.mapped_column(sqlalchemy.String, nullable=False)
     text: orm.Mapped[str] = orm.mapped_column(sqlalchemy.String, nullable=False)
     correct: orm.Mapped[bool] = orm.mapped_column(sqlalchemy.Boolean, nullable=True)
-    question_id: orm.Mapped[int] = orm.mapped_column(
+    question_id: orm.Mapped[Optional[int]] = orm.mapped_column(
         sqlalchemy.Integer,
         sqlalchemy.ForeignKey(column="question.id", ondelete="CASCADE"),
+        nullable=True,
     )
     question: orm.Mapped[Question] = orm.relationship(
         "Question",
@@ -86,7 +91,7 @@ class Player(Base):
         nullable=False,
         default=0.0,
     )
-    game_room_id: orm.Mapped[int | None] = orm.mapped_column(
+    game_room_id: orm.Mapped[Optional[int]] = orm.mapped_column(
         sqlalchemy.Integer,
         sqlalchemy.ForeignKey("game_room.id"),
         nullable=True,

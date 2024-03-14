@@ -3,6 +3,8 @@ from typing import Any
 
 ResponseType = dict[str, str | int | float | bool]
 
+# TODO: search if factoryboy works with fastapi
+
 # Question fields
 ID = "id"
 GAME_NAME = "game_name"
