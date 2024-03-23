@@ -1,0 +1,10 @@
+[tool.ruff]
+show-fixes = true
+target-version = "py311"
+
+[tool.ruff.lint]
+extend-select = ["ANN", "C4", "COM", "I", "N", "PT", "RET", "SIM", "TCH", "TID"]
+ignore = ["ANN003", "ANN101", "ANN102", "COM812"]
+
+[tool.ruff.lint.isort]
+case-sensitive = true
