@@ -6,7 +6,6 @@ from starlette import responses, templating
 
 from domuwa import database as db
 from domuwa import models, schemas
-from domuwa.config import settings
 from domuwa.services import players_services as services
 
 router = fastapi.APIRouter(prefix="/player", tags=["Player"])
@@ -21,25 +20,16 @@ def create_player(
 ) -> schemas.PlayerView | templating._TemplateResponse:
     player = validate_player_data(name)
     db_player = services.create_player(player, db_sess)
-    player_view = create_player_view(db_player)
-    if settings.TESTING:
-        return player_view
-    ctx = {"request": request, "player": player_view.model_dump()}
-    return templates.TemplateResponse("create_player.html", ctx)
+    return create_player_view(db_player)
 
 
 @router.get("/{player_id}", response_model=None)
 def get_player_by_id(
-    request: fastapi.Request,
     player_id: int,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> schemas.PlayerView | templating._TemplateResponse:
     player = db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
-    player_view = create_player_view(player)
-    if settings.TESTING:
-        return player_view
-    ctx = {"request": request, "player": player_view.model_dump()}
-    return templates.TemplateResponse("get_player.html", ctx)
+    return create_player_view(player)
 
 
 @router.get("/", response_model=None)
@@ -48,14 +38,7 @@ def get_all_players(
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> list[schemas.PlayerView] | templating._TemplateResponse:
     players = db.get_all_objs_of_type(models.Player, db_sess)
-    player_views = [create_player_view(player) for player in players]
-    if settings.TESTING:
-        return player_views
-    ctx = {
-        "request": request,
-        "players": [player_view.model_dump() for player_view in player_views],
-    }
-    return templates.TemplateResponse("get_all_players.html", ctx)
+    return [create_player_view(player) for player in players]
 
 
 @router.get("/from_game_room/{game_room_id}", response_model=None)
@@ -65,14 +48,7 @@ def get_all_players_from_game_room(
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> list[schemas.PlayerView] | templating._TemplateResponse:
     players = services.get_all_players_from_game_room(game_room_id, db_sess)
-    player_views = [create_player_view(player) for player in players]
-    if settings.TESTING:
-        return player_views
-    ctx = {
-        "request": request,
-        "players": [player_view.model_dump() for player_view in player_views],
-    }
-    return templates.TemplateResponse("get_all_players_from_game.html", ctx)
+    return [create_player_view(player) for player in players]
 
 
 @router.put("/update_name", response_model=None)
@@ -84,11 +60,7 @@ def update_player_name(
 ) -> schemas.PlayerView | templating._TemplateResponse:
     new_name_player = validate_player_data(new_name)
     player = services.update_player_name(player_id, new_name_player, db_sess)
-    player_view = create_player_view(player)
-    if settings.TESTING:
-        return player_view
-    ctx = {"request": request, "player": player_view.model_dump()}
-    return templates.TemplateResponse("update_player.html", ctx)
+    return create_player_view(player)
 
 
 @router.put("/update_score", response_model=None)
@@ -99,11 +71,7 @@ def update_player_score(
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> schemas.PlayerView | templating._TemplateResponse:
     player = services.update_player_score(player_id, points, db_sess)
-    player_view = create_player_view(player)
-    if settings.TESTING:
-        return player_view
-    ctx = {"request": request, "player": player_view.model_dump()}
-    return templates.TemplateResponse("update_player.html", ctx)
+    return create_player_view(player)
 
 
 @router.put("/reset_game_room", response_model=None)
@@ -113,11 +81,7 @@ def reset_player_game_room(
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> schemas.PlayerView | templating._TemplateResponse:
     player = services.reset_player_game_room(player_id, db_sess)
-    player_view = create_player_view(player)
-    if settings.TESTING:
-        return player_view
-    ctx = {"request": request, "player": player_view.model_dump()}
-    return templates.TemplateResponse("update_player.html", ctx)
+    return create_player_view(player)
 
 
 @router.put("/reset_score", response_model=None)
@@ -127,11 +91,7 @@ def reset_player_score(
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> schemas.PlayerView | templating._TemplateResponse:
     player = services.reset_player_score(player_id, db_sess)
-    player_view = create_player_view(player)
-    if settings.TESTING:
-        return player_view
-    ctx = {"request": request, "player": player_view.model_dump()}
-    return templates.TemplateResponse("update_player.html", ctx)
+    return create_player_view(player)
 
 
 @router.delete(
