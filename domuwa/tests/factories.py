@@ -1,9 +1,10 @@
 import factory
+from factory import Factory
 
 from domuwa import models
 
 
-class QuestionFactory(factory.alchemy.SQLAlchemyModelFactory):
+class QuestionFactory(Factory):
     game_name = "ego"
     category = "SFW"
     author = factory.Sequence(lambda x: "Author %d" % x)
@@ -14,7 +15,7 @@ class QuestionFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = models.Question
 
 
-class AnswerFactory(factory.alchemy.SQLAlchemyModelFactory):
+class AnswerFactory(Factory):
     author = factory.Sequence(lambda x: "Author %d" % x)
     text = "answer's text"
     correct = False
@@ -24,7 +25,7 @@ class AnswerFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = models.Answer
 
 
-class GameRoomFactory(factory.alchemy.SQLAlchemyModelFactory):
+class GameRoomFactory(Factory):
     game_name = "ego"
     game_category = "SFW"
 
@@ -32,12 +33,8 @@ class GameRoomFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = models.GameRoom
 
 
-class PlayerFactory(factory.alchemy.SQLAlchemyModelFactory):
+class PlayerFactory(Factory):
     name = factory.Sequence(lambda x: "Player %d" % x)
-    games_played = 0
-    games_won = 0
-    score = 0
-    game_room = factory.SubFactory(GameRoomFactory)
 
     class Meta:
         model = models.Player
