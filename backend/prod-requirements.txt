@@ -1,0 +1,14 @@
+SQLAlchemy
+alembic
+fastapi
+httpx
+itsdangerous
+pydantic
+pydantic-settings
+uvicorn
+factory-boy
+pytest
+pytest-xdist
+pytest-asyncio
+pytest-factoryboy
+colorlog
