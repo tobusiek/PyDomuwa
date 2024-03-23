@@ -1,109 +1,137 @@
-from collections.abc import Generator
+from collections.abc import Callable, Generator
+from typing import Any
 
 import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
 from starlette import status
 
-from domuwa import models
-from domuwa.services import game_rooms_services
-from domuwa.tests import data_for_testing as test_data
-from domuwa.tests import factories
-from domuwa.tests import setup as tests_setup
+from domuwa import schemas
+from domuwa.models import Player
+from domuwa.tests.factories import PlayerFactory
 
 
 class TestPlayerEndpoint:
     PLAYERS_PREFIX = "/player/"
     GAME_ROOMS_PREFIX = "/game_rooms/"
 
-    def validate_response(
+    # @classmethod
+    # def setup_class(cls) -> None:
+    #     db_sess = next(get_db_session())
+    #     players = PlayerFactory.create_batch(cls._players_count)
+    #     db_sess.add_all(players)
+    #     db_sess.commit()
+    #     cls._players = players
+    #
+    # @classmethod
+    # def teardown_class(cls) -> None:
+    #     db_sess = next(get_db_session())
+    #     for player in cls._players:
+    #         if player not in db_sess.deleted:
+    #             db_sess.delete(player)
+    #     db_sess.commit()
+
+    @pytest.fixture()
+    def player(
         self,
-        request_data: test_data.ResponseType,
-        response_data: test_data.ResponseType,
+        player_factory: PlayerFactory,
+        db_session: Session,
+    ) -> Generator[Player, None, None]:
+        player = player_factory.create()
+
+        db_session.add(player)
+        db_session.commit()
+
+        yield player
+
+        db_session.delete(player)
+        db_session.commit()
+
+    @pytest.fixture()
+    def players_creator(
+        self,
+        player_factory: PlayerFactory,
+        db_session: Session,
+    ) -> Callable[[int], Generator[list[Player], None, None]]:
+        def _players(
+            count: int = 3,
+        ) -> Generator[list[Player], None, None]:
+            players = player_factory.create_batch(count)
+
+            for idx, player in enumerate(players):
+                db_session.add(player)
+                db_session.commit()
+                db_session.refresh(player)
+                players[idx] = player
+
+            yield players
+
+            for player in players:
+                db_session.delete(player)
+            db_session.commit()
+
+        return _players
+
+    def assert_valid_response(self, response: dict[str, Any]) -> None:
+        assert "id" in response, response
+        assert "games_played" in response, response
+        assert "games_won" in response, response
+        assert "score" in response, response
+
+    def test_create_player(
+        self,
+        player_factory: PlayerFactory,
+        api_client: TestClient,
     ) -> None:
-        assert request_data[test_data.NAME] == response_data[test_data.NAME]
-        assert request_data[test_data.SCORE] == response_data[test_data.SCORE]
+        player = schemas.PlayerSchema.model_validate(player_factory.build())
 
-    # def post_valid_player(
-    # valid_player_idx: int = 0,
-    # ) -> Generator[test_data.ResponseType, None, None]:
-    # yield player_factory.create(id=1)
-    # player = test_data.TEST_PLAYERS_VALID[valid_player_idx]
-    # player_data = player.__dict__
-    # player_data.pop(test_data.SCORE, None)
-    # player_response = tests_setup.client.post(
-    #     PLAYERS_PREFIX,
-    #     params=player_data,
-    # )
-    #
-    # assert player_response.status_code == status.HTTP_201_CREATED, player_response.text
-    # player_response_data = player_response.json()
-    # assert test_data.ID in player_response_data
-    # yield player_response_data
-    #
-    # db = next(tests_setup.override_get_db_session())
-    # db_player = db.get(models.Player, player_response_data[test_data.ID])
-    # if db_player is not None:
-    #     db.delete(db_player)
-    # db.commit()
+        response = api_client.post(
+            self.PLAYERS_PREFIX,
+            params=player.model_dump(),
+        )
+        assert response.status_code == status.HTTP_201_CREATED, response.text
+        response_data = response.json()
+        self.assert_valid_response(response_data)
 
-    def test_create_player(self, player: factories.PlayerFactory) -> None:
-        # player_data = next(post_valid_player())
-        # player_id = player_data[test_data.ID]
-        # player = player.build()
-        player_response = tests_setup.client.post(self.PLAYERS_PREFIX, data=player)
+        response = api_client.get(
+            f"{self.PLAYERS_PREFIX}{response_data['id']}",
+        )
+        assert response.status_code == status.HTTP_200_OK, response.text
+        self.assert_valid_response(response.json())
+
+    def test_create_player_invalid_name(self, api_client: TestClient) -> None:
+        player = {"name": 12}
+
+        response = api_client.post(self.PLAYERS_PREFIX, params=player)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+
+    def test_create_player_non_unique_name(
+        self,
+        player: Player,
+        api_client: TestClient,
+    ) -> None:
+        new_player = {"name": player.name}
+
+        response = api_client.post(self.PLAYERS_PREFIX, params=new_player)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+
+    def test_get_non_existing_player(self, api_client: TestClient) -> None:
+        player_response = api_client.get(self.PLAYERS_PREFIX + str(999))
         assert (
-            player_response.status_code == status.HTTP_201_CREATED
+            player_response.status_code == status.HTTP_404_NOT_FOUND
         ), player_response.text
 
-        player_response = tests_setup.client.get(self.PLAYERS_PREFIX + str(1))
-        assert player_response.status_code == status.HTTP_200_OK, player_response.text
+    def test_get_all_players(
+        self,
+        players_creator: Callable[[int], list[Player]],
+        api_client: TestClient,
+        count: int = 3,
+    ) -> None:
+        players_creator(count)
+        response = api_client.get(self.PLAYERS_PREFIX)
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()) == count, response.text
 
-        player_response_data = player_response.json()
-        # self.validate_response(player_data, player_response_data)
-
-        assert test_data.GAMES_PLAYED in player_response_data, player_response_data
-        assert player_response_data[test_data.GAMES_PLAYED] == 0, player_response_data
-        assert test_data.GAMES_WON in player_response_data, player_response_data
-        assert player_response_data[test_data.GAMES_WON] == 0, player_response_data
-
-        # db = next(tests_setup.override_get_db_session())
-        # db_player = db.get(models.Player, player_id)
-        # self.validate_response(player_response_data, db_player.__dict__)
-
-    # def test_create_player_invalid_name() -> None:
-    #     invalid_player = test_data.TEST_PLAYERS_INVALID[test_data.NAME]
-    #     player_response = tests_setup.client.post(
-    #         PLAYERS_PREFIX,
-    #         params=invalid_player.__dict__,
-    #     )
-    #     assert (
-    #         player_response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    #     ), player_response.text
-    #
-    # def test_get_player_invalid_id() -> None:
-    #     player_response = tests_setup.client.get(PLAYERS_PREFIX + str(999))
-    #     assert (
-    #         player_response.status_code == status.HTTP_404_NOT_FOUND
-    #     ), player_response.text
-    #
-    # def test_get_all_players() -> None:
-    #     db = next(tests_setup.override_get_db_session())
-    #     db_players = db.query(models.Player).all()
-    #     assert isinstance(db_players, list)
-    #     assert len(db_players) == 0, "Db not empty"
-    #
-    #     player1_request_data = next(post_valid_player(0))
-    #     player2_request_data = next(post_valid_player(1))
-    #
-    #     players_response = tests_setup.client.get(PLAYERS_PREFIX)
-    #     assert players_response.status_code == status.HTTP_200_OK, players_response.text
-    #     players_response_data = players_response.json()
-    #     assert isinstance(players_response_data, list)
-    #     assert len(players_response_data) == 2, players_response_data
-    #
-    #     player1_response_data, player2_response_data = players_response_data
-    #     validate_response(player1_request_data, player1_response_data)
-    #     validate_response(player2_request_data, player2_response_data)
-    #
     # @pytest.mark.asyncio()
     # async def test_get_all_players_from_game_room() -> None:
     #     db = next(tests_setup.override_get_db_session())
