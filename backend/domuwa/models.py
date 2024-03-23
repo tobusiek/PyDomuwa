@@ -7,8 +7,6 @@ from sqlalchemy import orm
 
 from domuwa import database
 
-# TODO: make GameType and GameCategory separate models
-
 
 class Base(orm.DeclarativeBase):
     __abstract__ = True

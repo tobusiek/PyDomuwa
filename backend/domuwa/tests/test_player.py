@@ -67,7 +67,7 @@ class TestPlayerEndpoint:
         player_factory: PlayerFactory,
         api_client: TestClient,
     ) -> None:
-        player = schemas.PlayerSchema.model_validate(player_factory.build())
+        player = schemas.PlayerCreateSchema.model_validate(player_factory.build())
 
         response = api_client.post(
             self.PLAYERS_PREFIX,

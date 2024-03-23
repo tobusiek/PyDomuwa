@@ -1,30 +1,30 @@
-import fastapi
-from sqlalchemy import orm
+from fastapi import Depends
+from sqlalchemy.orm import Session
 
 from domuwa import database as db
 from domuwa import models, schemas
 from domuwa.services import players_services
 
 
-async def create_game_room(
-    game: schemas.GameRoomSchema,
-    db_sess: orm.Session = fastapi.Depends(db.get_db_session),
+def create_game_room(
+    game: schemas.GameRoomCreateSchema,
+    db_sess: Session = Depends(db.get_db_session),
 ) -> models.GameRoom:
     db_game_room = models.GameRoom(
         game_name=game.game_name,
         game_category=game.game_category,
         players=[],
     )
-    return await db.save_obj(db_game_room, db_sess)
+    return db.save_obj(db_game_room, db_sess)
 
 
-async def add_player(
+def add_player(
     game_room_id: int,
     player_id: int,
-    db_sess: orm.Session = fastapi.Depends(db.get_db_session),
+    db_sess: Session = Depends(db.get_db_session),
 ) -> models.GameRoom:
-    player = await db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
-    game_room = await db.get_obj_of_type_by_id(
+    player = db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
+    game_room = db.get_obj_of_type_by_id(
         game_room_id,
         models.GameRoom,
         "GameRoom",
@@ -33,35 +33,35 @@ async def add_player(
     player.game_room = game_room
     player.game_room_id = game_room_id
     if player not in game_room.players:
-        await db.save_obj(player, db_sess)
+        db.save_obj(player, db_sess)
         game_room.players.append(player)
-    return await db.save_obj(game_room, db_sess)
+    return db.save_obj(game_room, db_sess)
 
 
-async def remove_player(
+def remove_player(
     game_room_id: int,
     player_id: int,
-    db_sess: orm.Session = fastapi.Depends(db.get_db_session),
+    db_sess: Session = Depends(db.get_db_session),
 ) -> models.GameRoom:
-    player = await db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
+    player = db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
     player.game_room = None
     player.game_room_id = None
-    await db.save_obj(player, db_sess)
-    game = await db.get_obj_of_type_by_id(
+    db.save_obj(player, db_sess)
+    game = db.get_obj_of_type_by_id(
         game_room_id,
         models.GameRoom,
         "GameRoom",
         db_sess,
     )
     game.players.remove(player)
-    return await db.save_obj(game, db_sess)
+    return db.save_obj(game, db_sess)
 
 
-async def remove_all_players(
+def remove_all_players(
     game_room_id: int,
-    db_sess: orm.Session = fastapi.Depends(db.get_db_session),
+    db_sess: Session = Depends(db.get_db_session),
 ) -> models.GameRoom:
-    game = await db.get_obj_of_type_by_id(
+    game = db.get_obj_of_type_by_id(
         game_room_id,
         models.GameRoom,
         "GameRoom",
@@ -73,19 +73,19 @@ async def remove_all_players(
         .all()
     )
     for player in players:
-        await players_services.reset_player_game_room(player.id, db_sess)
-    return await db.save_obj(game, db_sess)
+        players_services.reset_player_game_room(player.id, db_sess)
+    return db.save_obj(game, db_sess)
 
 
-async def delete_game_room(
+def delete_game_room(
     game_room_id: int,
-    db_sess: orm.Session = fastapi.Depends(db.get_db_session),
+    db_sess: Session = Depends(db.get_db_session),
 ) -> None:
-    await db.delete_obj(game_room_id, models.GameRoom, "GameRoom", db_sess)
+    db.delete_obj(game_room_id, models.GameRoom, "GameRoom", db_sess)
     players = (
         db_sess.query(models.Player)
         .filter(models.Player.game_room_id == game_room_id)
         .all()
     )
     for player in players:
-        await players_services.reset_player_game_room(player.id, db_sess)
+        players_services.reset_player_game_room(player.id, db_sess)

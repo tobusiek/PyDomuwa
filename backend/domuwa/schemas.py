@@ -16,7 +16,7 @@ MAX_TEXT_LEN = 150
 valid_id = pydantic.Field(ge=1)
 
 
-class AnswerSchema(pydantic.BaseModel):
+class AnswerCreateSchema(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(from_attributes=True)
 
     author: str = pydantic.Field(
@@ -25,10 +25,10 @@ class AnswerSchema(pydantic.BaseModel):
     )
     text: str = pydantic.Field(min_length=MIN_TEXT_LEN, max_length=MAX_TEXT_LEN)
     correct: bool = pydantic.Field(False)
-    question_id: int = pydantic.Field(strict=True, ge=MIN_ID)
+    question_id: int | None = pydantic.Field(strict=True, ge=MIN_ID)
 
 
-class AnswerView(AnswerSchema):
+class AnswerSchema(AnswerCreateSchema):
     id: int = valid_id
 
 
@@ -50,7 +50,7 @@ def check_category(category: str) -> str:
     return category
 
 
-class QuestionSchema(pydantic.BaseModel):
+class QuestionCreateSchema(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(from_attributes=True)
 
     game_name: str = pydantic.Field(
@@ -83,19 +83,19 @@ class QuestionSchema(pydantic.BaseModel):
         return check_category(category)
 
 
-class QuestionView(QuestionSchema):
+class QuestionSchema(QuestionCreateSchema):
     id: int = valid_id
 
 
-class QuestionWithAnswersView(QuestionView):
-    answers: list[AnswerView]
+class QuestionWithAnswersSchema(QuestionSchema):
+    answers: list[AnswerSchema] | None
 
 
-class AnswerWithQuestionView(AnswerView):
-    question: QuestionView
+class AnswerWithQuestionSchema(AnswerSchema):
+    question: QuestionSchema | None
 
 
-class GameRoomSchema(pydantic.BaseModel):
+class GameRoomCreateSchema(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(from_attributes=True)
 
     game_name: str = pydantic.Field(
@@ -113,11 +113,11 @@ class GameRoomSchema(pydantic.BaseModel):
         return check_category(category)
 
 
-class GameRoomView(GameRoomSchema):
+class GameRoomSchema(GameRoomCreateSchema):
     id: int = valid_id
 
 
-class PlayerSchema(pydantic.BaseModel):
+class PlayerCreateSchema(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(from_attributes=True)
 
     name: str = pydantic.Field(
@@ -126,16 +126,16 @@ class PlayerSchema(pydantic.BaseModel):
     )
 
 
-class PlayerView(PlayerSchema):
+class PlayerSchema(PlayerCreateSchema):
     id: int = valid_id
     games_played: int
     games_won: int
     score: float
 
 
-class PlayerWithGameView(PlayerView):
-    game: Optional[GameRoomView]
+class PlayerWithGameSchema(PlayerSchema):
+    game: Optional[GameRoomSchema]
 
 
-class GameRoomWithPlayersView(GameRoomView):
-    players: list[PlayerView]
+class GameRoomWithPlayersSchema(GameRoomSchema):
+    players: list[PlayerSchema]

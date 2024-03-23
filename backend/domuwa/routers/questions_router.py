@@ -1,86 +1,68 @@
-import fastapi
-import pydantic
-from fastapi import status
-from sqlalchemy import orm
-from starlette import templating
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from pydantic import ValidationError
+from sqlalchemy.orm import Session
+from starlette.responses import Response
 
-from domuwa import config, models, schemas
 from domuwa import database as db
+from domuwa import schemas
+from domuwa.models import Question
 from domuwa.services import questions_services as services
 from domuwa.utils import logging
 
 logger = logging.get_logger("domuwa")
 
-router = fastapi.APIRouter(prefix="/question", tags=["Question"])
-templates = templating.Jinja2Templates(directory="resources/templates")
+router = APIRouter(prefix="/question", tags=["Question"])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=None)
-async def create_question(
-    request: fastapi.Request,
+def create_question(
+    request: Request,
     game_name: str,
     category: str,
     author: str,
     text: str,
-    db_sess: orm.Session = fastapi.Depends(db.get_db_session),
-) -> schemas.QuestionView | templating._TemplateResponse:
+    db_sess: Session = Depends(db.get_db_session),
+) -> schemas.QuestionSchema:
     question = validate_question_data(game_name, category, author, text)
-    db_question = await services.create_question(question, db_sess)
-    question_view = create_question_view(db_question)
-    if config.TESTING:
-        return question_view
-    ctx = {"request": request, "question": question_view.model_dump()}
-    return templates.TemplateResponse("create_question.html", ctx)
+    db_question = services.create_question(question, db_sess)
+    return create_question_view(db_question)
 
 
 @router.get("/{question_id}", response_model=None)
-async def get_question_by_id(
-    request: fastapi.Request,
+def get_question_by_id(
+    request: Request,
     question_id: int,
-    db_sess: orm.Session = fastapi.Depends(db.get_db_session),
-) -> schemas.QuestionWithAnswersView | templating._TemplateResponse:
-    question = await db.get_obj_of_type_by_id(
+    db_sess: Session = Depends(db.get_db_session),
+) -> schemas.QuestionWithAnswersSchema:
+    question = db.get_obj_of_type_by_id(
         question_id,
-        models.Question,
+        Question,
         "Question",
         db_sess,
     )
-    question_view = create_question_view_with_answers(question)
-    if config.TESTING:
-        return question_view
-    ctx = {"request": request, "question": question_view.model_dump()}
-    return templates.TemplateResponse("get_question.html", ctx)
+    return create_question_view_with_answers(question)
 
 
 @router.get("/", response_model=None)
-async def get_all_questions(
-    request: fastapi.Request,
-    db_sess: orm.Session = fastapi.Depends(db.get_db_session),
-) -> list[schemas.QuestionWithAnswersView] | templating._TemplateResponse:
-    questions = await db.get_all_objs_of_type(models.Question, db_sess)
-    question_views = [
-        create_question_view_with_answers(question) for question in questions
-    ]
-    if config.TESTING:
-        return question_views
-    ctx = {
-        "request": request,
-        "questions": [question_view.model_dump() for question_view in question_views],
-    }
-    return templates.TemplateResponse("get_all_questions.html", ctx)
+def get_all_questions(
+    request: Request,
+    db_sess: Session = Depends(db.get_db_session),
+) -> list[schemas.QuestionWithAnswersSchema]:
+    questions = db.get_all_objs_of_type(Question, db_sess)
+    return [create_question_view_with_answers(question) for question in questions]
 
 
 @router.put("/", response_model=None)
-async def update_question(
-    request: fastapi.Request,
+def update_question(
+    request: Request,
     question_id: int,
     game_name: str,
     category: str,
     author: str,
     text: str,
     excluded: bool,
-    db_sess: orm.Session = fastapi.Depends(db.get_db_session),
-) -> schemas.QuestionView | templating._TemplateResponse:
+    db_sess: Session = Depends(db.get_db_session),
+) -> schemas.QuestionSchema:
     modified_question = validate_question_data(
         game_name,
         category,
@@ -88,43 +70,35 @@ async def update_question(
         text,
         excluded,
     )
-    db_question = await services.update_question(
+    db_question = services.update_question(
         question_id,
         modified_question,
         db_sess,
     )
-    question_view = create_question_view(db_question)
-    if config.TESTING:
-        return question_view
-    ctx = {"request": request, "question": question_view.model_dump()}
-    return templates.TemplateResponse("update_question.html", ctx)
+    return create_question_view(db_question)
 
 
 @router.put("/excluding", response_model=None)
-async def update_question_excluded(
-    request: fastapi.Request,
+def update_question_excluded(
+    request: Request,
     question_id: int,
     excluded: bool,
-    db_sess: orm.Session = fastapi.Depends(db.get_db_session),
-) -> schemas.QuestionView | templating._TemplateResponse:
-    question = await services.update_question_excluded(question_id, excluded, db_sess)
-    question_view = create_question_view(question)
-    if config.TESTING:
-        return question_view
-    ctx = {"request": request, "question": question_view.model_dump()}
-    return templates.TemplateResponse("update_question.html", ctx)
+    db_sess: Session = Depends(db.get_db_session),
+) -> schemas.QuestionSchema:
+    question = services.update_question_excluded(question_id, excluded, db_sess)
+    return create_question_view(question)
 
 
 @router.delete(
     "/",
     status_code=status.HTTP_204_NO_CONTENT,
-    response_class=fastapi.Response,
+    response_class=Response,
 )
-async def delete_question(
+def delete_question(
     question_id: int,
-    db_sess: orm.Session = fastapi.Depends(db.get_db_session),
+    db_sess: Session = Depends(db.get_db_session),
 ) -> None:
-    await db.delete_obj(question_id, models.Question, "Question", db_sess)
+    db.delete_obj(question_id, Question, "Question", db_sess)
 
 
 def validate_question_data(
@@ -133,28 +107,28 @@ def validate_question_data(
     author: str,
     text: str,
     excluded: bool = False,
-) -> schemas.QuestionSchema:
+) -> schemas.QuestionCreateSchema:
     try:
-        question = schemas.QuestionSchema(
+        question = schemas.QuestionCreateSchema(
             game_name=game_name,
             category=category,
             author=author,
             text=text,
             excluded=excluded,
         )
-    except pydantic.ValidationError:
-        raise fastapi.HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid data input")
+    except ValidationError:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid data input")
     return question
 
 
-def create_question_view(question: models.Question) -> schemas.QuestionView:
-    return schemas.QuestionView.model_validate(question)
+def create_question_view(question: Question) -> schemas.QuestionSchema:
+    return schemas.QuestionSchema.model_validate(question)
 
 
 def create_question_view_with_answers(
-    question: models.Question,
-) -> schemas.QuestionWithAnswersView:
-    return schemas.QuestionWithAnswersView(
+    question: Question,
+) -> schemas.QuestionWithAnswersSchema:
+    return schemas.QuestionWithAnswersSchema(
         id=question.id,
         game_name=question.game_name,
         category=question.category,
@@ -162,6 +136,6 @@ def create_question_view_with_answers(
         text=question.text,
         excluded=question.excluded,
         answers=[
-            schemas.AnswerView.model_validate(answer) for answer in question.answers
+            schemas.AnswerSchema.model_validate(answer) for answer in question.answers
         ],
     )

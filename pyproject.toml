@@ -8,3 +8,7 @@ ignore = ["ANN003", "ANN101", "ANN102", "COM812"]
 
 [tool.ruff.lint.isort]
 case-sensitive = true
+
+[tool.mypy]
+python_version = "3.11"
+mypy_path = "backend"
