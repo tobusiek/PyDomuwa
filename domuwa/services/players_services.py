@@ -12,7 +12,7 @@ async def create_player(
 ) -> models.Player:
     db_player = models.Player(name=player.name)
     try:
-        db_player = await db.save_obj(db_player, db_sess)
+        db_player = db.save_obj(db_player, db_sess)
     except exc.IntegrityError:
         raise fastapi.HTTPException(
             status.HTTP_400_BAD_REQUEST,
@@ -37,9 +37,9 @@ async def update_player_name(
     new_name_player: schemas.PlayerSchema,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> models.Player:
-    player = await db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
+    player = db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
     player.name = new_name_player.name
-    return await db.save_obj(player, db_sess)
+    return db.save_obj(player, db_sess)
 
 
 async def update_player_score(
@@ -47,18 +47,18 @@ async def update_player_score(
     points: float,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> models.Player:
-    player = await db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
+    player = db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
     player.score += points
-    return await db.save_obj(player, db_sess)
+    return db.save_obj(player, db_sess)
 
 
 async def reset_player_score(
     player_id: int,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> models.Player:
-    player = await db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
+    player = db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
     player.score = 0.0
-    return await db.save_obj(player, db_sess)
+    return db.save_obj(player, db_sess)
 
 
 async def set_player_game_room(
@@ -66,17 +66,17 @@ async def set_player_game_room(
     game: models.GameRoom,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> models.Player:
-    player = await db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
+    player = db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
     player.game_room = game
     player.game_room_id = game.id
-    return await db.save_obj(player, db_sess)
+    return db.save_obj(player, db_sess)
 
 
 async def reset_player_game_room(
     player_id: int,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> models.Player:
-    player = await db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
+    player = db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
     player.game_room = None
     player.game_room_id = None
-    return await db.save_obj(player, db_sess)
+    return db.save_obj(player, db_sess)

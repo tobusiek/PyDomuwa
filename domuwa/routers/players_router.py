@@ -33,7 +33,7 @@ async def get_player_by_id(
     player_id: int,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> schemas.PlayerView | templating._TemplateResponse:
-    player = await db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
+    player = db.get_obj_of_type_by_id(player_id, models.Player, "Player", db_sess)
     player_view = create_player_view(player)
     if config.TESTING:
         return player_view
@@ -46,7 +46,7 @@ async def get_all_players(
     request: fastapi.Request,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> list[schemas.PlayerView] | templating._TemplateResponse:
-    players = await db.get_all_objs_of_type(models.Player, db_sess)
+    players = db.get_all_objs_of_type(models.Player, db_sess)
     player_views = [create_player_view(player) for player in players]
     if config.TESTING:
         return player_views
@@ -143,7 +143,7 @@ async def delete_player(
     player_id: int,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> None:
-    await db.delete_obj(player_id, models.Player, "Player", db_sess)
+    db.delete_obj(player_id, models.Player, "Player", db_sess)
 
 
 def validate_player_data(name: str) -> schemas.PlayerSchema:

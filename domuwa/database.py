@@ -29,7 +29,7 @@ async def get_db_session() -> AsyncGenerator[orm.Session, None]:
         db.close()
 
 
-async def get_obj_of_type_by_id(
+def get_obj_of_type_by_id(
     obj_id: int,
     obj_model_type: Type[T],
     obj_model_type_name: str,
@@ -45,14 +45,14 @@ async def get_obj_of_type_by_id(
     return obj
 
 
-async def get_all_objs_of_type(
+def get_all_objs_of_type(
     obj_model: Type[T],
     db: orm.Session = fastapi.Depends(get_db_session),
 ) -> list[T]:
     return db.query(obj_model).all()
 
 
-async def save_obj(
+def save_obj(
     obj_model: T,
     db: orm.Session = fastapi.Depends(get_db_session),
 ) -> T:
@@ -62,13 +62,13 @@ async def save_obj(
     return obj_model
 
 
-async def delete_obj(
+def delete_obj(
     obj_id: int,
     obj_model_type: Type[T],  # type: ignore
     obj_model_type_name: str,
     db: orm.Session = fastapi.Depends(get_db_session),
 ) -> None:
-    obj = await get_obj_of_type_by_id(obj_id, obj_model_type, obj_model_type_name, db)
+    obj = get_obj_of_type_by_id(obj_id, obj_model_type, obj_model_type_name, db)
     db.delete(obj)
     db.commit()
     logger.debug(f"{obj_model_type_name} of id={obj_id} deleted")
