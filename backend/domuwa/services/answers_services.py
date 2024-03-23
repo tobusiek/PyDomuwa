@@ -9,11 +9,11 @@ from domuwa.utils import logging
 logger = logging.get_logger("db_connector")
 
 
-async def create_answer(
+def create_answer(
     answer: schemas.AnswerSchema,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> models.Answer:
-    question = await db.get_obj_of_type_by_id(
+    question = db.get_obj_of_type_by_id(
         answer.question_id,
         models.Question,
         "Question",
@@ -22,7 +22,7 @@ async def create_answer(
     if not question:
         raise fastapi.HTTPException(status.HTTP_400_BAD_REQUEST, "Question not found")
     if answer.correct:
-        await check_correct_answer_already_exists_for_question(question.id, db_sess)
+        check_correct_answer_already_exists_for_question(question.id, db_sess)
     db_answer = models.Answer(
         author=answer.author,
         text=answer.text,
@@ -32,10 +32,10 @@ async def create_answer(
     )  # type: ignore
     question.answers.append(db_answer)
     db_sess.add(question)
-    return await db.save_obj(db_answer, db_sess)
+    return db.save_obj(db_answer, db_sess)
 
 
-async def get_answers_for_question(
+def get_answers_for_question(
     question_id: int,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> list[models.Answer]:
@@ -46,28 +46,28 @@ async def get_answers_for_question(
     )
 
 
-async def update_answer(
+def update_answer(
     answer_id: int,
     modified_answer: schemas.AnswerSchema,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> models.Answer:
-    answer = await db.get_obj_of_type_by_id(answer_id, models.Answer, "Answer", db_sess)
+    answer = db.get_obj_of_type_by_id(answer_id, models.Answer, "Answer", db_sess)
     if modified_answer.correct:
-        await check_correct_answer_already_exists_for_question(
+        check_correct_answer_already_exists_for_question(
             answer.question_id,
             db_sess,
         )
     answer.author = modified_answer.author
     answer.text = modified_answer.text
     answer.correct = modified_answer.correct
-    return await db.save_obj(answer, db_sess)
+    return db.save_obj(answer, db_sess)
 
 
-async def check_correct_answer_already_exists_for_question(
+def check_correct_answer_already_exists_for_question(
     question_id: int,
     db_sess: orm.Session = fastapi.Depends(db.get_db_session),
 ) -> None:
-    question = await db.get_obj_of_type_by_id(
+    question = db.get_obj_of_type_by_id(
         question_id,
         models.Question,
         "Question",
