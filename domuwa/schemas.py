@@ -17,6 +17,8 @@ valid_id = pydantic.Field(ge=1)
 
 
 class AnswerSchema(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(from_attributes=True)
+
     author: str = pydantic.Field(
         min_length=MIN_PLAYER_NAME_LEN,
         max_length=MAX_PLAYER_NAME_LEN,
@@ -28,7 +30,6 @@ class AnswerSchema(pydantic.BaseModel):
 
 class AnswerView(AnswerSchema):
     id: int = valid_id
-    model_config = pydantic.ConfigDict(from_attributes=True)
 
 
 MIN_GAME_NAME_LEN = 3
@@ -50,6 +51,8 @@ def check_category(category: str) -> str:
 
 
 class QuestionSchema(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(from_attributes=True)
+
     game_name: str = pydantic.Field(
         min_length=MIN_GAME_NAME_LEN,
         max_length=MAX_GAME_NAME_LEN,
@@ -82,7 +85,6 @@ class QuestionSchema(pydantic.BaseModel):
 
 class QuestionView(QuestionSchema):
     id: int = valid_id
-    model_config = pydantic.ConfigDict(from_attributes=True)
 
 
 class QuestionWithAnswersView(QuestionView):
@@ -94,6 +96,8 @@ class AnswerWithQuestionView(AnswerView):
 
 
 class GameRoomSchema(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(from_attributes=True)
+
     game_name: str = pydantic.Field(
         min_length=MIN_GAME_NAME_LEN,
         max_length=MAX_GAME_NAME_LEN,
@@ -111,10 +115,11 @@ class GameRoomSchema(pydantic.BaseModel):
 
 class GameRoomView(GameRoomSchema):
     id: int = valid_id
-    model_config = pydantic.ConfigDict(from_attributes=True)
 
 
 class PlayerSchema(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(from_attributes=True)
+
     name: str = pydantic.Field(
         min_length=MIN_PLAYER_NAME_LEN,
         max_length=MAX_PLAYER_NAME_LEN,
@@ -126,7 +131,6 @@ class PlayerView(PlayerSchema):
     games_played: int
     games_won: int
     score: float
-    model_config = pydantic.ConfigDict(from_attributes=True)
 
 
 class PlayerWithGameView(PlayerView):
