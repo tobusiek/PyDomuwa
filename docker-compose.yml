@@ -5,8 +5,8 @@ services:
     volumes:
       - ./backend/:/usr/src/app/
     ports:
-      - target: ${API_PORT}
-        published: 8080
+      - target: 8080
+        published: ${API_PORT}
         protocol: tcp
     env_file:
       - ./backend/.env

@@ -12,8 +12,8 @@ from domuwa.routers import (
 from domuwa.utils import logging as app_logging
 from domuwa.utils.get_computer_ip import get_computer_ip
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from starlette.middleware.sessions import SessionMiddleware
 
 logger = app_logging.get_logger("fastapi")
