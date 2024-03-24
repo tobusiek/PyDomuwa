@@ -1,63 +1,54 @@
-from collections.abc import Generator
+import warnings
 
 import pytest
-from fastapi.testclient import TestClient
-from pytest_factoryboy import register
-from sqlalchemy import StaticPool, create_engine
-from sqlalchemy.orm import Session, scoped_session, sessionmaker
-
 from config import settings
-from domuwa import database as db
-from domuwa.models import Base
-from domuwa.tests import factories
+from factory.alchemy import SQLAlchemyModelFactory
+from fastapi.testclient import TestClient
 from main import app
+from sqlmodel import SQLModel, Session, create_engine
+from sqlmodel.pool import StaticPool
+
+from domuwa import database as db
+
+warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
 settings.TESTING = True
 
-# SQLALCHEMY_DATABASE_URL = "sqlite:///test_database.db"
-SQLALCHEMY_DATABASE_URL = "sqlite://"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-TestingSessionLocal = scoped_session(sessionmaker(autoflush=False, bind=engine))
+SQLALCHEMY_DATABASE_URL = "sqlite:///test_database.db"
+# SQLALCHEMY_DATABASE_URL = "sqlite://"
 
 
-@pytest.fixture()
-def db_session() -> Generator[Session, None, None]:
-    # Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
+@pytest.fixture(name="db_session")
+def db_session_fixture():
+    from domuwa.tests import factories
 
-    # connection = engine.connect()
-    # transaction = connection.begin()
-    # db_sess = TestingSessionLocal(bind=connection)
-    # yield db_sess
-    #
-    # db_sess.close()
-    # transaction.rollback()
-    # connection.close()
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    SQLModel.metadata.drop_all(engine)
+    SQLModel.metadata.create_all(engine)
 
-    with TestingSessionLocal() as db_sess:
-        yield db_sess
+    db_sess = Session(engine)
+
+    for factory in SQLAlchemyModelFactory.__subclasses__():
+        factory._meta.sqlalchemy_session = db_sess  # type: ignore
+
+    yield db_sess
+
+    db_sess.rollback()
+    db_sess.close()
 
 
-@pytest.fixture()
-def api_client(db_session: Session) -> Generator[TestClient, None, None]:
-    def override_get_db_session() -> Generator[Session, None, None]:
-        with db_session:
-            yield db_session
+@pytest.fixture(name="api_client")
+def api_client_fixture(db_session: Session):
+    def override_get_db_session():
+        return db_session
 
     app.dependency_overrides[db.get_db_session] = override_get_db_session
 
     with TestClient(app) as client:
         yield client
 
-    del app.dependency_overrides[db.get_db_session]
-
-
-register(factories.AnswerFactory)
-register(factories.QuestionFactory)
-register(factories.GameRoomFactory)
-register(factories.PlayerFactory)
+    app.dependency_overrides.clear()

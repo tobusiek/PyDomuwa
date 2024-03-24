@@ -60,47 +60,6 @@ class GameRoom(Base):
     )
 
 
-class Player(Base):
-    __tablename__ = "player"
-
-    id: orm.Mapped[int] = orm.mapped_column(
-        sqlalchemy.Integer,
-        primary_key=True,
-        autoincrement=True,
-    )
-    name: orm.Mapped[str] = orm.mapped_column(
-        sqlalchemy.String,
-        nullable=False,
-        index=True,
-        unique=True,
-    )
-    games_played: orm.Mapped[int] = orm.mapped_column(
-        sqlalchemy.Integer,
-        nullable=False,
-        default=0,
-    )
-    games_won: orm.Mapped[int] = orm.mapped_column(
-        sqlalchemy.Integer,
-        nullable=False,
-        default=0,
-    )
-    score: orm.Mapped[float] = orm.mapped_column(
-        sqlalchemy.Float,
-        nullable=False,
-        default=0.0,
-    )
-    game_room_id: orm.Mapped[Optional[int]] = orm.mapped_column(
-        sqlalchemy.Integer,
-        sqlalchemy.ForeignKey("game_room.id"),
-        nullable=True,
-    )
-    game_room: orm.Mapped[GameRoom | None] = orm.relationship(
-        "GameRoom",
-        back_populates="players",
-        foreign_keys=game_room_id,
-    )
-
-
 class Question(Base):
     __tablename__ = "question"
 

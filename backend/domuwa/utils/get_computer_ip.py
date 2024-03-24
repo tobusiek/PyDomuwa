@@ -1,7 +1,7 @@
 import socket
 
 
-def get_ip_address(port: int = 80) -> str:
+def get_computer_ip(port: int = 80) -> str:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", port))
     ip_addr = s.getsockname()[0]
@@ -10,4 +10,4 @@ def get_ip_address(port: int = 80) -> str:
 
 
 if __name__ == "__main__":
-    print("IP addr:", get_ip_address())
+    print("IP addr:", get_computer_ip())

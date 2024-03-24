@@ -1,6 +1,6 @@
 ruff
 mypy
-SQLAlchemy
+sqlmodel
 alembic
 fastapi
 httpx
@@ -14,5 +14,4 @@ types-factory-boy
 pytest
 pytest-xdist
 pytest-asyncio
-pytest-factoryboy
 colorlog
