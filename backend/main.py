@@ -29,6 +29,7 @@ async def lifespan(_: FastAPI) -> AsyncGenerator[None, None]:
         f"http://{address}:{settings.API_PORT}",
     )
     create_db_and_tables()
+    logger.critical("fix .env support for docker compose")
     yield
 
 

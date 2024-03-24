@@ -18,10 +18,10 @@ Every player can modify question and answers database (initially empty):
 - delete one by one
 
 
-### Run app
+### Run app (.env needs fix)
 
 ```console
-docker compose up -d --build
+docker compose --env-file=backend/.env up -d --build
 ```
 
 ### Shutdown app
