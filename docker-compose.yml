@@ -1,9 +1,9 @@
 services:
   api:
     build: ./backend
-    command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8080
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 8080
     volumes:
-      - ./backend/:/usr/src/app/
+      - ./backend/:/app/
     ports:
       - target: 8080
         published: ${API_PORT}
