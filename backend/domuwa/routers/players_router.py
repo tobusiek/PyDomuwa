@@ -5,8 +5,8 @@ from sqlmodel import Session
 from starlette import responses
 
 from domuwa.database import get_db_session
+from domuwa.models.view_models import player as player_models
 from domuwa.services import players_services as services
-from domuwa.sqlmodels import player as player_models
 
 router = APIRouter(prefix="/players", tags=["Players"])
 
@@ -14,22 +14,27 @@ router = APIRouter(prefix="/players", tags=["Players"])
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def create_player(
     request: Request,
-    new_player: player_models.PlayerCreate,
+    new_player: player_models.Player,
     db_sess: Session = Depends(get_db_session),
 ):
     try:
-        player = player_models.Player.model_validate(new_player, strict=True)
+        player = player_models.DbPlayer.model_validate(new_player, strict=True)
     except ValidationError as exc:
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, "Provided invalid data"
         ) from exc
 
-    db_player = services.create_player(player, db_sess)
-    db_player_data = db_player.model_dump()
-    response = JSONResponse(db_player_data, status.HTTP_201_CREATED)
+    db_player = player_models.PlayerRead.model_validate(
+        services.create_player(player, db_sess)
+    )
+    response = JSONResponse(db_player.model_dump(), status.HTTP_201_CREATED)
 
     if request.session.get("user") is None:
-        response.set_cookie("user", db_player_data)
+        response.set_cookie(
+            "user",
+            player_models.PlayerSession.model_validate(db_player).model_dump_json(),
+        )
+
     return response
 
 
@@ -39,7 +44,9 @@ def get_player_by_id(
     player_id: int,
     db_sess: Session = Depends(get_db_session),
 ):
-    player = services.get_player_by_id(player_id, db_sess)
+    player = player_models.PlayerRead.model_validate(
+        services.get_player_by_id(player_id, db_sess)
+    )
     return JSONResponse(player.model_dump())
 
 
@@ -60,7 +67,7 @@ def update_player_name(
     db_sess: Session = Depends(get_db_session),
 ):
     try:
-        player = player_models.Player.model_validate(player_update, strict=True)
+        player = player_models.DbPlayer.model_validate(player_update, strict=True)
     except ValidationError as exc:
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, "Provided invalid data"

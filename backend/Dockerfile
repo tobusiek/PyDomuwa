@@ -1,13 +1,13 @@
 FROM python:3.11.8-alpine
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE 1
 
-COPY ./prod-requirements.txt /usr/src/app/requirements.txt
+COPY ./prod-requirements.txt /app/requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-COPY . /usr/src/app
+COPY . /app
 
 RUN pytest -x -s

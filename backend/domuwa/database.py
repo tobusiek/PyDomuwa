@@ -4,7 +4,7 @@ from config import settings
 from fastapi import Depends, HTTPException, status
 from sqlmodel import SQLModel, Session, create_engine, select
 
-from domuwa.utils import logging
+from domuwa import logging
 
 logger = logging.get_logger("db_connector")
 
@@ -20,7 +20,6 @@ class SQLModelWithId(SQLModel):
 
 
 ModelType = TypeVar("ModelType", bound=SQLModel)
-ModelWithIdType = TypeVar("ModelWithIdType", bound=SQLModelWithId)
 
 
 def create_db_and_tables():
