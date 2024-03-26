@@ -8,11 +8,7 @@ from domuwa import logging
 
 logger = logging.get_logger("db_connector")
 
-engine = create_engine(
-    settings.DATABASE_URL,
-    echo=True,
-    connect_args={"check_same_thread": False},
-)
+engine = create_engine(settings.DATABASE_URL, connect_args={"check_same_thread": False})
 
 
 class SQLModelWithId(SQLModel):

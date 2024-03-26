@@ -7,9 +7,7 @@ logging.getLogger("asyncio").setLevel(logging.INFO)
 
 
 def get_logger(logger_name: str) -> logging.Logger:
-    logger_fmt = (
-        "%(log_color)s%(asctime)s [%(name)s:%(levelname)s] %(funcName)s() %(message)s"
-    )
+    logger_fmt = "%(log_color)s%(asctime)s [%(name)s:%(levelname)s] %(message)s"
     log_colors = {
         "DEBUG": "cyan",
         "INFO": "green",
