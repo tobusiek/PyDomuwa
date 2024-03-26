@@ -1,8 +1,7 @@
 import factory
 from factory.alchemy import SQLAlchemyModelFactory
 
-from domuwa import models
-from domuwa.sqlmodels.player import Player
+from domuwa.models import db_models
 
 
 class QuestionFactory(SQLAlchemyModelFactory):
@@ -13,7 +12,7 @@ class QuestionFactory(SQLAlchemyModelFactory):
     excluded = False
 
     class Meta:  # type: ignore
-        model = models.Question
+        model = db_models.DbQuestion
 
 
 class AnswerFactory(SQLAlchemyModelFactory):
@@ -23,7 +22,7 @@ class AnswerFactory(SQLAlchemyModelFactory):
     question: factory.SubFactory = factory.SubFactory(QuestionFactory)
 
     class Meta:  # type: ignore
-        model = models.Answer
+        model = db_models.DbAnswer
 
 
 class GameRoomFactory(SQLAlchemyModelFactory):
@@ -31,12 +30,12 @@ class GameRoomFactory(SQLAlchemyModelFactory):
     game_category = "SFW"
 
     class Meta:  # type: ignore
-        model = models.GameRoom
+        model = db_models.DbGameRoom
 
 
 class PlayerFactory(SQLAlchemyModelFactory):
     name = factory.Sequence(lambda x: "Player %d" % x)
 
     class Meta:  # type: ignore
-        model = Player
+        model = db_models.DbPlayer
         sqlalchemy_session_persistence = "commit"

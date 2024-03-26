@@ -3,12 +3,14 @@ from contextlib import asynccontextmanager
 from config import settings
 from domuwa import logging
 from domuwa.database import create_db_and_tables
-from domuwa.routers import (
-    # answers_router,
-    # questions_router,
-    # game_rooms_router,
-    players_router,
-)
+
+# from domuwa.routers import (
+# answers_router,
+# questions_router,
+# game_rooms_router,
+# players_router,
+# )
+from domuwa.routers.players_router import router as players_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware

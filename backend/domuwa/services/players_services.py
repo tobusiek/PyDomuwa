@@ -3,11 +3,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 
 from domuwa import database as db
-from domuwa.sqlmodels.player import Player
+from domuwa.models.db_models import DbPlayer
 
 
 def create_player(
-    player: Player,
+    player: DbPlayer,
     db_sess: Session = Depends(db.get_db_session),
 ):
     try:
@@ -21,11 +21,13 @@ def create_player(
 
 
 def get_player_by_id(player_id: int, db_sess: Session = Depends(db.get_db_session)):
-    return db.get_obj_of_type_by_id(player_id, Player, "Player", db_sess)
+    return db.get_obj_of_type_by_id(player_id, DbPlayer, "Player", db_sess)
 
 
 def get_player_by_name(player_name: str, db_sess: Session = Depends(db.get_db_session)):
-    db_player = db_sess.exec(select(Player).where(Player.name == player_name)).first()
+    db_player = db_sess.exec(
+        select(DbPlayer).where(DbPlayer.name == player_name)
+    ).first()
     if db_player is None:
         raise HTTPException(
             status.HTTP_404_NOT_FOUND, f"Player of given name={player_name} not found"
@@ -34,16 +36,16 @@ def get_player_by_name(player_name: str, db_sess: Session = Depends(db.get_db_se
 
 
 def get_all_players(db_sess: Session = Depends(db.get_db_session)):
-    return db.get_all_objs_of_type(Player, db_sess)
+    return db.get_all_objs_of_type(DbPlayer, db_sess)
 
 
 def update_player_name(
     player_id: int,
-    player: Player,
+    player: DbPlayer,
     db_sess: Session = Depends(db.get_db_session),
 ):
     return db.update_obj(player_id, player, "Player", db_sess)
 
 
 def delete_player(player_id: int, db_sess: Session = Depends(db.get_db_session)):
-    db.delete_obj(player_id, Player, "Player", db_sess)
+    db.delete_obj(player_id, DbPlayer, "Player", db_sess)

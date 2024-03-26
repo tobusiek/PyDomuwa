@@ -1,18 +1,23 @@
-from domuwa.models.db_models import DbPlayer
 from sqlmodel import Field, SQLModel
 
 
-class Player(SQLModel):
+class PlayerBase(SQLModel):
     name: str = Field(min_length=3, max_length=25)
 
 
-class PlayerSession(Player):
+class PlayerCreate(PlayerBase):
+    pass
+
+
+class PlayerSession(PlayerBase):
     id: int
 
 
-class PlayerRead(DbPlayer):
+class PlayerRead(PlayerBase):
     id: int
+    games_played: int
+    games_won: int
 
 
-class PlayerUpdate(Player):
+class PlayerUpdate(PlayerBase):
     pass
