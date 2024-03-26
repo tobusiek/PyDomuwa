@@ -3,7 +3,7 @@ from sqlmodel import Session
 from starlette.responses import Response
 
 from domuwa import database as db
-from domuwa.models.db_models import DbGameRoom
+from domuwa.models.db_models import GameRoom
 from domuwa.services import game_rooms_services as services
 
 router = APIRouter(prefix="/game_room", tags=["Game Room"])

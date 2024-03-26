@@ -5,7 +5,7 @@ from sqlmodel import Session
 from starlette import responses
 
 from domuwa.database import get_db_session
-from domuwa.models.db_models import DbPlayer
+from domuwa.models.db_models import Player
 from domuwa.models.view_models import player as player_models
 from domuwa.services import players_services as services
 
@@ -19,7 +19,7 @@ def create_player(
     db_sess: Session = Depends(get_db_session),
 ):
     try:
-        player = DbPlayer.model_validate(new_player, strict=True)
+        player = Player.model_validate(new_player, strict=True)
     except ValidationError as exc:
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, "Provided invalid data"
@@ -68,7 +68,7 @@ def update_player_name(
     db_sess: Session = Depends(get_db_session),
 ):
     try:
-        player = DbPlayer.model_validate(player_update, strict=True)
+        player = Player.model_validate(player_update, strict=True)
     except ValidationError as exc:
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, "Provided invalid data"

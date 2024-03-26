@@ -12,7 +12,7 @@ class QuestionFactory(SQLAlchemyModelFactory):
     excluded = False
 
     class Meta:  # type: ignore
-        model = db_models.DbQuestion
+        model = db_models.Question
 
 
 class AnswerFactory(SQLAlchemyModelFactory):
@@ -22,7 +22,7 @@ class AnswerFactory(SQLAlchemyModelFactory):
     question: factory.SubFactory = factory.SubFactory(QuestionFactory)
 
     class Meta:  # type: ignore
-        model = db_models.DbAnswer
+        model = db_models.Answer
 
 
 class GameRoomFactory(SQLAlchemyModelFactory):
@@ -30,12 +30,12 @@ class GameRoomFactory(SQLAlchemyModelFactory):
     game_category = "SFW"
 
     class Meta:  # type: ignore
-        model = db_models.DbGameRoom
+        model = db_models.GameRoom
 
 
 class PlayerFactory(SQLAlchemyModelFactory):
     name = factory.Sequence(lambda x: "Player %d" % x)
 
     class Meta:  # type: ignore
-        model = db_models.DbPlayer
+        model = db_models.Player
         sqlalchemy_session_persistence = "commit"

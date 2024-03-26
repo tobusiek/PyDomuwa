@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from domuwa import database as db
 from domuwa import logging
-from domuwa.models.db_models import DbAnswer, DbQuestion
+from domuwa.models.db_models import Answer, Question
 
 logger = logging.get_logger("db_connector")
 

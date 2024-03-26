@@ -5,7 +5,7 @@ from starlette import responses
 
 from domuwa import database as db
 from domuwa import logging
-from domuwa.models.db_models import DbAnswer as Answer
+from domuwa.models.db_models import Answer as Answer
 from domuwa.services import answers_services as services
 
 logger = logging.get_logger("domuwa")
