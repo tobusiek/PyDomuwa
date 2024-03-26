@@ -6,10 +6,7 @@ from domuwa import database as db
 from domuwa.models.db_models import Player
 
 
-def create_player(
-    player: Player,
-    db_sess: Session = Depends(db.get_db_session),
-):
+def create_player(player: Player, db_sess: Session = Depends(db.get_db_session)):
     try:
         db_player = db.save_obj(player, db_sess)
     except IntegrityError:
