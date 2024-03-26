@@ -14,7 +14,7 @@ router = APIRouter(prefix="/players", tags=["Players"])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_player(
+async def create_player(
     new_player: player_models.PlayerCreate, db_sess: Session = Depends(get_db_session)
 ):
     try:
@@ -24,9 +24,8 @@ def create_player(
             status.HTTP_400_BAD_REQUEST, "Provided invalid data"
         ) from exc
 
-    db_player = player_models.PlayerRead.model_validate(
-        services.create_player(player, db_sess)
-    )
+    db_player = await services.create_player(player, db_sess)
+    db_player = player_models.PlayerRead.model_validate(db_player)
     return JSONResponse(db_player.model_dump(), status.HTTP_201_CREATED)
 
     # TODO: separate session from creation
@@ -38,21 +37,19 @@ def create_player(
 
 
 @router.get("/{player_id}")
-def get_player_by_id(player_id: int, db_sess: Session = Depends(get_db_session)):
-    player = player_models.PlayerRead.model_validate(
-        services.get_player_by_id(player_id, db_sess)
-    )
-    return JSONResponse(player.model_dump())
+async def get_player_by_id(player_id: int, db_sess: Session = Depends(get_db_session)):
+    db_player = await services.get_player_by_id(player_id, db_sess)
+    return JSONResponse(player_models.PlayerRead.model_validate(db_player).model_dump())
 
 
 @router.get("/")
-def get_all_players(db_sess: Session = Depends(get_db_session)):
-    players = services.get_all_players(db_sess)
-    return JSONResponse([player.model_dump() for player in players])
+async def get_all_players(db_sess: Session = Depends(get_db_session)):
+    db_players = await services.get_all_players(db_sess)
+    return JSONResponse([player.model_dump() for player in db_players])
 
 
 @router.patch("/{player_id}")
-def update_player_name(
+async def update_player_name(
     request: Request,
     player_id: int,
     player_update: player_models.PlayerUpdate,
@@ -68,14 +65,13 @@ def update_player_name(
     if (session_player := request.session.get("player")) is not None:
         session_player = json.loads(session_player)
 
-    return JSONResponse(
-        services.update_player_name(player_id, player, db_sess).model_dump()
-    )
+    db_player = await services.update_player_name(player_id, player, db_sess)
+    return JSONResponse(player_models.PlayerRead.model_validate(db_player).model_dump())
 
 
 @router.delete("/{player_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_player(
+async def delete_player(
     player_id: int,
     db_sess: Session = Depends(get_db_session),
 ):
-    services.delete_player(player_id, db_sess)
+    await services.delete_player(player_id, db_sess)

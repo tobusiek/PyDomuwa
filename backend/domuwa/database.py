@@ -31,7 +31,7 @@ def get_db_session():
         yield db_sess
 
 
-def get_obj_of_type_by_id(
+async def get_obj_of_type_by_id(
     obj_id: int,
     obj_model_type: type[ModelType],
     obj_model_type_name: str,
@@ -47,14 +47,14 @@ def get_obj_of_type_by_id(
     return obj
 
 
-def get_all_objs_of_type(
+async def get_all_objs_of_type(
     obj_model: type[ModelType],
     db_sess: Session = Depends(get_db_session),
 ):
     return db_sess.exec(select(obj_model)).all()
 
 
-def save_obj(
+async def save_obj(
     obj_model: ModelType,  # type: ignore
     db: Session = Depends(get_db_session),
 ):
@@ -64,13 +64,13 @@ def save_obj(
     return obj_model
 
 
-def update_obj(
+async def update_obj(
     obj_id: int,
     obj_model: ModelType,  # type: ignore
     ojb_model_type_name: str,
     db_sess: Session = Depends(get_db_session),
 ):
-    db_obj = get_obj_of_type_by_id(
+    db_obj = await get_obj_of_type_by_id(
         obj_id, type(obj_model), ojb_model_type_name, db_sess
     )
     obj_data = obj_model.model_dump(exclude_unset=True)
@@ -81,13 +81,13 @@ def update_obj(
     return db_obj
 
 
-def delete_obj(
+async def delete_obj(
     obj_id: int,
     obj_model_type: type[ModelType],
     obj_model_type_name: str,
     db: Session = Depends(get_db_session),
 ):
-    obj = get_obj_of_type_by_id(obj_id, obj_model_type, obj_model_type_name, db)
+    obj = await get_obj_of_type_by_id(obj_id, obj_model_type, obj_model_type_name, db)
     db.delete(obj)
     db.commit()
     logger.debug(f"{obj_model_type_name} of id={obj_id} deleted")

@@ -20,7 +20,7 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///test_database.db"
 
 @pytest.fixture(name="db_session")
 def db_session_fixture():
-    from domuwa.tests import factories
+    from domuwa.tests import factories  # noqa: F401
 
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL,
