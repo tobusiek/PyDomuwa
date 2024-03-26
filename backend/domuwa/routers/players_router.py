@@ -25,8 +25,7 @@ async def create_player(
         ) from exc
 
     db_player = await services.create_player(player, db_sess)
-    db_player = player_models.PlayerRead.model_validate(db_player)
-    return JSONResponse(db_player.model_dump(), status.HTTP_201_CREATED)
+    return create_player_response(db_player, status.HTTP_201_CREATED)
 
     # TODO: separate session from creation
     # if request.session.get("player") is None:
@@ -39,13 +38,22 @@ async def create_player(
 @router.get("/{player_id}")
 async def get_player_by_id(player_id: int, db_sess: Session = Depends(get_db_session)):
     db_player = await services.get_player_by_id(player_id, db_sess)
-    return JSONResponse(player_models.PlayerRead.model_validate(db_player).model_dump())
+    return create_player_response(db_player)
 
 
 @router.get("/")
 async def get_all_players(db_sess: Session = Depends(get_db_session)):
     db_players = await services.get_all_players(db_sess)
-    return JSONResponse([player.model_dump() for player in db_players])
+    read_players = []
+    for db_player in db_players:
+        try:
+            read_players.append(player_models.PlayerRead.model_validate(db_player))
+        except ValidationError as exc:
+            raise HTTPException(
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "Cannot create Players from database",
+            ) from exc
+    return JSONResponse([player.model_dump() for player in read_players])
 
 
 @router.patch("/{player_id}")
@@ -66,7 +74,7 @@ async def update_player_name(
         session_player = json.loads(session_player)
 
     db_player = await services.update_player_name(player_id, player, db_sess)
-    return JSONResponse(player_models.PlayerRead.model_validate(db_player).model_dump())
+    return create_player_response(db_player)
 
 
 @router.delete("/{player_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -75,3 +83,14 @@ async def delete_player(
     db_sess: Session = Depends(get_db_session),
 ):
     await services.delete_player(player_id, db_sess)
+
+
+def create_player_response(db_player: Player, status_code: int = status.HTTP_200_OK):
+    try:
+        player_read = player_models.PlayerRead.model_validate(db_player)
+    except ValidationError as exc:
+        raise HTTPException(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            "Cannot create Player from database",
+        ) from exc
+    return JSONResponse(player_read.model_dump(), status_code)
