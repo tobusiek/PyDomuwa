@@ -1,8 +1,4 @@
-from fastapi import Depends
-from sqlalchemy.orm import Session
 
-from domuwa import database as db
-from domuwa import models
 
 
 # def create_question(

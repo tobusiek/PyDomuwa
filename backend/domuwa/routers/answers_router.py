@@ -1,12 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
-from pydantic import ValidationError
-from sqlmodel import Session
-from starlette import responses
+from fastapi import APIRouter
 
-from domuwa import database as db
 from domuwa import logging
 from domuwa.models.db_models import Answer as Answer
-from domuwa.services import answers_services as services
 
 logger = logging.get_logger("domuwa")
 
