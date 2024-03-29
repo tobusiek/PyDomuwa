@@ -1,3 +1,6 @@
+[tool.basedpyright]
+reportUnknownVariableType = false
+
 [tool.ruff]
 show-fixes = true
 target-version = "py311"

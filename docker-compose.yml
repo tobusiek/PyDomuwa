@@ -12,6 +12,8 @@ services:
       - ./backend/.env
 
   client:
+    depends_on:
+      - api
     build: ./frontend
     command: npm run start
     volumes:
