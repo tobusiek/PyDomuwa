@@ -13,4 +13,4 @@ case-sensitive = true
 [tool.mypy]
 python_version = "3.11"
 mypy_path = "backend"
-python_executable = "backend/.venv/bin/python"
+python_executable = ".venv/bin/python"

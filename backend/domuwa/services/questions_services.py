@@ -1,6 +1,3 @@
-
-
-
 # def create_question(
 #     question: schemas.QuestionCreateSchema,
 #     db_sess: Session = Depends(db.get_db_session),

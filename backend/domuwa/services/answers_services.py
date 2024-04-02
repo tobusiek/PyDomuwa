@@ -1,4 +1,3 @@
-
 from domuwa import logging
 
 logger = logging.get_logger("db_connector")
