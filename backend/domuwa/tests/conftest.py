@@ -1,7 +1,6 @@
 import warnings
 
 import pytest
-from config import settings
 from factory.alchemy import SQLAlchemyModelFactory
 from fastapi.testclient import TestClient
 from main import app
@@ -11,8 +10,6 @@ from sqlmodel.pool import StaticPool
 from domuwa import database as db
 
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
-
-settings.TESTING = True
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///test_database.db"
 # SQLALCHEMY_DATABASE_URL = "sqlite://"

@@ -1,9 +1,6 @@
-[tool.basedpyright]
-reportUnknownVariableType = false
-
 [tool.ruff]
 show-fixes = true
-target-version = "py311"
+# target-version = "py311"
 line-length = 88
 
 [tool.ruff.lint]
@@ -16,3 +13,4 @@ case-sensitive = true
 [tool.mypy]
 python_version = "3.11"
 mypy_path = "backend"
+python_executable = "backend/.venv/bin/python"

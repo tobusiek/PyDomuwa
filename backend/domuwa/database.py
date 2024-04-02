@@ -1,10 +1,10 @@
 from typing import TypeVar
 
-from config import settings
 from fastapi import Depends, HTTPException, status
 from sqlmodel import SQLModel, Session, create_engine, select
 
 from domuwa import logging
+from domuwa.config import settings
 
 logger = logging.get_logger("db_connector")
 
