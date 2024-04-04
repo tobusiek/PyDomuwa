@@ -11,6 +11,7 @@ from domuwa import database as db
 from main import app
 
 logging.getLogger("faker").setLevel(logging.ERROR)
+logging.getLogger("factory").setLevel(logging.ERROR)
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///test_database.db"

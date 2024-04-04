@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -13,6 +14,7 @@ from domuwa.routers.players_router import router as players_router
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    logging.getLogger("asyncio").setLevel(logging.INFO)
     create_db_and_tables()
     yield
 
