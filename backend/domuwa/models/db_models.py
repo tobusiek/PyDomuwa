@@ -13,7 +13,7 @@ class GameTypeChoices(PyEnum):
 
 
 class GameType(SQLModel, table=True):
-    __tablename__ = "game_type"
+    __tablename__ = "game_type"  # type: ignore
 
     id: Optional[int] = Field(default=None, primary_key=True)
     name: GameTypeChoices = Field(sa_column=Column(Enum(GameTypeChoices)))
@@ -29,7 +29,7 @@ class QnACategoryChoices(PyEnum):
 
 
 class QnACategory(SQLModel, table=True):
-    __tablename__ = "qna_category"
+    __tablename__ = "qna_category"  # type: ignore
 
     id: Optional[int] = Field(default=None, primary_key=True)
     name: QnACategoryChoices = Field(sa_column=Column(Enum(QnACategoryChoices)))
@@ -39,7 +39,7 @@ class QnACategory(SQLModel, table=True):
 
 
 class Player(SQLModel, table=True):
-    __tablename__ = "player"
+    __tablename__ = "player"  # type: ignore
 
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(min_length=3, max_length=25, index=True, unique=True)
@@ -56,7 +56,7 @@ class Player(SQLModel, table=True):
 
 
 class Answer(SQLModel, table=True):
-    __tablename__ = "answer"
+    __tablename__ = "answer"  # type: ignore
 
     id: Optional[int] = Field(default=None, primary_key=True)
     text: str = Field(min_length=1, max_length=150)
@@ -90,7 +90,7 @@ class GameRoomQuestionsLink(SQLModel, table=True):
 
 
 class Question(SQLModel, table=True):
-    __tablename__ = "question"
+    __tablename__ = "question"  # type: ignore
 
     id: Optional[int] = Field(default=None, primary_key=True)
     text: str = Field(min_length=3, max_length=150)
@@ -117,7 +117,7 @@ class GameCategoryChoices(PyEnum):
 
 
 class GameCategory(SQLModel, table=True):
-    __tablename__ = "game_category"
+    __tablename__ = "game_category"  # type: ignore
 
     id: Optional[int] = Field(default=None, primary_key=True)
     name: GameCategoryChoices = Field(sa_column=Column(Enum(GameCategoryChoices)))
@@ -126,7 +126,7 @@ class GameCategory(SQLModel, table=True):
 
 
 class GameRoom(SQLModel, table=True):
-    __tablename__ = "game_room"
+    __tablename__ = "game_room"  # type: ignore
 
     id: Optional[int] = Field(default=None, primary_key=True)
     websocket: Optional[str] = Field(default=None, index=True)
@@ -152,7 +152,7 @@ class GameRoom(SQLModel, table=True):
 
 
 class Ranking(SQLModel, table=True):
-    __tablename__ = "ranking"
+    __tablename__ = "ranking"  # type: ignore
 
     id: Optional[int] = Field(default=None, primary_key=True)
 
@@ -163,7 +163,7 @@ class Ranking(SQLModel, table=True):
 
 
 class PlayerScore(SQLModel, table=True):
-    __tablename__ = "player_score"
+    __tablename__ = "player_score"  # type: ignore
 
     id: Optional[int] = Field(default=None, primary_key=True)
 

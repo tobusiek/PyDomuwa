@@ -3,11 +3,11 @@ import warnings
 import pytest
 from factory.alchemy import SQLAlchemyModelFactory
 from fastapi.testclient import TestClient
-from main import app
 from sqlmodel import SQLModel, Session, create_engine
 from sqlmodel.pool import StaticPool
 
 from domuwa import database as db
+from main import app
 
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 

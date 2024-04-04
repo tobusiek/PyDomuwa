@@ -11,10 +11,6 @@ logger = logging.get_logger("db_connector")
 engine = create_engine(settings.DATABASE_URL, connect_args={"check_same_thread": False})
 
 
-class SQLModelWithId(SQLModel):
-    id: int
-
-
 ModelType = TypeVar("ModelType", bound=SQLModel)
 
 
