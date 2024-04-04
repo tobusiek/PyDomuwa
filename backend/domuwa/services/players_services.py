@@ -38,7 +38,7 @@ async def get_all_players(db_sess: Session = Depends(db.get_db_session)):
     return await db.get_all_objs_of_type(Player, db_sess)
 
 
-async def update_player_name(
+async def update_player(
     player_id: int,
     player: Player,
     db_sess: Session = Depends(db.get_db_session),

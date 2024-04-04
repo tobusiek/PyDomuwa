@@ -1,6 +1,4 @@
-import json
-
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from sqlmodel import Session
@@ -27,13 +25,6 @@ async def create_player(
     db_player = await services.create_player(player, db_sess)
     return create_player_response(db_player, status.HTTP_201_CREATED)
 
-    # TODO: separate session from creation
-    # if request.session.get("player") is None:
-    #     response.set_cookie(
-    #         "player",
-    #         player_models.PlayerSession.model_validate(db_player).model_dump_json(),
-    #     )
-
 
 @router.get("/{player_id}")
 async def get_player_by_id(player_id: int, db_sess: Session = Depends(get_db_session)):
@@ -57,8 +48,7 @@ async def get_all_players(db_sess: Session = Depends(get_db_session)):
 
 
 @router.patch("/{player_id}")
-async def update_player_name(
-    request: Request,
+async def update_player(
     player_id: int,
     player_update: player_models.PlayerUpdate,
     db_sess: Session = Depends(get_db_session),
@@ -70,18 +60,12 @@ async def update_player_name(
             status.HTTP_400_BAD_REQUEST, "Provided invalid data"
         ) from exc
 
-    if (session_player := request.session.get("player")) is not None:
-        session_player = json.loads(session_player)
-
-    db_player = await services.update_player_name(player_id, player, db_sess)
+    db_player = await services.update_player(player_id, player, db_sess)
     return create_player_response(db_player)
 
 
 @router.delete("/{player_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_player(
-    player_id: int,
-    db_sess: Session = Depends(get_db_session),
-):
+async def delete_player(player_id: int, db_sess: Session = Depends(get_db_session)):
     await services.delete_player(player_id, db_sess)
 
 
