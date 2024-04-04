@@ -1,5 +1,6 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from sqlmodel import Session
 
@@ -8,73 +9,60 @@ from domuwa.models.db_models import Player
 from domuwa.models.view_models import player as player_models
 from domuwa.services import players_services as services
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/players", tags=["Players"])
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/", response_model=player_models.PlayerRead, status_code=status.HTTP_201_CREATED
+)
 async def create_player(
     new_player: player_models.PlayerCreate, db_sess: Session = Depends(get_db_session)
 ):
     try:
+        logger.debug(f"received Player({new_player}) to create")
         player = Player.model_validate(new_player, strict=True)
     except ValidationError as exc:
+        logger.error(str(exc))
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, "Provided invalid data"
         ) from exc
 
-    db_player = await services.create_player(player, db_sess)
-    return create_player_response(db_player, status.HTTP_201_CREATED)
+    return await services.create_player(player, db_sess)
 
 
-@router.get("/{player_id}")
+@router.get("/{player_id}", response_model=player_models.PlayerRead)
 async def get_player_by_id(player_id: int, db_sess: Session = Depends(get_db_session)):
-    db_player = await services.get_player_by_id(player_id, db_sess)
-    return create_player_response(db_player)
+    return await services.get_player_by_id(player_id, db_sess)
 
 
-@router.get("/")
+@router.get("/", response_model=list[player_models.PlayerRead])
 async def get_all_players(db_sess: Session = Depends(get_db_session)):
-    db_players = await services.get_all_players(db_sess)
-    read_players = []
-    for db_player in db_players:
-        try:
-            read_players.append(player_models.PlayerRead.model_validate(db_player))
-        except ValidationError as exc:
-            raise HTTPException(
-                status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "Cannot create Players from database",
-            ) from exc
-    return JSONResponse([player.model_dump() for player in read_players])
+    return await services.get_all_players(db_sess)
 
 
-@router.patch("/{player_id}")
+@router.patch("/{player_id}", response_model=player_models.PlayerRead)
 async def update_player(
     player_id: int,
     player_update: player_models.PlayerUpdate,
     db_sess: Session = Depends(get_db_session),
 ):
     try:
+        logger.debug(
+            f"received Player({player_update}) to update Player(id={player_id})"
+        )
         player = Player.model_validate(player_update, strict=True)
     except ValidationError as exc:
+        logger.error(str(exc))
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, "Provided invalid data"
         ) from exc
 
-    db_player = await services.update_player(player_id, player, db_sess)
-    return create_player_response(db_player)
+    return await services.update_player(player_id, player, db_sess)
 
 
 @router.delete("/{player_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_player(player_id: int, db_sess: Session = Depends(get_db_session)):
+    logger.debug(f"removing Player(id={player_id})")
     await services.delete_player(player_id, db_sess)
-
-
-def create_player_response(db_player: Player, status_code: int = status.HTTP_200_OK):
-    try:
-        player_read = player_models.PlayerRead.model_validate(db_player)
-    except ValidationError as exc:
-        raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            "Cannot create Player from database",
-        ) from exc
-    return JSONResponse(player_read.model_dump(), status_code)

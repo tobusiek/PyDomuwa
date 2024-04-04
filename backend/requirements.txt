@@ -14,4 +14,3 @@ types-factory-boy
 pytest
 pytest-xdist
 pytest-asyncio
-colorlog

@@ -16,13 +16,16 @@ def assert_valid_response(response: dict[str, Any]):
 
 
 def test_create_player(api_client: TestClient):
+    player = {"name": "Player 1"}
+
     response = api_client.post(
         PLAYERS_PREFIX,
-        json={"name": "Player 1"},
+        json=player,
     )
     assert response.status_code == status.HTTP_201_CREATED, response.text
     response_data = response.json()
     assert_valid_response(response_data)
+    assert player["name"] == response_data["name"], response.text
 
     response = api_client.get(f'{PLAYERS_PREFIX}{response_data["id"]}')
     assert response.status_code == status.HTTP_200_OK, response.text
@@ -68,17 +71,22 @@ def test_get_all_players(api_client: TestClient, count: int = 3):
 
 def test_update_player_name(api_client: TestClient):
     player_old = PlayerFactory.create()
+    player_new = PlayerFactory.build()
 
     response = api_client.patch(
         f"{PLAYERS_PREFIX}{player_old.id}",
-        json=PlayerFactory.build().model_dump(),
+        json=player_new.model_dump(),
     )
     assert response.status_code == status.HTTP_200_OK, response.text
-    assert_valid_response(response.json())
+    response_data = response.json()
+    assert_valid_response(response_data)
+    assert player_new.name == response_data["name"]
 
     response = api_client.get(f"{PLAYERS_PREFIX}{player_old.id}")
     assert response.status_code == status.HTTP_200_OK, response.text
-    assert_valid_response(response.json())
+    response_data = response.json()
+    assert_valid_response(response_data)
+    assert player_new.name == response_data["name"]
 
 
 def test_update_non_existing_player_name(api_client: TestClient):

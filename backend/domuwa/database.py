@@ -1,12 +1,12 @@
+import logging
 from typing import TypeVar
 
 from fastapi import Depends, HTTPException, status
 from sqlmodel import SQLModel, Session, create_engine, select
 
-from domuwa import logging
 from domuwa.config import settings
 
-logger = logging.get_logger("db_connector")
+logger = logging.getLogger(__name__)
 
 engine = create_engine(settings.DATABASE_URL, connect_args={"check_same_thread": False})
 
@@ -23,63 +23,63 @@ def get_db_session():
         yield db_sess
 
 
-async def get_obj_of_type_by_id(
-    obj_id: int,
-    obj_model_type: type[ModelType],
-    obj_model_type_name: str,
+async def get(
+    model_id: int,
+    model_type: type[ModelType],
     db_sess: Session = Depends(get_db_session),
 ):
-    obj = db_sess.get(obj_model_type, obj_id)
+    obj = db_sess.get(model_type, model_id)
     if not obj:
-        logger.warning(f"{obj_model_type_name} of id={obj_id} not found")
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND,
-            f"{obj_model_type_name} of id={obj_id} not found",
-        )
+        err_msg = f"{model_type.__name__}(id={model_id}) not found"
+        logger.warning(err_msg)
+        raise HTTPException(status.HTTP_404_NOT_FOUND, err_msg)
+
+    logger.debug(f"got {obj} from db")
     return obj
 
 
-async def get_all_objs_of_type(
-    obj_model: type[ModelType],
+async def get_all(
+    model_type: type[ModelType],
     db_sess: Session = Depends(get_db_session),
 ):
-    return db_sess.exec(select(obj_model)).all()
+    logger.debug(f"getting all {model_type.__name__} from db")
+    return db_sess.exec(select(model_type)).all()
 
 
-async def save_obj(
-    obj_model: ModelType,  # type: ignore
+async def save(
+    model: ModelType,  # type: ignore
     db: Session = Depends(get_db_session),
 ):
-    db.add(obj_model)
+    db.add(model)
     db.commit()
-    db.refresh(obj_model)
-    return obj_model
+    db.refresh(model)
+    logger.debug(f"saved {model.__class__.__name__}({model}) to db")
+    return model
 
 
-async def update_obj(
-    obj_id: int,
-    obj_model: ModelType,  # type: ignore
-    ojb_model_type_name: str,
+async def update(
+    model_id: int,
+    model: ModelType,  # type: ignore
     db_sess: Session = Depends(get_db_session),
 ):
-    db_obj = await get_obj_of_type_by_id(
-        obj_id, type(obj_model), ojb_model_type_name, db_sess
-    )
-    obj_data = obj_model.model_dump(exclude_unset=True)
+    db_obj = await get(model_id, type(model), db_sess)
+    obj_data = model.model_dump(exclude_unset=True)
     db_obj.sqlmodel_update(obj_data)
     db_sess.add(db_obj)
     db_sess.commit()
     db_sess.refresh(db_obj)
+    logger.debug(
+        f"updated {model.__class__.__name__}({model}) to {model.__class__.__name__}({db_obj})"
+    )
     return db_obj
 
 
-async def delete_obj(
-    obj_id: int,
-    obj_model_type: type[ModelType],
-    obj_model_type_name: str,
+async def delete(
+    model_id: int,
+    model_type: type[ModelType],
     db: Session = Depends(get_db_session),
 ):
-    obj = await get_obj_of_type_by_id(obj_id, obj_model_type, obj_model_type_name, db)
+    obj = await get(model_id, model_type, db)
     db.delete(obj)
     db.commit()
-    logger.debug(f"{obj_model_type_name} of id={obj_id} deleted")
+    logger.debug(f"{model_type.__name__}(id={model_id}) deleted")

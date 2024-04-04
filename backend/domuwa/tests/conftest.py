@@ -1,3 +1,4 @@
+import logging
 import warnings
 
 import pytest
@@ -9,6 +10,7 @@ from sqlmodel.pool import StaticPool
 from domuwa import database as db
 from main import app
 
+logging.getLogger("faker").setLevel(logging.ERROR)
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///test_database.db"

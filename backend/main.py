@@ -7,6 +7,7 @@ from starlette.responses import Response
 
 from domuwa.config import settings
 from domuwa.database import create_db_and_tables
+from domuwa.routers.game_types_router import router as game_types_router
 from domuwa.routers.players_router import router as players_router
 
 
@@ -22,6 +23,7 @@ API_PREFIX = "/api"
 # app.include_router(answers_router, prefix=API_PREFIX)
 # app.include_router(game_rooms_router, prefix=API_PREFIX)
 app.include_router(players_router, prefix=API_PREFIX)
+app.include_router(game_types_router, prefix=API_PREFIX)
 # app.include_router(questions_router, prefix=API_PREFIX)
 
 app.add_middleware(SessionMiddleware, secret_key=settings.SESSION_MIDDLEWARE_KEY)

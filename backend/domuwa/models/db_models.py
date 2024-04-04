@@ -1,5 +1,5 @@
 from datetime import datetime
-from enum import Enum as PyEnum
+from enum import StrEnum as PyEnum
 from typing import Optional
 
 from sqlmodel import Column, Enum, Field, Relationship, SQLModel

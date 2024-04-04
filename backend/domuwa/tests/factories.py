@@ -39,3 +39,11 @@ class PlayerFactory(SQLAlchemyModelFactory):
     class Meta:  # type: ignore
         model = db_models.Player
         sqlalchemy_session_persistence = "commit"
+
+
+class GameTypeFactory(SQLAlchemyModelFactory):
+    name = factory.Sequence(lambda x: "GameType %d" % x)
+
+    class Meta:  # type: ignore
+        model = db_models.GameType
+        sqlalchemy_session_persistence = "commit"
