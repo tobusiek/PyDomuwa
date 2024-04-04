@@ -11,8 +11,7 @@ async def create_player(player: Player, db_sess: Session = Depends(db.get_db_ses
         db_player = await db.save_obj(player, db_sess)
     except IntegrityError:
         raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            "Player of given name already exists",
+            status.HTTP_400_BAD_REQUEST, "Player of given name already exists"
         )
     return db_player
 
@@ -39,9 +38,7 @@ async def get_all_players(db_sess: Session = Depends(db.get_db_session)):
 
 
 async def update_player(
-    player_id: int,
-    player: Player,
-    db_sess: Session = Depends(db.get_db_session),
+    player_id: int, player: Player, db_sess: Session = Depends(db.get_db_session)
 ):
     return await db.update_obj(player_id, player, "Player", db_sess)
 
