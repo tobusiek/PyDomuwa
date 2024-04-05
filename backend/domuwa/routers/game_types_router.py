@@ -66,9 +66,9 @@ async def update_game_type(
     return await services.update_game_type(game_type_id, game_type, db_sess)
 
 
-@router.delete("/{player_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{game_type_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_game_type(
     game_type_id: int, db_sess: Session = Depends(get_db_session)
 ):
-    logger.debug(f"removing GameType(id={game_type_id})")
+    logger.debug(f"received GameType(id={game_type_id}) to remove")
     await services.delete_game_type(game_type_id, db_sess)
