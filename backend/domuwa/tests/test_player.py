@@ -42,12 +42,17 @@ def test_create_player_invalid_name(api_client: TestClient):
 
 def test_create_player_non_unique_name(api_client: TestClient):
     player = PlayerFactory.create()
-
     response = api_client.post(
         PLAYERS_PREFIX,
         json={"name": player.name},
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+
+
+def test_get_player_by_id(api_client: TestClient):
+    player = PlayerFactory.create()
+    response = api_client.get(f"{PLAYERS_PREFIX}{player.id}")
+    assert response.status_code == status.HTTP_200_OK, response.text
 
 
 def test_get_non_existing_player(api_client: TestClient):
@@ -69,7 +74,7 @@ def test_get_all_players(api_client: TestClient, count: int = 3):
         assert_valid_response(player)
 
 
-def test_update_player_name(api_client: TestClient):
+def test_update_player(api_client: TestClient):
     player_old = PlayerFactory.create()
     player_new = PlayerFactory.build()
 
@@ -89,7 +94,7 @@ def test_update_player_name(api_client: TestClient):
     assert player_new.name == response_data["name"]
 
 
-def test_update_non_existing_player_name(api_client: TestClient):
+def test_update_non_existing_player(api_client: TestClient):
     response = api_client.patch(
         f"{PLAYERS_PREFIX}{999}",
         json={"name": "Player 1"},
@@ -97,9 +102,8 @@ def test_update_non_existing_player_name(api_client: TestClient):
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
 
 
-def test_update_player_name_invalid_name(api_client: TestClient):
+def test_update_player_invalid_name(api_client: TestClient):
     player = PlayerFactory.create()
-
     response = api_client.patch(
         f"{PLAYERS_PREFIX}{player.id}",
         json={"name": "x"},
@@ -109,7 +113,6 @@ def test_update_player_name_invalid_name(api_client: TestClient):
 
 def test_delete_player(api_client: TestClient):
     player = PlayerFactory.create()
-
     response = api_client.delete(f"{PLAYERS_PREFIX}{player.id}")
     assert response.status_code == status.HTTP_204_NO_CONTENT, response.text
 
