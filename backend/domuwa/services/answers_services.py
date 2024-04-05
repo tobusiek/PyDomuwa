@@ -1,7 +1,6 @@
-from domuwa import logging
+import logging
 
-logger = logging.get_logger("db_connector")
-
+logger = logging.getLogger("db_connector")
 
 # def create_answer(
 #     answer: schemas.AnswerCreateSchema,

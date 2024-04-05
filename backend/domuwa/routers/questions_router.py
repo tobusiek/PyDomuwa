@@ -1,11 +1,10 @@
+import logging
+
 from fastapi import APIRouter
 
-from domuwa import logging
-
-logger = logging.get_logger("domuwa")
+logger = logging.getLogger("domuwa")
 
 router = APIRouter(prefix="/question", tags=["Question"])
-
 
 # @router.post("/", status_code=status.HTTP_201_CREATED, response_model=None)
 # def create_question(
