@@ -2,6 +2,7 @@ import logging
 from typing import TypeVar
 
 from fastapi import Depends, HTTPException, status
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import SQLModel, Session, create_engine, select
 
 from domuwa.config import settings
@@ -50,8 +51,14 @@ async def save(
     model: ModelType,  # type: ignore
     db: Session = Depends(get_db_session),
 ):
-    db.add(model)
-    db.commit()
+    try:
+        db.add(model)
+        db.commit()
+    except IntegrityError as exc:
+        logger.error(str(exc))
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, f"{model.__class__.__name__} is not unique"
+        )
     db.refresh(model)
     logger.debug(f"saved {model.__class__.__name__}({model}) to db")
     return model
