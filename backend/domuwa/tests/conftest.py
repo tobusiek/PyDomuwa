@@ -10,12 +10,14 @@ from sqlmodel.pool import StaticPool
 from domuwa import database as db
 from main import app
 
-logging.getLogger("faker").setLevel(logging.ERROR)
-logging.getLogger("factory").setLevel(logging.ERROR)
+logging.getLogger("faker").setLevel(logging.INFO)
+logging.getLogger("factory").setLevel(logging.INFO)
+logging.getLogger("asyncio").setLevel(logging.INFO)
+
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///test_database.db"
-# SQLALCHEMY_DATABASE_URL = "sqlite://"
+# SQLALCHEMY_DATABASE_URL = "sqlite:///test_database.db"
+SQLALCHEMY_DATABASE_URL = "sqlite://"
 
 
 @pytest.fixture(name="db_session")
