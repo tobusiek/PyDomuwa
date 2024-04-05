@@ -3,6 +3,7 @@ from typing import Any
 from fastapi import status
 from fastapi.testclient import TestClient
 
+from domuwa.models.db_models import GameTypeChoices
 from domuwa.tests.factories import GameTypeFactory
 
 GAME_TYPES_PREFIX = "/api/game-types/"
@@ -16,7 +17,7 @@ def assert_valid_response(response: dict[str, Any]):
 def test_create_game_type(api_client: TestClient):
     response = api_client.post(
         GAME_TYPES_PREFIX,
-        json={"name": "Ego"},
+        json={"name": GameTypeChoices.EGO},
     )
     assert response.status_code == status.HTTP_201_CREATED, response.text
     response_data = response.json()
@@ -28,4 +29,79 @@ def test_create_game_type(api_client: TestClient):
 
 
 def test_create_game_type_invalid_name(api_client: TestClient):
-    response = api_client.post(GAME_TYPES_PREFIX)
+    response = api_client.post(GAME_TYPES_PREFIX, json={"name": "not from enum"})
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
+
+
+def test_get_game_by_id(api_client: TestClient):
+    game_type = GameTypeFactory.create()
+    response = api_client.get(f"{GAME_TYPES_PREFIX}{game_type.id}")
+    assert response.status_code == status.HTTP_200_OK, response.text
+
+
+def test_get_non_existing_game_type(api_client: TestClient):
+    response = api_client.get(f"{GAME_TYPES_PREFIX}999")
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
+
+
+def test_get_all_game_types(api_client: TestClient, count: int = 3):
+    GameTypeFactory.create_batch(count)
+
+    response = api_client.get(GAME_TYPES_PREFIX)
+    assert response.status_code == status.HTTP_200_OK, response.text
+    response_data = response.json()
+
+    assert isinstance(response_data, list), response_data
+    assert len(response_data) >= count, response_data
+
+    for game_type in response_data:
+        assert_valid_response(game_type)
+
+
+def test_update_game_type(api_client: TestClient):
+    game_type = GameTypeFactory.create()
+    updated_game_type_data = {"name": GameTypeChoices.WHOS_MOST_LIKELY}
+
+    response = api_client.patch(
+        f"{GAME_TYPES_PREFIX}{game_type.id}", json=updated_game_type_data
+    )
+    assert response.status_code == status.HTTP_200_OK, response.text
+    assert_valid_response(response.json())
+
+    response = api_client.get(f"{GAME_TYPES_PREFIX}{game_type.id}")
+    assert response.status_code == status.HTTP_200_OK, response.text
+
+    response_data = response.json()
+    assert_valid_response(response_data)
+    assert response_data["name"] == updated_game_type_data["name"]
+
+
+def test_update_non_existing_game_type(api_client: TestClient):
+    response = api_client.patch(
+        f"{GAME_TYPES_PREFIX}999", json={"name": GameTypeChoices.WHOS_MOST_LIKELY}
+    )
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
+
+
+def test_update_game_type_invalid_name(api_client: TestClient):
+    game_type = GameTypeFactory.create()
+    response = api_client.patch(
+        f"{GAME_TYPES_PREFIX}{game_type.id}", json={"name": "not from enum"}
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
+
+
+def test_delete_game_type(api_client: TestClient):
+    game_type = GameTypeFactory.create()
+    print(repr(game_type))
+
+    response = api_client.delete(f"{GAME_TYPES_PREFIX}{game_type.id}")
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.text
+
+    response = api_client.get(f"{GAME_TYPES_PREFIX}{game_type.id}")
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
+
+
+def test_delete_non_existing_game_type(api_client: TestClient):
+    response = api_client.delete(f"{GAME_TYPES_PREFIX}999")
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
