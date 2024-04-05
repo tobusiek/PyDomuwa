@@ -27,6 +27,7 @@ async def get_player_by_id(player_id: int, db_sess: Session = Depends(get_db_ses
     return await services.get_player_by_id(player_id, db_sess)
 
 
+@router.get("/name/", response_model=PlayerRead)
 async def get_player_by_name(
     player_name: str,
     db_sess: Session = Depends(get_db_session),

@@ -55,8 +55,29 @@ def test_get_player_by_id(api_client: TestClient):
     assert response.status_code == status.HTTP_200_OK, response.text
 
 
-def test_get_non_existing_player(api_client: TestClient):
+def test_get_non_existing_player_by_id(api_client: TestClient):
     response = api_client.get(f"{PLAYERS_PREFIX}999")
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
+
+
+def test_get_player_by_name(api_client: TestClient):
+    player = PlayerFactory.create()
+    response = api_client.get(
+        PLAYERS_PREFIX + "name/", params={"player_name": player.name}
+    )
+    assert response.status_code == status.HTTP_200_OK, response.text
+    assert_valid_response(response.json())
+
+
+def test_get_non_existing_player_by_name(api_client: TestClient):
+    response = api_client.get(
+        PLAYERS_PREFIX + "name/", params={"player_name": "some-name"}
+    )
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
+
+
+def test_get_player_by_invalid_name(api_client: TestClient):
+    response = api_client.get(PLAYERS_PREFIX + "name/", params={"player_name": None})
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
 
 

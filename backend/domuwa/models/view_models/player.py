@@ -9,10 +9,6 @@ class PlayerCreate(PlayerBase):
     pass
 
 
-class PlayerSession(PlayerBase):
-    id: int
-
-
 class PlayerRead(PlayerBase):
     id: int
     games_played: int
