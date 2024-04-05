@@ -34,7 +34,7 @@ async def get(
         logger.warning(err_msg)
         raise HTTPException(status.HTTP_404_NOT_FOUND, err_msg)
 
-    logger.debug(f"got {obj} from db")
+    logger.debug(f"got {model_type.__name__}({obj}) from db")
     return obj
 
 

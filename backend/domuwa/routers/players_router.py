@@ -64,5 +64,5 @@ async def update_player(
 
 @router.delete("/{player_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_player(player_id: int, db_sess: Session = Depends(get_db_session)):
-    logger.debug(f"removing Player(id={player_id})")
+    logger.debug(f"received Player(id={player_id}) to remove")
     await services.delete_player(player_id, db_sess)
