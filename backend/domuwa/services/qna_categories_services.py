@@ -1,23 +1,42 @@
 import logging
 
-from fastapi import Depends, HTTPException, status
-from sqlalchemy.exc import IntegrityError
+from fastapi import Depends
 from sqlmodel import Session
 
 from domuwa import database as db
-from domuwa.models.db_models import QnACategory
+from domuwa.models.db_models import GameType, QnACategory
 
 logger = logging.getLogger(__name__)
 
 
 async def create_qna_category(
-    qna_category: QnACategory, db_sess: Session = Depends(db.get_db_session)
+    qna_category: QnACategory,
+    db_sess: Session = Depends(db.get_db_session),
 ):
-    try:
-        db_qna_category = await db.save(qna_category, db_sess)
-    except IntegrityError as exc:
-        logger.error(str(exc))
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, "QnACategory of given name already exists"
-        ) from exc
-    return db_qna_category
+    return await db.save(qna_category, db_sess)
+
+
+async def get_qna_category_by_id(
+    qna_category_id: int,
+    db_sess: Session = Depends(db.get_db_session),
+):
+    return await db.get(qna_category_id, QnACategory, db_sess)
+
+
+async def get_all_qna_categories(db_sess: Session = Depends(db.get_db_session)):
+    return await db.get_all(QnACategory, db_sess)
+
+
+async def update_qna_category(
+    qna_category_id: int,
+    qna_category: QnACategory,
+    db_sess: Session = Depends(db.get_db_session),
+):
+    return await db.update(qna_category_id, qna_category, db_sess)
+
+
+async def delete_qna_category(
+    qna_category_id: int,
+    db_sess: Session = Depends(db.get_db_session),
+):
+    await db.delete(qna_category_id, GameType, db_sess)
