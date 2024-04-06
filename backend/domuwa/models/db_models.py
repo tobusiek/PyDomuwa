@@ -62,7 +62,7 @@ class Answer(SQLModel, table=True):
     text: str = Field(min_length=1, max_length=150)
     excluded: bool = Field(default=False, index=True)
 
-    author_name: Optional[str] = Field(default=None, foreign_key="player.name")
+    author_id: Optional[str] = Field(default=None, foreign_key="player.id")
     author: Optional[Player] = Relationship(back_populates="answers")
 
     game_type_id: Optional[int] = Field(default=None, foreign_key="game_type.id")
@@ -96,7 +96,7 @@ class Question(SQLModel, table=True):
     text: str = Field(min_length=3, max_length=150)
     excluded: bool = Field(default=False, index=True)
 
-    author_name: Optional[str] = Field(default=None, foreign_key="player.name")
+    author_id: Optional[str] = Field(default=None, foreign_key="player.id")
     author: Optional[Player] = Relationship(back_populates="questions")
 
     game_type_id: Optional[int] = Field(default=None, foreign_key="game_type.id")
