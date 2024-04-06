@@ -27,7 +27,7 @@ async def create(
     db_sess: Session = Depends(get_db_session),
 ):
     try:
-        logger.debug(f"received GameType({game_type_create}) to create")
+        logger.debug("received GameType(%s) to create", game_type_create)
         game_type = GameType.model_validate(game_type_create, strict=True)
     except ValidationError as exc:
         logger.error(str(exc))
@@ -42,7 +42,7 @@ async def create(
 async def get_game_type_by_id(
     game_type_id: int, db_sess: Session = Depends(get_db_session)
 ):
-    logger.debug(f"received GameType(id={game_type_id}) to get")
+    logger.debug("received GameType(id=%d) to get", game_type_id)
     return await services.get_game_type_by_id(game_type_id, db_sess)
 
 
@@ -59,7 +59,9 @@ async def update_game_type(
 ):
     try:
         logger.debug(
-            f"received GameType({game_type_update}) to update GameType(id={game_type_id})"
+            "received GameType(%s) to update GameType(id=%s)",
+            game_type_update,
+            game_type_id,
         )
         game_type = GameType.model_validate(game_type_update, strict=True)
     except ValidationError as exc:
@@ -75,5 +77,5 @@ async def update_game_type(
 async def delete_game_type(
     game_type_id: int, db_sess: Session = Depends(get_db_session)
 ):
-    logger.debug(f"received GameType(id={game_type_id}) to remove")
+    logger.debug("received GameType(id=%d) to remove", game_type_id)
     await services.delete_game_type(game_type_id, db_sess)

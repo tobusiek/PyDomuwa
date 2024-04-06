@@ -20,7 +20,7 @@ async def create_player(
     db_sess: Session = Depends(get_db_session),
 ):
     try:
-        logger.debug(f"received Player({player_create}) to create")
+        logger.debug("received Player(%s) to create", player_create)
         player = Player.model_validate(player_create, strict=True)
     except ValidationError as exc:
         logger.error(str(exc))
@@ -28,12 +28,13 @@ async def create_player(
             status.HTTP_400_BAD_REQUEST,
             "Provided invalid data",
         ) from exc
+
     return await services.create_player(player, db_sess)
 
 
 @router.get("/{player_id}", response_model=PlayerRead)
 async def get_player_by_id(player_id: int, db_sess: Session = Depends(get_db_session)):
-    logger.debug(f"received Player(id={player_id}) to get")
+    logger.debug("received Player(id=%d) to get", player_id)
     return await services.get_player_by_id(player_id, db_sess)
 
 
@@ -42,7 +43,7 @@ async def get_player_by_name(
     player_name: str,
     db_sess: Session = Depends(get_db_session),
 ):
-    logger.debug(f"received Player(name={player_name}) to get")
+    logger.debug("received Player(name=%s) to get", player_name)
     return await services.get_player_by_name(player_name, db_sess)
 
 
@@ -59,7 +60,9 @@ async def update_player(
 ):
     try:
         logger.debug(
-            f"received Player({player_update}) to update Player(id={player_id})"
+            "received Player(%s) to update Player(id=%d)",
+            player_update,
+            player_id,
         )
         player = Player.model_validate(player_update, strict=True)
     except ValidationError as exc:
