@@ -62,7 +62,7 @@ def test_update_game_type(api_client: TestClient):
     game_type = GameTypeFactory.create()
     updated_game_type_data = {"name": GameTypeChoices.WHOS_MOST_LIKELY}
 
-    response = api_client.patch(
+    response = api_client.put(
         f"{GAME_TYPES_PREFIX}{game_type.id}", json=updated_game_type_data
     )
     assert response.status_code == status.HTTP_200_OK, response.text
@@ -77,7 +77,7 @@ def test_update_game_type(api_client: TestClient):
 
 
 def test_update_non_existing_game_type(api_client: TestClient):
-    response = api_client.patch(
+    response = api_client.put(
         f"{GAME_TYPES_PREFIX}999", json={"name": GameTypeChoices.WHOS_MOST_LIKELY}
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
@@ -85,7 +85,7 @@ def test_update_non_existing_game_type(api_client: TestClient):
 
 def test_update_game_type_invalid_name(api_client: TestClient):
     game_type = GameTypeFactory.create()
-    response = api_client.patch(
+    response = api_client.put(
         f"{GAME_TYPES_PREFIX}{game_type.id}", json={"name": "not from enum"}
     )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text

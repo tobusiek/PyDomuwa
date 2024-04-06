@@ -63,7 +63,7 @@ def test_get_non_existing_player_by_id(api_client: TestClient):
 def test_get_player_by_name(api_client: TestClient):
     player = PlayerFactory.create()
     response = api_client.get(
-        PLAYERS_PREFIX + "name/", params={"player_name": player.name}
+        f"{PLAYERS_PREFIX}name/", params={"player_name": player.name}
     )
     assert response.status_code == status.HTTP_200_OK, response.text
     assert_valid_response(response.json())
@@ -71,13 +71,13 @@ def test_get_player_by_name(api_client: TestClient):
 
 def test_get_non_existing_player_by_name(api_client: TestClient):
     response = api_client.get(
-        PLAYERS_PREFIX + "name/", params={"player_name": "some-name"}
+        f"{PLAYERS_PREFIX}name/", params={"player_name": "some-name"}
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
 
 
 def test_get_player_by_invalid_name(api_client: TestClient):
-    response = api_client.get(PLAYERS_PREFIX + "name/", params={"player_name": None})
+    response = api_client.get(f"{PLAYERS_PREFIX}name/", params={"player_name": None})
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
 
 
@@ -99,7 +99,7 @@ def test_update_player(api_client: TestClient):
     player_old = PlayerFactory.create()
     player_new = PlayerFactory.build()
 
-    response = api_client.patch(
+    response = api_client.put(
         f"{PLAYERS_PREFIX}{player_old.id}",
         json=player_new.model_dump(),
     )
@@ -116,7 +116,7 @@ def test_update_player(api_client: TestClient):
 
 
 def test_update_non_existing_player(api_client: TestClient):
-    response = api_client.patch(
+    response = api_client.put(
         f"{PLAYERS_PREFIX}{999}",
         json={"name": "Player 1"},
     )
@@ -125,7 +125,7 @@ def test_update_non_existing_player(api_client: TestClient):
 
 def test_update_player_invalid_name(api_client: TestClient):
     player = PlayerFactory.create()
-    response = api_client.patch(
+    response = api_client.put(
         f"{PLAYERS_PREFIX}{player.id}",
         json={"name": "x"},
     )

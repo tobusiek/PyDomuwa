@@ -1,7 +1,6 @@
 import logging
 
-from fastapi import Depends, HTTPException, status
-from sqlalchemy.exc import IntegrityError
+from fastapi import Depends
 from sqlmodel import Session
 
 from domuwa import database as db
@@ -13,14 +12,7 @@ logger = logging.getLogger(__name__)
 async def create_game_type(
     game_type: GameType, db_sess: Session = Depends(db.get_db_session)
 ):
-    try:
-        db_game_type = await db.save(game_type, db_sess)
-    except IntegrityError as exc:
-        logger.error(str(exc))
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, "GameType of given name already exists"
-        ) from exc
-    return db_game_type
+    return await db.save(game_type, db_sess)
 
 
 async def get_game_type_by_id(

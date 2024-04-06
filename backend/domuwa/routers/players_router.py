@@ -1,9 +1,11 @@
 import logging
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import ValidationError
 from sqlmodel import Session
 
 from domuwa.database import get_db_session
+from domuwa.models.db_models import Player
 from domuwa.models.view_models.player import PlayerCreate, PlayerRead, PlayerUpdate
 from domuwa.services import players_services as services
 
@@ -14,10 +16,18 @@ router = APIRouter(prefix="/players", tags=["Players"])
 
 @router.post("/", response_model=PlayerRead, status_code=status.HTTP_201_CREATED)
 async def create_player(
-    player: PlayerCreate,
+    player_create: PlayerCreate,
     db_sess: Session = Depends(get_db_session),
 ):
-    logger.debug(f"received Player({player}) to create")
+    try:
+        logger.debug(f"received Player({player_create}) to create")
+        player = Player.model_validate(player_create, strict=True)
+    except ValidationError as exc:
+        logger.error(str(exc))
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "Provided invalid data",
+        ) from exc
     return await services.create_player(player, db_sess)
 
 
@@ -41,13 +51,24 @@ async def get_all_players(db_sess: Session = Depends(get_db_session)):
     return await services.get_all_players(db_sess)
 
 
-@router.patch("/{player_id}", response_model=PlayerRead)
+@router.put("/{player_id}", response_model=PlayerRead)
 async def update_player(
     player_id: int,
-    player: PlayerUpdate,
+    player_update: PlayerUpdate,
     db_sess: Session = Depends(get_db_session),
 ):
-    logger.debug(f"received Player({player}) to update Player(id={player_id})")
+    try:
+        logger.debug(
+            f"received Player({player_update}) to update Player(id={player_id})"
+        )
+        player = Player.model_validate(player_update, strict=True)
+    except ValidationError as exc:
+        logger.error(str(exc))
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "Provided invalid data",
+        ) from exc
+
     return await services.update_player(player_id, player, db_sess)
 
 
