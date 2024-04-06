@@ -9,7 +9,10 @@ from domuwa.config import settings
 
 logger = logging.getLogger(__name__)
 
-engine = create_engine(settings.DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(
+    settings.DATABASE_URL,
+    connect_args={"check_same_thread": False},
+)
 
 
 ModelType = TypeVar("ModelType", bound=SQLModel)
@@ -29,14 +32,14 @@ async def get(
     model_type: type[ModelType],
     db_sess: Session = Depends(get_db_session),
 ):
-    obj = db_sess.get(model_type, model_id)
-    if not obj:
+    model = db_sess.get(model_type, model_id)
+    if not model:
         err_msg = f"{model_type.__name__}(id={model_id}) not found"
         logger.warning(err_msg)
         raise HTTPException(status.HTTP_404_NOT_FOUND, err_msg)
 
-    logger.debug(f"got {model_type.__name__}({obj}) from db")
-    return obj
+    logger.debug(f"got {model_type.__name__}({model}) from db")
+    return model
 
 
 async def get_all(
@@ -49,17 +52,17 @@ async def get_all(
 
 async def save(
     model: ModelType,  # type: ignore
-    db: Session = Depends(get_db_session),
+    db_sess: Session = Depends(get_db_session),
 ):
     try:
-        db.add(model)
-        db.commit()
+        db_sess.add(model)
+        db_sess.commit()
     except IntegrityError as exc:
         logger.error(str(exc))
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, f"{model.__class__.__name__} is not unique"
         )
-    db.refresh(model)
+    db_sess.refresh(model)
     logger.debug(f"saved {model.__class__.__name__}({model}) to db")
     return model
 
@@ -69,24 +72,24 @@ async def update(
     model: ModelType,  # type: ignore
     db_sess: Session = Depends(get_db_session),
 ):
-    db_obj = await get(model_id, type(model), db_sess)
-    obj_data = model.model_dump(exclude_unset=True)
-    db_obj.sqlmodel_update(obj_data)
-    db_sess.add(db_obj)
+    db_model = await get(model_id, type(model), db_sess)
+    db_model_data = model.model_dump(exclude_unset=True)
+    db_model.sqlmodel_update(db_model_data)
+    db_sess.add(db_model)
     db_sess.commit()
-    db_sess.refresh(db_obj)
+    db_sess.refresh(db_model)
     logger.debug(
-        f"updated {model.__class__.__name__}({model}) to {model.__class__.__name__}({db_obj})"
+        f"updated {model.__class__.__name__}({model}) to {model.__class__.__name__}({db_model})"
     )
-    return db_obj
+    return db_model
 
 
 async def delete(
     model_id: int,
     model_type: type[ModelType],
-    db: Session = Depends(get_db_session),
+    db_sess: Session = Depends(get_db_session),
 ):
-    obj = await get(model_id, model_type, db)
-    db.delete(obj)
-    db.commit()
+    model = await get(model_id, model_type, db_sess)
+    db_sess.delete(model)
+    db_sess.commit()
     logger.debug(f"{model_type.__name__}(id={model_id}) deleted")
