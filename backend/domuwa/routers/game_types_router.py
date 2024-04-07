@@ -51,7 +51,7 @@ async def get_all_players(db_sess: Session = Depends(get_db_session)):
     return await services.get_all_game_types(db_sess)
 
 
-@router.put("/{game_type_id}", response_model=GameTypeRead)
+@router.patch("/{game_type_id}", response_model=GameTypeRead)
 async def update_game_type(
     game_type_id: int,
     game_type_update: GameTypeUpdate,

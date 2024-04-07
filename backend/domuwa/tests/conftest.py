@@ -16,8 +16,8 @@ logging.getLogger("asyncio").setLevel(logging.INFO)
 
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
-# SQLALCHEMY_DATABASE_URL = "sqlite:///test_database.db"
-SQLALCHEMY_DATABASE_URL = "sqlite://"
+SQLALCHEMY_DATABASE_URL = "sqlite:///test_database.db"
+# SQLALCHEMY_DATABASE_URL = "sqlite://"
 
 
 @pytest.fixture(name="db_session")

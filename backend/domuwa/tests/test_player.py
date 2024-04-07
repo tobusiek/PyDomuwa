@@ -99,7 +99,7 @@ def test_update_player(api_client: TestClient):
     player_old = PlayerFactory.create()
     player_new = PlayerFactory.build()
 
-    response = api_client.put(
+    response = api_client.patch(
         f"{PLAYERS_PREFIX}{player_old.id}",
         json=player_new.model_dump(),
     )
@@ -116,7 +116,7 @@ def test_update_player(api_client: TestClient):
 
 
 def test_update_non_existing_player(api_client: TestClient):
-    response = api_client.put(
+    response = api_client.patch(
         f"{PLAYERS_PREFIX}{999}",
         json={"name": "Player 1"},
     )
@@ -125,7 +125,7 @@ def test_update_non_existing_player(api_client: TestClient):
 
 def test_update_player_invalid_name(api_client: TestClient):
     player = PlayerFactory.create()
-    response = api_client.put(
+    response = api_client.patch(
         f"{PLAYERS_PREFIX}{player.id}",
         json={"name": "x"},
     )

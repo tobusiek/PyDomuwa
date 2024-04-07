@@ -48,7 +48,7 @@ async def get_all_qna_categories(db_sess: Session = Depends(get_db_session)):
     return await services.get_all_qna_categories(db_sess)
 
 
-@router.put("/{qna_category_id}", response_model=QnACategoryRead)
+@router.patch("/{qna_category_id}", response_model=QnACategoryRead)
 async def update_qna_category(
     qna_category_id: int,
     qna_category_update: QnACategoryUpdate,

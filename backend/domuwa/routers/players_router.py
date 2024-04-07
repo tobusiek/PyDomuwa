@@ -52,7 +52,7 @@ async def get_all_players(db_sess: Session = Depends(get_db_session)):
     return await services.get_all_players(db_sess)
 
 
-@router.put("/{player_id}", response_model=PlayerRead)
+@router.patch("/{player_id}", response_model=PlayerRead)
 async def update_player(
     player_id: int,
     player_update: PlayerUpdate,
