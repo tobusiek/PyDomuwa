@@ -28,6 +28,14 @@ class Question(SQLModel, table=True):
     game_category_id: Optional[int] = Field(None, foreign_key="qna_category.id")
     game_category: Optional["QnACategory"] = Relationship(back_populates="questions")
 
+    prev_version_id: Optional[int] = Field(None, foreign_key="question.id")
+    prev_version: Optional["Question"] = Relationship(
+        back_populates="next_versions",
+        sa_relationship_kwargs={"remote_side": "Question.id"},
+    )
+
+    next_versions: list["Question"] = Relationship(back_populates="prev_version")
+
     answers: list["Answer"] = Relationship(back_populates="question")
 
     game_rooms: list["GameRoom"] = Relationship(
