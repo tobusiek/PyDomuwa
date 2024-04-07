@@ -44,15 +44,17 @@ def test_get_non_existing_game_type(api_client: TestClient):
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
 
 
-def test_get_all_game_types(api_client: TestClient, count: int = 3):
-    GameTypeFactory.create_batch(count)
+def test_get_all_game_types(api_client: TestClient):
+    GameTypeFactory.create(name=GameTypeChoices.EGO)
+    GameTypeFactory.create(name=GameTypeChoices.WHOS_MOST_LIKELY)
+    GameTypeFactory.create(name=GameTypeChoices.GENTLEMENS_CARDS)
 
     response = api_client.get(GAME_TYPES_PREFIX)
     assert response.status_code == status.HTTP_200_OK, response.text
     response_data = response.json()
 
     assert isinstance(response_data, list), response_data
-    assert len(response_data) >= count, response_data
+    assert len(response_data) >= 3, response_data
 
     for game_type in response_data:
         assert_valid_response(game_type)
