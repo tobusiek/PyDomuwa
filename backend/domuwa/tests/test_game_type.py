@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from domuwa.models.db_models import GameTypeChoices
+from domuwa.models.game_type import GameTypeChoices
 from domuwa.tests.factories import GameTypeFactory
 
 GAME_TYPES_PREFIX = "/api/game-types/"

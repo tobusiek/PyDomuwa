@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException, status
 from sqlmodel import Session, select
 
 from domuwa import database as db
-from domuwa.models.db_models import Player
+from domuwa.models.player import Player
 
 logger = logging.getLogger(__name__)
 

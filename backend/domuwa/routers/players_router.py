@@ -1,12 +1,19 @@
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.requests import Request
 from pydantic import ValidationError
 from sqlmodel import Session
 
 from domuwa.database import get_db_session
-from domuwa.models.db_models import Player
-from domuwa.models.view_models.player import PlayerCreate, PlayerRead, PlayerUpdate
+from domuwa.models.player import (
+    Player,
+    PlayerCreate,
+    PlayerLogin,
+    PlayerRead,
+    PlayerSession,
+    PlayerUpdate,
+)
 from domuwa.services import players_services as services
 
 logger = logging.getLogger(__name__)
@@ -30,6 +37,22 @@ async def create_player(
         ) from exc
 
     return await services.create_player(player, db_sess)
+
+
+@router.post("/login")
+async def login(
+    request: Request,
+    player_login: PlayerLogin,
+    db_sess: Session = Depends(get_db_session),
+):
+    raise NotImplementedError()
+    if player_session := request.session.get("player"):
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            f"Player(name={player_login.name}) already logged in",
+        )
+    logger.debug("received Player(%s) to login", player_login)
+    return await services.login_player(player_login, db_sess)
 
 
 @router.get("/{player_id}", response_model=PlayerRead)

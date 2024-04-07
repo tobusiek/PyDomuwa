@@ -5,8 +5,8 @@ from pydantic import ValidationError
 from sqlmodel import Session
 
 from domuwa.database import get_db_session
-from domuwa.models.db_models import GameType
-from domuwa.models.view_models.game_type import (
+from domuwa.models.game_type import (
+    GameType,
     GameTypeCreate,
     GameTypeRead,
     GameTypeUpdate,

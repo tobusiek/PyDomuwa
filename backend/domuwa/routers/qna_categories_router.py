@@ -6,8 +6,8 @@ from pydantic import ValidationError
 from sqlmodel import Session
 
 from domuwa.database import get_db_session
-from domuwa.models.db_models import QnACategory
-from domuwa.models.view_models.qna_category import (
+from domuwa.models.qna_category import (
+    QnACategory,
     QnACategoryCreate,
     QnACategoryRead,
     QnACategoryUpdate,

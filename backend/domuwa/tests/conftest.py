@@ -16,12 +16,23 @@ logging.getLogger("asyncio").setLevel(logging.INFO)
 
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///test_database.db"
-# SQLALCHEMY_DATABASE_URL = "sqlite://"
+# SQLALCHEMY_DATABASE_URL = "sqlite:///test_database.db"
+SQLALCHEMY_DATABASE_URL = "sqlite://"
 
 
 @pytest.fixture(name="db_session")
 def db_session_fixture():
+    from domuwa.models import (
+        answer,  # noqa: F401
+        game_category,  # noqa: F401
+        game_room,  # noqa: F401
+        game_type,  # noqa: F401
+        player,  # noqa: F401
+        player_score,  # noqa: F401
+        qna_category,  # noqa: F401
+        question,  # noqa: F401
+        ranking,  # noqa: F401
+    )
     from domuwa.tests import factories  # noqa: F401
 
     engine = create_engine(

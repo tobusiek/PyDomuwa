@@ -4,7 +4,7 @@ from fastapi import Depends
 from sqlmodel import Session
 
 from domuwa import database as db
-from domuwa.models.db_models import GameType, QnACategory
+from domuwa.models.qna_category import QnACategory
 
 logger = logging.getLogger(__name__)
 
@@ -39,4 +39,4 @@ async def delete_qna_category(
     qna_category_id: int,
     db_sess: Session = Depends(db.get_db_session),
 ):
-    await db.delete(qna_category_id, GameType, db_sess)
+    await db.delete(qna_category_id, QnACategory, db_sess)

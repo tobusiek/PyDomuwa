@@ -4,7 +4,7 @@ from fastapi import Depends
 from sqlmodel import Session
 
 from domuwa import database as db
-from domuwa.models.db_models import GameType
+from domuwa.models.game_type import GameType
 
 logger = logging.getLogger(__name__)
 
