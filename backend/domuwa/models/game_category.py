@@ -13,6 +13,10 @@ class GameCategoryChoices(StrEnum):
     MIXED = "Mixed"
 
 
+class GameCategoryBase(SQLModel):
+    name: GameCategoryChoices
+
+
 class GameCategory(SQLModel, table=True):
     __tablename__ = "game_category"  # type: ignore
 
@@ -20,3 +24,15 @@ class GameCategory(SQLModel, table=True):
     name: GameCategoryChoices = Field(index=True, unique=True)
 
     game_rooms: list["GameRoom"] = Relationship(back_populates="game_category")
+
+
+class GameCategoryCreate(GameCategoryBase):
+    pass
+
+
+class GameCategoryUpdate(GameCategoryBase):
+    pass
+
+
+class GameCategoryRead(GameCategoryBase):
+    id: int
