@@ -31,10 +31,7 @@ async def create_player(
         player = Player.model_validate(player_create, strict=True)
     except ValidationError as exc:
         logger.error(str(exc))
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            "Provided invalid data",
-        ) from exc
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc)) from exc
 
     return await services.create_player(player, db_sess)
 
@@ -45,29 +42,33 @@ async def login(
     player_login: PlayerLogin,
     db_sess: Session = Depends(get_db_session),
 ):
-    raise NotImplementedError()
-    if player_session := request.session.get("player"):
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            f"Player(name={player_login.name}) already logged in",
-        )
     logger.debug("received Player(%s) to login", player_login)
-    return await services.login_player(player_login, db_sess)
+    if request.session.get("player"):
+        logger.warning(f"Player({player_login}) already logged in")
+        return
+
+    try:
+        player = Player.model_validate(player_login, strict=True)
+    except ValidationError as exc:
+        err_msg = f"cannot parse PlayerLogin({player_login}) to Player"
+        logger.error(err_msg)
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, err_msg) from exc
+
+    db_player = await services.login_player(player, db_sess)
+    try:
+        player_session = PlayerSession.model_validate(db_player)
+    except ValidationError as exc:
+        err_msg = f"couldn't parse PlayerSession from Player({player})"
+        logger.error(err_msg)
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, err_msg) from exc
+
+    request.session["player"] = player_session.model_dump()
 
 
 @router.get("/{player_id}", response_model=PlayerRead)
 async def get_player_by_id(player_id: int, db_sess: Session = Depends(get_db_session)):
     logger.debug("received Player(id=%d) to get", player_id)
     return await services.get_player_by_id(player_id, db_sess)
-
-
-@router.get("/name/", response_model=PlayerRead)
-async def get_player_by_name(
-    player_name: str,
-    db_sess: Session = Depends(get_db_session),
-):
-    logger.debug("received Player(name=%s) to get", player_name)
-    return await services.get_player_by_name(player_name, db_sess)
 
 
 @router.get("/", response_model=list[PlayerRead])
@@ -90,10 +91,7 @@ async def update_player(
         player = Player.model_validate(player_update, strict=True)
     except ValidationError as exc:
         logger.error(str(exc))
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            "Provided invalid data",
-        ) from exc
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc)) from exc
 
     return await services.update_player(player_id, player, db_sess)
 

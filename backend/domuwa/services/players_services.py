@@ -13,6 +13,15 @@ async def create_player(player: Player, db_sess: Session = Depends(db.get_db_ses
     return await db.save(player, db_sess)
 
 
+async def login_player(player: Player, db_sess: Session = Depends(db.get_db_session)):
+    db_player = db_sess.exec(
+        select(Player).where(Player.name == player.name)
+    ).one_or_none()
+    if db_player is None:
+        db_player = await create_player(player, db_sess)
+    return db_player
+
+
 async def get_player_by_id(
     player_id: int,
     db_sess: Session = Depends(db.get_db_session),
@@ -24,7 +33,9 @@ async def get_player_by_name(
     player_name: str,
     db_sess: Session = Depends(db.get_db_session),
 ):
-    db_player = db_sess.exec(select(Player).where(Player.name == player_name)).first()
+    db_player = db_sess.exec(
+        select(Player).where(Player.name == player_name)
+    ).one_or_none()
     if db_player is None:
         err_msg = f"Player with name={player_name} not found"
         logger.error(err_msg)

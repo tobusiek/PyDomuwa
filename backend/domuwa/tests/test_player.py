@@ -49,6 +49,32 @@ def test_create_player_non_unique_name(api_client: TestClient):
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
 
 
+def test_login_existing_player(api_client: TestClient):
+    player = PlayerFactory.create()
+    response = api_client.post(
+        f"{PLAYERS_PREFIX}login",
+        json={"name": player.name},
+    )
+    assert response.status_code == status.HTTP_200_OK, response.text
+
+
+def test_login_non_existing_player(api_client: TestClient):
+    player = PlayerFactory.build()
+    response = api_client.post(
+        f"{PLAYERS_PREFIX}login",
+        json={"name": player.name},
+    )
+    assert response.status_code == status.HTTP_200_OK, response.text
+
+
+def test_login_player_invalid_name(api_client: TestClient):
+    response = api_client.post(
+        f"{PLAYERS_PREFIX}login",
+        json={"name": False},
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
+
+
 def test_get_player_by_id(api_client: TestClient):
     player = PlayerFactory.create()
     response = api_client.get(f"{PLAYERS_PREFIX}{player.id}")
@@ -57,27 +83,6 @@ def test_get_player_by_id(api_client: TestClient):
 
 def test_get_non_existing_player_by_id(api_client: TestClient):
     response = api_client.get(f"{PLAYERS_PREFIX}999")
-    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
-
-
-def test_get_player_by_name(api_client: TestClient):
-    player = PlayerFactory.create()
-    response = api_client.get(
-        f"{PLAYERS_PREFIX}name/", params={"player_name": player.name}
-    )
-    assert response.status_code == status.HTTP_200_OK, response.text
-    assert_valid_response(response.json())
-
-
-def test_get_non_existing_player_by_name(api_client: TestClient):
-    response = api_client.get(
-        f"{PLAYERS_PREFIX}name/", params={"player_name": "some-name"}
-    )
-    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
-
-
-def test_get_player_by_invalid_name(api_client: TestClient):
-    response = api_client.get(f"{PLAYERS_PREFIX}name/", params={"player_name": None})
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
 
 

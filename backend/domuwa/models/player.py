@@ -8,16 +8,24 @@ if TYPE_CHECKING:
     from domuwa.models.player_score import PlayerScore
     from domuwa.models.question import Question
 
+NAME_MIN_LEN = 3
+NAME_MAX_LEN = 25
+
 
 class PlayerBase(SQLModel):
-    name: str = Field(min_length=3, max_length=25)
+    name: str = Field(min_length=NAME_MIN_LEN, max_length=NAME_MAX_LEN)
 
 
 class Player(SQLModel, table=True):
     __tablename__ = "player"  # type: ignore
 
     id: Optional[int] = Field(None, primary_key=True)
-    name: str = Field(min_length=3, max_length=25, index=True, unique=True)
+    name: str = Field(
+        min_length=NAME_MIN_LEN,
+        max_length=NAME_MAX_LEN,
+        index=True,
+        unique=True,
+    )
     games_played: int = 0
     games_won: int = 0
 
