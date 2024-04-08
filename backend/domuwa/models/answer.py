@@ -3,17 +3,30 @@ from typing import TYPE_CHECKING, Optional
 from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
-    from domuwa.models.game_type import GameType
-    from domuwa.models.player import Player
-    from domuwa.models.qna_category import QnACategory
-    from domuwa.models.question import Question
+    from domuwa.models.game_type import GameType, GameTypeRead
+    from domuwa.models.player import Player, PlayerRead
+    from domuwa.models.qna_category import QnACategory, QnACategoryRead
+    from domuwa.models.question import Question, QuestionRead
+
+
+TEXT_MIN_LEN = 1
+TEXT_MAX_LEN = 250
+
+
+class AnswerBase(SQLModel):
+    text: str = Field(min_length=TEXT_MIN_LEN, max_length=TEXT_MAX_LEN)
+    excluded: bool = False
+    author_id: int
+    game_type_id: int
+    game_category_id: int
+    question_id: int | None
 
 
 class Answer(SQLModel, table=True):
     __tablename__ = "answer"  # type: ignore
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    text: str = Field(min_length=1, max_length=150)
+    text: str = Field(min_length=TEXT_MIN_LEN, max_length=TEXT_MAX_LEN)
     excluded: bool = Field(default=False, index=True)
 
     prev_version_id: Optional[int] = Field(None, foreign_key="answer.id")
@@ -39,3 +52,27 @@ class Answer(SQLModel, table=True):
         nullable=True,
     )
     question: Optional["Question"] = Relationship(back_populates="answers")
+
+
+class AnswerCreate(AnswerBase):
+    pass
+
+
+class AnswerUpdate(SQLModel):
+    text: str | None = Field(
+        default=None, min_length=TEXT_MIN_LEN, max_length=TEXT_MAX_LEN
+    )
+    excluded: bool | None = None
+    author_id: int | None = None
+    game_type_id: int | None = None
+    game_category_id: int | None = None
+    question_id: int | None = None
+
+
+class AnswerRead(SQLModel):
+    text: str = Field(min_length=TEXT_MIN_LEN, max_length=TEXT_MAX_LEN)
+    excluded: bool
+    author: "PlayerRead"
+    game_type: "GameTypeRead"
+    game_category: "QnACategoryRead"
+    question: Optional["QuestionRead"]

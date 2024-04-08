@@ -7,16 +7,27 @@ from domuwa.models.links import GameRoomQuestionsLink
 if TYPE_CHECKING:
     from domuwa.models.answer import Answer
     from domuwa.models.game_room import GameRoom
-    from domuwa.models.game_type import GameType
-    from domuwa.models.player import Player
-    from domuwa.models.qna_category import QnACategory
+    from domuwa.models.game_type import GameType, GameTypeRead
+    from domuwa.models.player import Player, PlayerRead
+    from domuwa.models.qna_category import QnACategory, QnACategoryRead
+
+TEXT_MIN_LEN = 3
+TEXT_MAX_LEN = 250
+
+
+class QuestionBase(SQLModel):
+    text: str = Field(min_length=TEXT_MIN_LEN, max_length=TEXT_MAX_LEN)
+    excluded: bool = False
+    author_id: int
+    game_type_id: int
+    game_category_id: int
 
 
 class Question(SQLModel, table=True):
     __tablename__ = "question"  # type: ignore
 
     id: Optional[int] = Field(None, primary_key=True)
-    text: str = Field(min_length=3, max_length=150)
+    text: str = Field(min_length=TEXT_MIN_LEN, max_length=TEXT_MAX_LEN)
     excluded: bool = Field(False, index=True)
 
     author_id: Optional[str] = Field(None, foreign_key="player.id")
@@ -42,3 +53,19 @@ class Question(SQLModel, table=True):
         back_populates="questions",
         link_model=GameRoomQuestionsLink,
     )
+
+
+class QuestionCreate(QuestionBase):
+    pass
+
+
+class QuestionUpdate(SQLModel):
+    pass
+
+
+class QuestionRead(SQLModel):
+    text: str = Field(min_length=TEXT_MIN_LEN, max_length=TEXT_MAX_LEN)
+    excluded: bool = False
+    author: "PlayerRead"
+    game_type: "GameTypeRead"
+    game_category: "QnACategoryRead"
