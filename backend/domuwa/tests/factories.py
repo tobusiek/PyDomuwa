@@ -3,6 +3,7 @@ from factory.alchemy import SQLAlchemyModelFactory
 
 from domuwa.models.game_type import GameType, GameTypeChoices
 from domuwa.models.player import Player
+from domuwa.models.qna_category import QnACategory, QnACategoryChoices
 
 
 class GameTypeFactory(SQLAlchemyModelFactory):
@@ -18,4 +19,12 @@ class PlayerFactory(SQLAlchemyModelFactory):
 
     class Meta:  # type: ignore
         model = Player
+        sqlalchemy_session_persistence = "commit"
+
+
+class QnACategoryFactory(SQLAlchemyModelFactory):
+    name = QnACategoryChoices.SFW
+
+    class Meta:  # type: ignore
+        model = QnACategory
         sqlalchemy_session_persistence = "commit"
