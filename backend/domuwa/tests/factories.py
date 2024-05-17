@@ -1,9 +1,11 @@
 import factory
 from factory.alchemy import SQLAlchemyModelFactory
 
+from domuwa.models.answer import Answer
 from domuwa.models.game_type import GameType, GameTypeChoices
 from domuwa.models.player import Player
 from domuwa.models.qna_category import QnACategory, QnACategoryChoices
+from domuwa.models.question import Question
 
 
 class GameTypeFactory(SQLAlchemyModelFactory):
@@ -27,4 +29,29 @@ class QnACategoryFactory(SQLAlchemyModelFactory):
 
     class Meta:  # type: ignore
         model = QnACategory
+        sqlalchemy_session_persistence = "commit"
+
+
+class AnswerFactory(SQLAlchemyModelFactory):
+    text: str = "answer text"
+    excluded: bool = False
+    author_id: int
+    game_type_id: int
+    game_category_id: int
+    question_id: int | None = None
+
+    class Meta:  # type: ignore
+        model = Answer
+        sqlalchemy_session_persistence = "commit"
+
+
+class QuestionFactory(SQLAlchemyModelFactory):
+    text: str = "question text"
+    excluded: bool = False
+    author_id: int
+    game_type_id: int
+    game_category_id: int
+
+    class Meta:  # type: ignore
+        model = Question
         sqlalchemy_session_persistence = "commit"

@@ -1,18 +1,18 @@
 from typing import Any
 
+from fastapi import status
 from fastapi.testclient import TestClient
-from starlette import status
 
 from domuwa.tests.factories import PlayerFactory
 
 PLAYERS_PREFIX = "/api/players/"
 
 
-def assert_valid_response(response: dict[str, Any]):
-    assert "id" in response, response
-    assert "name" in response, response
-    assert "games_played" in response, response
-    assert "games_won" in response, response
+def assert_valid_response(response_data: dict[str, Any]):
+    assert "id" in response_data, response_data
+    assert "name" in response_data, response_data
+    assert "games_played" in response_data, response_data
+    assert "games_won" in response_data, response_data
 
 
 def test_create_player(api_client: TestClient):

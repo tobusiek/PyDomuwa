@@ -60,7 +60,9 @@ class AnswerCreate(AnswerBase):
 
 class AnswerUpdate(SQLModel):
     text: str | None = Field(
-        default=None, min_length=TEXT_MIN_LEN, max_length=TEXT_MAX_LEN
+        default=None,
+        min_length=TEXT_MIN_LEN,
+        max_length=TEXT_MAX_LEN,
     )
     excluded: bool | None = None
     author_id: int | None = None
@@ -70,6 +72,16 @@ class AnswerUpdate(SQLModel):
 
 
 class AnswerRead(SQLModel):
+    id: int
+    text: str = Field(min_length=TEXT_MIN_LEN, max_length=TEXT_MAX_LEN)
+    excluded: bool
+    author: "PlayerRead"
+    game_type: "GameTypeRead"
+    game_category: "QnACategoryRead"
+
+
+class AnswerWithQuestionRead(SQLModel):
+    id: int
     text: str = Field(min_length=TEXT_MIN_LEN, max_length=TEXT_MAX_LEN)
     excluded: bool
     author: "PlayerRead"

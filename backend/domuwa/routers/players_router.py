@@ -26,8 +26,8 @@ async def create_player(
     player_create: PlayerCreate,
     db_sess: Session = Depends(get_db_session),
 ):
+    logger.debug("received Player(%s) to create", player_create)
     try:
-        logger.debug("received Player(%s) to create", player_create)
         player = Player.model_validate(player_create, strict=True)
     except ValidationError as exc:
         logger.error(str(exc))
@@ -82,12 +82,12 @@ async def update_player(
     player_update: PlayerUpdate,
     db_sess: Session = Depends(get_db_session),
 ):
+    logger.debug(
+        "received Player(%s) to update Player(id=%d)",
+        player_update,
+        player_id,
+    )
     try:
-        logger.debug(
-            "received Player(%s) to update Player(id=%d)",
-            player_update,
-            player_id,
-        )
         player = Player.model_validate(player_update, strict=True)
     except ValidationError as exc:
         logger.error(str(exc))
@@ -98,5 +98,5 @@ async def update_player(
 
 @router.delete("/{player_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_player(player_id: int, db_sess: Session = Depends(get_db_session)):
-    logger.debug(f"received Player(id={player_id}) to remove")
+    logger.debug("received Player(id=%d) to remove", player_id)
     await services.delete_player(player_id, db_sess)

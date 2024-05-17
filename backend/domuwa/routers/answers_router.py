@@ -1,109 +1,70 @@
 import logging
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import ValidationError
+from sqlmodel import Session
 
-logger = logging.getLogger("domuwa")
+from domuwa.database import get_db_session
+from domuwa.models.answer import (
+    Answer,
+    AnswerCreate,
+    AnswerUpdate,
+    AnswerWithQuestionRead,
+)
+from domuwa.services import answers_services as services
 
-router = APIRouter(prefix="/answer", tags=["Answer"])
+logger = logging.getLogger(__name__)
 
-# @router.post("/", status_code=status.HTTP_201_CREATED)
-# async def create_answer(
-#     request: Request,
-#     author: str,
-#     text: str,
-#     question_id: int | None = None,
-#     correct: bool = False,
-#     db_sess: Session = Depends(db.get_db_session),
-# ):
-#     answer_view = validate_answer_data(author, text, correct, question_id)
-#     logger.debug(f"{answer_view=}")
-#     db_answer = services.create_answer(answer_view, db_sess)
-#     return create_answer_view_with_question(db_answer)
-#
-#
-# @router.get("/{answer_id}")
-# def get_answer_by_id(
-#     request: Request,
-#     answer_id: int,
-#     db_sess: Session = Depends(db.get_db_session),
-# ):
-#     answer = db.get_obj_of_type_by_id(answer_id, Answer, "Answer", db_sess)
-#     return create_answer_view_with_question(answer)
-#
-#
-# @router.get("/")
-# def get_all_answers(request: Request, db_sess: Session = Depends(db.get_db_session)):
-#     answers = db.get_all_objs_of_type(Answer, db_sess)
-#     return [create_answer_view_with_question(answer) for answer in answers]
-#
-#
-# @router.get("/for_question/{question_id}", response_model=None)
-# def get_answers_for_question(
-#     request: Request,
-#     question_id: int,
-#     db_sess: Session = Depends(db.get_db_session),
-# ) -> list[schemas.AnswerSchema]:
-#     answers = services.get_answers_for_question(question_id, db_sess)
-#     return [create_answer_view(answer) for answer in answers]
-#
-#
-# @router.put("/", response_model=None)
-# def update_answer(
-#     request: Request,
-#     answer_id: int,
-#     author: str,
-#     text: str,
-#     correct: bool,
-#     question_id: int,
-#     db_sess: Session = Depends(db.get_db_session),
-# ) -> schemas.AnswerWithQuestionSchema:
-#     modified_answer = validate_answer_data(author, text, correct, question_id)
-#     answer = services.update_answer(answer_id, modified_answer, db_sess)
-#     return create_answer_view_with_question(answer)
-#
-#
-# @router.delete(
-#     "/",
-#     status_code=status.HTTP_204_NO_CONTENT,
-#     response_class=responses.Response,
-# )
-# def delete_answer(
-#     answer_id: int,
-#     db_sess: Session = Depends(db.get_db_session),
-# ) -> None:
-#     db.delete_obj(answer_id, Answer, "Answer", db_sess)
-#
-#
-# def validate_answer_data(
-#     author: str,
-#     text: str,
-#     correct: bool,
-#     question_id: int | None = None,
-# ) -> schemas.AnswerCreateSchema:
-#     try:
-#         answer = schemas.AnswerCreateSchema(
-#             author=author,
-#             text=text,
-#             correct=correct,
-#             question_id=question_id,
-#         )
-#     except ValidationError:
-#         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid data input")
-#     return answer
-#
-#
-# def create_answer_view(answer: Answer) -> schemas.AnswerSchema:
-#     return schemas.AnswerSchema.model_validate(answer)
-#
-#
-# def create_answer_view_with_question(
-#     answer: Answer,
-# ) -> schemas.AnswerWithQuestionSchema:
-#     return schemas.AnswerWithQuestionSchema(
-#         id=answer.id,
-#         author=answer.author,
-#         text=answer.text,
-#         correct=answer.correct,
-#         question_id=answer.question_id,
-#         question=schemas.QuestionSchema.model_validate(answer.question),
-#     )  # type: ignore
+router = APIRouter(prefix="/answers", tags=["Answer"])
+
+
+@router.post(
+    "/", response_model=AnswerWithQuestionRead, status_code=status.HTTP_201_CREATED
+)
+async def create_answer(
+    answer_create: AnswerCreate,
+    db_sess: Session = Depends(get_db_session),
+):
+    logger.debug("received Answer(%s) to create", answer_create)
+    try:
+        answer = Answer.model_validate(answer_create, strict=True)
+    except ValidationError as exc:
+        logger.error(str(exc))
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc)) from exc
+
+    return await services.create_answer(answer, db_sess)
+
+
+@router.get("/{answer_id}", response_model=AnswerWithQuestionRead)
+async def get_answer_by_id(answer_id: int, db_sess: Session = Depends(get_db_session)):
+    logger.debug("received Answer(id=%d) to get", answer_id)
+    return await services.get_answer_by_id(answer_id, db_sess)
+
+
+@router.get("/", response_model=list[AnswerWithQuestionRead])
+async def get_all_answers(db_sess: Session = Depends(get_db_session)):
+    return await services.get_all_answers(db_sess)
+
+
+@router.patch("/{answer_id}", response_model=AnswerWithQuestionRead)
+async def update_answer(
+    answer_id: int,
+    answer_update: AnswerUpdate,
+    db_sess: Session = Depends(get_db_session),
+):
+    logger.debug(
+        "received Answer(%s) to update Answer(id=%d)", answer_update, answer_id
+    )
+    try:
+        answer = Answer.model_validate(answer_update, strict=True)
+    except ValidationError as exc:
+        logger.error(str(exc))
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc)) from exc
+
+    return await services.update_answer(answer_id, answer, db_sess)
+
+
+@router.delete("/{answer_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_answer(answer_id: int, db_sess: Session = Depends(get_db_session)):
+    logger.debug("received Answer(id=%d) to remove", answer_id)
+    await services.delete_answer(answer_id, db_sess)
