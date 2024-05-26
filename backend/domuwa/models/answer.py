@@ -19,7 +19,7 @@ class AnswerBase(SQLModel):
     author_id: int
     game_type_id: int
     game_category_id: int
-    question_id: int | None
+    question_id: int | None = None
 
 
 class Answer(SQLModel, table=True):

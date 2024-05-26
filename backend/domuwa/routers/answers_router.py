@@ -19,7 +19,9 @@ router = APIRouter(prefix="/answers", tags=["Answer"])
 
 
 @router.post(
-    "/", response_model=AnswerWithQuestionRead, status_code=status.HTTP_201_CREATED
+    "/",
+    response_model=AnswerWithQuestionRead,
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_answer(
     answer_create: AnswerCreate,

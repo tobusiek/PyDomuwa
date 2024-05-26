@@ -5,7 +5,7 @@ from sqlmodel import Field, Relationship, SQLModel
 from domuwa.models.links import GameRoomQuestionsLink
 
 if TYPE_CHECKING:
-    from domuwa.models.answer import Answer
+    from domuwa.models.answer import Answer, AnswerRead
     from domuwa.models.game_room import GameRoom
     from domuwa.models.game_type import GameType, GameTypeRead
     from domuwa.models.player import Player, PlayerRead
@@ -69,3 +69,7 @@ class QuestionRead(SQLModel):
     author: "PlayerRead"
     game_type: "GameTypeRead"
     game_category: "QnACategoryRead"
+
+
+class QuestionWithAnswersRead(QuestionRead):
+    answers: list["AnswerRead"]

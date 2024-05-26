@@ -14,6 +14,7 @@ class GameTypeFactory(SQLAlchemyModelFactory):
     class Meta:  # type: ignore
         model = GameType
         sqlalchemy_session_persistence = "commit"
+        sqlalchemy_get_or_create = ("name",)
 
 
 class PlayerFactory(SQLAlchemyModelFactory):
@@ -30,6 +31,7 @@ class QnACategoryFactory(SQLAlchemyModelFactory):
     class Meta:  # type: ignore
         model = QnACategory
         sqlalchemy_session_persistence = "commit"
+        sqlalchemy_get_or_create = ("name",)
 
 
 class AnswerFactory(SQLAlchemyModelFactory):

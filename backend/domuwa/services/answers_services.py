@@ -50,5 +50,5 @@ async def delete_answer(answer_id: int, db_sess: Session = Depends(db.get_db_ses
         question.answers.remove(answer)
         db_sess.add(question)
 
-    db_sess.add(question)
+    db_sess.delete(answer)
     db_sess.commit()

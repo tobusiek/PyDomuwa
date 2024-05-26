@@ -9,3 +9,6 @@ ignore = ["ANN003", "ANN101", "ANN102", "ANN201", "ANN202", "COM812"]
 
 [tool.ruff.lint.isort]
 case-sensitive = true
+
+[tool.pytest.ini_options]
+filterwarnings = ["ignore::DeprecationWarning"]
