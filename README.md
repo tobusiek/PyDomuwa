@@ -34,7 +34,40 @@ docker compose down
 ### List docker logs
 
 ```console
-docker logs <container name>
+docker logs <container name> [-f] [-t]
 ```
 
 Then go to http address printed in console
+
+#### TODO
+
+- [x] add tests for question
+    - [ ] add tests for update and delete
+- [ ] add ep for question view
+- [ ] fix answer services - update and delete
+- [ ] on `get_all` in questions and answers filter for `deleted` and order by `excluded`
+- [ ] remove `next_version` from questions and answers
+- [ ] update tests for answers
+- [ ] add game type services
+- [ ] add game type eps
+- [ ] add game type tests
+- [ ] add game category services
+- [ ] add game category eps
+- [ ] add game category tests
+- [ ] add game room services
+- [ ] add game room eps
+- [ ] add game room tests
+- [ ] add ranking services
+- [ ] add ranking eps
+- [ ] add rankihg tests
+
+##### TODO later
+
+- [ ] add alembic
+- [ ] start ui
+- [ ] add auth services
+- [ ] add auth aps
+- [ ] add auth eps
+- [ ] add pagination
+- [ ] move to postgres
+

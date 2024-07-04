@@ -29,8 +29,9 @@ class Question(SQLModel, table=True):
     id: Optional[int] = Field(None, primary_key=True)
     text: str = Field(min_length=TEXT_MIN_LEN, max_length=TEXT_MAX_LEN)
     excluded: bool = Field(False, index=True)
+    deleted: bool = Field(False, index=True)
 
-    author_id: Optional[str] = Field(None, foreign_key="player.id")
+    author_id: Optional[int] = Field(None, foreign_key="player.id")
     author: Optional["Player"] = Relationship(back_populates="questions")
 
     game_type_id: Optional[int] = Field(None, foreign_key="game_type.id")
@@ -64,6 +65,7 @@ class QuestionUpdate(SQLModel):
 
 
 class QuestionRead(SQLModel):
+    id: int
     text: str = Field(min_length=TEXT_MIN_LEN, max_length=TEXT_MAX_LEN)
     excluded: bool = False
     author: "PlayerRead"

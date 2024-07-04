@@ -18,7 +18,7 @@ class GameTypeFactory(SQLAlchemyModelFactory):
 
 
 class PlayerFactory(SQLAlchemyModelFactory):
-    name = factory.Sequence(lambda x: "Player %d" % x)
+    name = factory.Sequence(lambda n: "Player %d" % n)
 
     class Meta:  # type: ignore
         model = Player
@@ -35,7 +35,7 @@ class QnACategoryFactory(SQLAlchemyModelFactory):
 
 
 class AnswerFactory(SQLAlchemyModelFactory):
-    text: str = "answer text"
+    text = factory.Sequence(lambda n: "answer text %d" % n)
     excluded: bool = False
     author_id: int
     game_type_id: int
@@ -48,8 +48,9 @@ class AnswerFactory(SQLAlchemyModelFactory):
 
 
 class QuestionFactory(SQLAlchemyModelFactory):
-    text: str = "question text"
+    text = factory.Sequence(lambda n: "question text %d" % n)
     excluded: bool = False
+    deleted: bool = False
     author_id: int
     game_type_id: int
     game_category_id: int

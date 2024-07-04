@@ -9,7 +9,7 @@ async def create_question(
     question: Question,
     db_sess: Session = Depends(db.get_db_session),
 ):
-    raise NotImplementedError()
+    return await db.save(question, db_sess)
 
 
 async def get_question_by_id(
@@ -20,7 +20,7 @@ async def get_question_by_id(
 
 
 async def get_all_questions(db_sess: Session = Depends(db.get_db_session)):
-    raise NotImplementedError()
+    return await db.get_all(Question, db_sess)
 
 
 async def update_question(
@@ -28,11 +28,29 @@ async def update_question(
     question: Question,
     db_sess: Session = Depends(db.get_db_session),
 ):
-    raise NotImplementedError()
+    old_question = await db.get(question_id, Question, db_sess)
+    question.prev_version = old_question
+
+    answers = old_question.answers
+    if answers:
+        question.answers = answers
+
+    db_sess.add(question)
+    db_sess.commit()
+    db_sess.refresh(question)
+    return question
 
 
 async def delete_question(
     question_id: int,
     db_sess: Session = Depends(db.get_db_session),
 ):
-    raise NotImplementedError()
+    question = await db.get(question_id, Question, db_sess)
+    question.deleted = True
+
+    for answer in question.answers:
+        answer.deleted = True
+        db_sess.add(answer)
+
+    db_sess.add(question)
+    db_sess.commit()
