@@ -42,11 +42,11 @@ Then go to http address printed in console
 #### TODO
 
 - [x] add tests for question
+    - [ ] understand `next_version` from questions and answers
     - [ ] add tests for update and delete
 - [ ] add ep for question view
 - [ ] fix answer services - update and delete
 - [ ] on `get_all` in questions and answers filter for `deleted` and order by `excluded`
-- [ ] remove `next_version` from questions and answers
 - [ ] update tests for answers
 - [ ] add game type services
 - [ ] add game type eps
