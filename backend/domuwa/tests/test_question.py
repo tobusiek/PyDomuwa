@@ -2,7 +2,9 @@ from typing import Any
 
 from fastapi import status
 from fastapi.testclient import TestClient
+from sqlmodel import Session
 
+from domuwa import database as db
 from domuwa.models.question import Question
 from domuwa.tests.factories import (
     GameTypeFactory,
@@ -105,5 +107,11 @@ def test_delete_question_without_answers(api_client: TestClient):
     pass
 
 
-def test_delete_question_with_answers(api_client: TestClient):
-    pass
+def test_delete_question_with_answers(api_client: TestClient, db_session: Session):
+    question = create_question()
+
+    response = api_client.delete(f"{QUESTIONS_PREFIX}{question.id}")
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.text
+
+    # TODO: finish
+    db.get(question.id, db_session)
