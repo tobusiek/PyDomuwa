@@ -1,8 +1,12 @@
-from fastapi import Depends
+import logging
+
+from fastapi import Depends, HTTPException, status
 from sqlmodel import Session
 
 from domuwa import database as db
 from domuwa.models.question import Question
+
+logger = logging.getLogger(__name__)
 
 
 async def create_question(
@@ -16,7 +20,13 @@ async def get_question_by_id(
     question_id: int,
     db_sess: Session = Depends(db.get_db_session),
 ):
-    return await db.get(question_id, Question, db_sess)
+    question = await db.get(question_id, Question, db_sess)
+    if not question.deleted:
+        return question
+
+    err_msg = f"Got Question(id={question_id}) to get, but it was deleted"
+    logger.warning(err_msg)
+    raise HTTPException(status.HTTP_404_NOT_FOUND, err_msg)
 
 
 async def get_all_questions(db_sess: Session = Depends(db.get_db_session)):
