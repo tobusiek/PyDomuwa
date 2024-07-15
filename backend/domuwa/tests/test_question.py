@@ -8,6 +8,7 @@ from sqlmodel import Session
 from domuwa import database as db
 from domuwa.models.question import Question
 from domuwa.tests.factories import (
+    AnswerFactory,
     GameTypeFactory,
     PlayerFactory,
     QnACategoryFactory,
@@ -97,20 +98,37 @@ def test_get_all_answers(api_client: TestClient, questions_count: int = 3):
 
 
 def test_update_question_without_answers(api_client: TestClient):
-    pass
+    question = create_question()
+    new_text = "new text"
+
+    response = api_client.patch(
+        f"{QUESTIONS_PREFIX}{question.id}",
+        json={"text": new_text},
+    )
+    assert response.status_code == status.HTTP_200_OK, response.text
+    response_data = response.json()
+    assert_valid_response(response_data)
+
+    for field, value in response_data.items():
+        if field == "text":
+            continue
+        assert getattr(question, field) == value, field
+
+    assert response_data["text"] != question.text
+    assert response_data["text"] == new_text
+
+    assert response_data["author"]["id"] != question.author.id
+    # assert response_data["author"]["id"] == new_author.id
 
 
 def test_update_question_with_answers(api_client: TestClient):
     pass
 
 
-def test_delete_question_without_answers(api_client: TestClient):
-    pass
-
-
 @pytest.mark.asyncio()
-async def test_delete_question_with_answers(
-    api_client: TestClient, db_session: Session
+async def test_delete_question_without_answers(
+    api_client: TestClient,
+    db_session: Session,
 ):
     question = create_question()
 
@@ -122,6 +140,23 @@ async def test_delete_question_with_answers(
 
     db_question = await db.get(question.id, Question, db_session)
     assert db_question.deleted
+    assert not db_question.answers
 
-    for answer in db_question.answers:
-        assert answer.deleted
+
+@pytest.mark.asyncio()
+async def test_delete_question_with_answers(
+    api_client: TestClient,
+    db_session: Session,
+):
+    question = create_question()
+    AnswerFactory.create(question_id=question.id)
+
+    response = api_client.delete(f"{QUESTIONS_PREFIX}{question.id}")
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.text
+
+    response = api_client.get(f"{QUESTIONS_PREFIX}{question.id}")
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
+
+    db_question = await db.get(question.id, Question, db_session)
+    assert db_question.deleted
+    assert db_question.answers[0].deleted

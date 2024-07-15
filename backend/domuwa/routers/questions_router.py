@@ -56,13 +56,8 @@ async def update_question(
     logger.debug(
         "received Question(%s) to update Question(id=%d)", question_update, question_id
     )
-    try:
-        question = Question.model_validate(question_update, strict=True)
-    except ValidationError as exc:
-        logger.error(str(exc))
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc)) from exc
-
-    return await services.update_question(question_id, question, db_sess)
+    question = await services.get_question_by_id(question_id, db_sess)
+    return await services.update_question(question_update, question, db_sess)
 
 
 @router.delete("/{question_id}", status_code=status.HTTP_204_NO_CONTENT)
