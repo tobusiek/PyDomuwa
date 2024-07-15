@@ -1,5 +1,6 @@
 from typing import Any
 
+import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 from sqlmodel import Session
@@ -107,11 +108,20 @@ def test_delete_question_without_answers(api_client: TestClient):
     pass
 
 
-def test_delete_question_with_answers(api_client: TestClient, db_session: Session):
+@pytest.mark.asyncio()
+async def test_delete_question_with_answers(
+    api_client: TestClient, db_session: Session
+):
     question = create_question()
 
     response = api_client.delete(f"{QUESTIONS_PREFIX}{question.id}")
     assert response.status_code == status.HTTP_204_NO_CONTENT, response.text
 
-    # TODO: finish
-    db.get(question.id, db_session)
+    response = api_client.get(f"{QUESTIONS_PREFIX}{question.id}")
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
+
+    db_question = await db.get(question.id, Question, db_session)
+    assert db_question.deleted
+
+    for answer in db_question.answers:
+        assert answer.deleted
