@@ -28,14 +28,7 @@ class Answer(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     text: str = Field(min_length=TEXT_MIN_LEN, max_length=TEXT_MAX_LEN)
     excluded: bool = Field(default=False, index=True)
-
-    prev_version_id: Optional[int] = Field(None, foreign_key="answer.id")
-    prev_version: Optional["Answer"] = Relationship(
-        back_populates="next_versions",
-        sa_relationship_kwargs={"remote_side": "Answer.id"},
-    )
-
-    next_versions: list["Answer"] = Relationship(back_populates="prev_version")
+    deleted: bool = Field(False, index=True)
 
     author_id: Optional[int] = Field(default=None, foreign_key="player.id")
     author: Optional["Player"] = Relationship(back_populates="answers")
@@ -45,6 +38,13 @@ class Answer(SQLModel, table=True):
 
     game_category_id: Optional[int] = Field(default=None, foreign_key="qna_category.id")
     game_category: Optional["QnACategory"] = Relationship(back_populates="answers")
+
+    prev_version_id: Optional[int] = Field(None, foreign_key="answer.id")
+    prev_version: Optional["Answer"] = Relationship(
+        back_populates="next_versions",
+        sa_relationship_kwargs={"remote_side": "Answer.id"},
+    )
+    next_versions: list["Answer"] = Relationship(back_populates="prev_version")
 
     question_id: Optional[int] = Field(
         default=None,

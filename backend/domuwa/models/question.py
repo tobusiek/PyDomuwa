@@ -45,7 +45,6 @@ class Question(SQLModel, table=True):
         back_populates="next_versions",
         sa_relationship_kwargs={"remote_side": "Question.id"},
     )
-
     next_versions: list["Question"] = Relationship(back_populates="prev_version")
 
     answers: list["Answer"] = Relationship(back_populates="question")
