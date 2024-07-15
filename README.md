@@ -41,9 +41,14 @@ Then go to http address printed in console
 
 #### TODO
 
+- [ ] raise 404 in routers
+- [ ] add auth
+  - [ ] add user model
+  - [ ] update player to use user
 - [x] add tests for question
-    - [ ] understand `next_version` from questions and answers
-    - [ ] add tests for update and delete
+  - [ ] understand `next_version` from questions and answers
+  - [ ] add tests for update and delete
+  - [ ] add user for update and post endpoints
 - [ ] add ep for question view
 - [ ] fix answer services - update and delete
 - [ ] on `get_all` in questions and answers filter for `deleted` and order by `excluded`
@@ -65,9 +70,6 @@ Then go to http address printed in console
 
 - [ ] add alembic
 - [ ] start ui
-- [ ] add auth services
-- [ ] add auth aps
-- [ ] add auth eps
 - [ ] add pagination
 - [ ] move to postgres
-
+- [ ] add auth with fb
