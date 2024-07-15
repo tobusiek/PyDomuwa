@@ -1,15 +1,15 @@
 from sqlmodel import SQLModel
 
-from domuwa.models.answer import *
-from domuwa.models.game_category import *
-from domuwa.models.game_room import *
-from domuwa.models.game_type import *
-from domuwa.models.links import *
-from domuwa.models.player import *
-from domuwa.models.player_score import *
-from domuwa.models.qna_category import *
-from domuwa.models.question import *
-from domuwa.models.ranking import *
+from domuwa.models.answer import *  # noqa: F403
+from domuwa.models.game_category import *  # noqa: F403
+from domuwa.models.game_room import *  # noqa: F403
+from domuwa.models.game_type import *  # noqa: F403
+from domuwa.models.links import *  # noqa: F403
+from domuwa.models.player import *  # noqa: F403
+from domuwa.models.player_score import *  # noqa: F403
+from domuwa.models.qna_category import *  # noqa: F403
+from domuwa.models.question import *  # noqa: F403
+from domuwa.models.ranking import *  # noqa: F403
 
 
 def get_subclasses(cls: type[SQLModel]):
