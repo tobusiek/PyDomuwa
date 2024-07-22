@@ -1,54 +1,46 @@
-from fastapi import Depends
+import logging
+
 from sqlmodel import Session
 
-from domuwa import database as db
-from domuwa.models.answer import Answer
+from domuwa.models.answer import Answer, AnswerCreate, AnswerUpdate
+from domuwa.services.common_services import CommonServices
 
 
-async def create_answer(answer: Answer, db_sess: Session = Depends(db.get_db_session)):
-    return await db.save(answer, db_sess)
+class AnswerServices(CommonServices[AnswerCreate, AnswerUpdate, Answer]):
+    def __init__(self) -> None:
+        super().__init__(Answer, logging.getLogger(__name__))
 
+    async def update(
+        self,
+        model: Answer,
+        model_update: AnswerUpdate,
+        session: Session,
+    ):
+        update_data = model_update.model_dump(exclude_unset=True)
+        model_data = model.model_dump() | update_data
+        updated_model = Answer(**model_data)
 
-async def get_answer_by_id(
-    answer_id: int,
-    db_sess: Session = Depends(db.get_db_session),
-):
-    return await db.get(answer_id, Answer, db_sess)
+        updated_model.prev_version = model
+        model.next_versions.append(updated_model)
 
+        question = model.question
+        if question is not None:
+            question.answers.remove(model)
+            question.answers.append(updated_model)
+            session.add(question)
 
-async def get_all_answers(db_sess: Session = Depends(db.get_db_session)):
-    return await db.get_all(Answer, db_sess)
+        session.add(updated_model)
+        session.add(model)
+        session.commit()
+        session.refresh(updated_model)
+        return updated_model
 
+    async def delete_answer(self, model: Answer, session: Session):
+        question = model.question
+        if question is not None:
+            question.answers.remove(model)
+            session.add(question)
 
-async def update_answer(
-    answer_id: int,
-    answer: Answer,
-    db_sess: Session = Depends(db.get_db_session),
-):
-    old_answer = await db.get(answer_id, Answer, db_sess)
-    answer.prev_version = old_answer
-    old_answer.next_versions.append(answer)
-
-    question = old_answer.question
-    if question is not None:
-        question.answers.remove(old_answer)
-        question.answers.append(answer)
-        db_sess.add(question)
-
-    db_sess.add(answer)
-    db_sess.add(old_answer)
-    db_sess.commit()
-    db_sess.refresh(answer)
-    return answer
-
-
-async def delete_answer(answer_id: int, db_sess: Session = Depends(db.get_db_session)):
-    answer = await db.get(answer_id, Answer, db_sess)
-
-    question = answer.question
-    if question is not None:
-        question.answers.remove(answer)
-        db_sess.add(question)
-
-    db_sess.delete(answer)
-    db_sess.commit()
+        session.delete(model)
+        session.commit()
+        self.logger.debug("removed %s(%d)", Answer.__name__, model.id)  # type: ignore
