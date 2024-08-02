@@ -8,6 +8,7 @@ from domuwa.database import get_db_session
 from domuwa.models.question import (
     Question,
     QuestionCreate,
+    QuestionRead,
     QuestionUpdate,
     QuestionWithAnswersRead,
 )
@@ -23,6 +24,20 @@ class QuestionRouter(CommonRouter[QuestionCreate, QuestionUpdate, Question]):
     services = QuestionServices()
     logger = logging.getLogger(__name__)
     db_model_type_name = Question.__name__
+
+    def __init__(self) -> None:
+        super().__init__()
+
+        self.router.routes.remove(
+            next(route for route in self.router.routes if route.name == "create")  # type: ignore
+        )
+        self.router.add_api_route(
+            "/",
+            self.create,
+            status_code=status.HTTP_201_CREATED,
+            methods=["POST"],
+            response_model=QuestionRead,
+        )
 
     @override
     async def get_by_id(
