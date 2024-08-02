@@ -18,7 +18,7 @@ class CommonServices(ABC, Generic[CreateModelT, UpdateModelT, DbModelT]):
     async def create(self, model: CreateModelT, session: Session):
         return await self.save(model, session)
 
-    async def get_by_id(self, model_id: int, session: Session):
+    async def get_by_id(self, model_id: int, session: Session) -> DbModelT | None:
         model = session.get(self.db_model_type, model_id)
         if model is None:
             self.logger.warning(
@@ -47,6 +47,8 @@ class CommonServices(ABC, Generic[CreateModelT, UpdateModelT, DbModelT]):
         model: CreateModelT | DbModelT,
         session: Session,
     ) -> DbModelT | None:
+        if not isinstance(model, self.db_model_type):
+            model = self.db_model_type.model_validate(model)
         try:
             session.add(model)
             session.commit()
