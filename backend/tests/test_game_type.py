@@ -6,7 +6,6 @@ from fastapi.testclient import TestClient
 from domuwa.models.game_type import GameTypeChoices
 from tests.factories import GameTypeFactory
 
-
 GAME_TYPES_PREFIX = "/api/game-types/"
 
 

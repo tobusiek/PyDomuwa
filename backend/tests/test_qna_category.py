@@ -6,7 +6,6 @@ from fastapi.testclient import TestClient
 from domuwa.models.qna_category import QnACategoryChoices
 from tests.factories import QnACategoryFactory
 
-
 QNA_CATEGORY_PREFIX = "/api/qna-categories/"
 
 

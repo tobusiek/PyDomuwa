@@ -4,14 +4,11 @@ import warnings
 import pytest
 from factory.alchemy import SQLAlchemyModelFactory
 from fastapi.testclient import TestClient
-from sqlmodel import SQLModel
-from sqlmodel import Session
-from sqlmodel import create_engine
+from sqlmodel import SQLModel, Session, create_engine
 from sqlmodel.pool import StaticPool
 
 from domuwa import database as db
-from main import app
-
+from domuwa.main import app
 
 logging.getLogger("faker").setLevel(logging.INFO)
 logging.getLogger("factory").setLevel(logging.INFO)

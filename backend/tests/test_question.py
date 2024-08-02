@@ -1,18 +1,15 @@
 from typing import Any
 
-import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
-from sqlmodel import Session
 
-from domuwa import database as db
 from domuwa.models.question import Question
-from tests.factories import AnswerFactory
-from tests.factories import GameTypeFactory
-from tests.factories import PlayerFactory
-from tests.factories import QnACategoryFactory
-from tests.factories import QuestionFactory
-
+from tests.factories import (
+    GameTypeFactory,
+    PlayerFactory,
+    QnACategoryFactory,
+    QuestionFactory,
+)
 
 QUESTIONS_PREFIX = "/api/questions/"
 

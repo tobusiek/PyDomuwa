@@ -4,12 +4,13 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from domuwa.models.answer import Answer
-from tests.factories import AnswerFactory
-from tests.factories import GameTypeFactory
-from tests.factories import PlayerFactory
-from tests.factories import QnACategoryFactory
-from tests.factories import QuestionFactory
-
+from tests.factories import (
+    AnswerFactory,
+    GameTypeFactory,
+    PlayerFactory,
+    QnACategoryFactory,
+    QuestionFactory,
+)
 
 ANSWERS_PREFIX = "/api/answers/"
 QUESTIONS_PREFIX = "/api/questions/"
@@ -160,7 +161,6 @@ def test_get_all_answers(api_client: TestClient, answers_count: int = 3):
     assert len(response_data) == answers_count, response_data
     for answer_data in response_data:
         assert_valid_response(answer_data)
-
 
 # def test_update_answer(api_client: TestClient):
 #     pass

@@ -5,7 +5,6 @@ from fastapi.testclient import TestClient
 
 from tests.factories import PlayerFactory
 
-
 PLAYERS_PREFIX = "/api/players/"
 
 
