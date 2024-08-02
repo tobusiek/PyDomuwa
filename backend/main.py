@@ -8,11 +8,8 @@ from starlette.responses import Response
 
 from domuwa.config import settings
 from domuwa.database import create_db_and_tables
-from domuwa.routers.answers_router import router as answers_router
-from domuwa.routers.game_types_router import router as game_types_router
-from domuwa.routers.players_router import router as players_router
-from domuwa.routers.qna_categories_router import router as qna_categories_router
-from domuwa.routers.questions_router import router as questions_router
+from domuwa.routers.answers_router import get_answers_router
+from domuwa.routers.questions_router import get_questions_router
 
 
 @asynccontextmanager
@@ -25,11 +22,11 @@ async def lifespan(_: FastAPI):
 app = FastAPI(debug=True, lifespan=lifespan)
 
 API_PREFIX = "/api"
-app.include_router(players_router, prefix=API_PREFIX)
-app.include_router(game_types_router, prefix=API_PREFIX)
-app.include_router(qna_categories_router, prefix=API_PREFIX)
-app.include_router(answers_router, prefix=API_PREFIX)
-app.include_router(questions_router, prefix=API_PREFIX)
+# app.include_router(players_router, prefix=API_PREFIX)
+# app.include_router(game_types_router, prefix=API_PREFIX)
+# app.include_router(qna_categories_router, prefix=API_PREFIX)
+app.include_router(get_answers_router(), prefix=API_PREFIX)
+app.include_router(get_questions_router(), prefix=API_PREFIX)
 # app.include_router(game_rooms_router, prefix=API_PREFIX)
 
 app.add_middleware(SessionMiddleware, secret_key=settings.SESSION_MIDDLEWARE_KEY)
