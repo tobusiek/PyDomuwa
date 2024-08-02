@@ -2,7 +2,7 @@
 
 ## Domuwa is a locally hosted service, created to play games on a party
 
-In future, there will be implementation of games like Ego or Who's most likely,
+In the future, there will be implementation of games like Ego or Who's most likely,
 Cards against humanity, etc.
 
 App uses Python 3.11, FastAPI, SQLite database (pointed to file in project directory)
@@ -64,7 +64,7 @@ Then go to http address printed in console
 - [ ] add game room tests
 - [ ] add ranking services
 - [ ] add ranking eps
-- [ ] add rankihg tests
+- [ ] add ranking tests
 
 ##### TODO later
 
