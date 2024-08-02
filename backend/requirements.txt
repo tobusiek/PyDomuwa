@@ -1,9 +1,9 @@
 ruff
+ruff-lsp
 mypy
 sqlmodel
 alembic
 fastapi
-fastapi-class
 httpx
 itsdangerous
 pydantic
