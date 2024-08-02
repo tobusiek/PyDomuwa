@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from domuwa.models.game_type import GameType, GameTypeRead
     from domuwa.models.player import Player, PlayerRead
     from domuwa.models.qna_category import QnACategory, QnACategoryRead
-    from domuwa.models.question import Question, QuestionRead
+    from domuwa.models.question import Question
 
 
 TEXT_MIN_LEN = 1
@@ -78,13 +78,3 @@ class AnswerRead(SQLModel):
     author: "PlayerRead"
     game_type: "GameTypeRead"
     game_category: "QnACategoryRead"
-
-
-class AnswerWithQuestionRead(SQLModel):
-    id: int
-    text: str = Field(min_length=TEXT_MIN_LEN, max_length=TEXT_MAX_LEN)
-    excluded: bool
-    author: "PlayerRead"
-    game_type: "GameTypeRead"
-    game_category: "QnACategoryRead"
-    question: Optional["QuestionRead"]

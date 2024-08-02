@@ -1,6 +1,7 @@
 import logging
 
 from sqlmodel import Session
+from typing_extensions import override
 
 from domuwa.models.answer import Answer, AnswerCreate, AnswerUpdate
 from domuwa.services.common_services import CommonServices
@@ -10,6 +11,7 @@ class AnswerServices(CommonServices[AnswerCreate, AnswerUpdate, Answer]):
     def __init__(self) -> None:
         super().__init__(Answer, logging.getLogger(__name__))
 
+    @override
     async def update(
         self,
         model: Answer,
@@ -35,12 +37,9 @@ class AnswerServices(CommonServices[AnswerCreate, AnswerUpdate, Answer]):
         session.refresh(updated_model)
         return updated_model
 
-    async def delete_answer(self, model: Answer, session: Session):
-        question = model.question
-        if question is not None:
-            question.answers.remove(model)
-            session.add(question)
-
+    @override
+    async def delete(self, model: Answer, session: Session):
+        model.deleted = True
         session.delete(model)
         session.commit()
-        self.logger.debug("removed %s(%d)", Answer.__name__, model.id)  # type: ignore
+        self.logger.debug("marked %s(%d) as deleted", Answer.__name__, model.id)  # type: ignore
