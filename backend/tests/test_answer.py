@@ -4,13 +4,12 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from domuwa.models.answer import Answer
-from domuwa.tests.factories import (
-    AnswerFactory,
-    GameTypeFactory,
-    PlayerFactory,
-    QnACategoryFactory,
-    QuestionFactory,
-)
+from tests.factories import AnswerFactory
+from tests.factories import GameTypeFactory
+from tests.factories import PlayerFactory
+from tests.factories import QnACategoryFactory
+from tests.factories import QuestionFactory
+
 
 ANSWERS_PREFIX = "/api/answers/"
 QUESTIONS_PREFIX = "/api/questions/"

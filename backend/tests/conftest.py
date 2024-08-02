@@ -4,11 +4,14 @@ import warnings
 import pytest
 from factory.alchemy import SQLAlchemyModelFactory
 from fastapi.testclient import TestClient
-from main import app
-from sqlmodel import SQLModel, Session, create_engine
+from sqlmodel import SQLModel
+from sqlmodel import Session
+from sqlmodel import create_engine
 from sqlmodel.pool import StaticPool
 
 from domuwa import database as db
+from main import app
+
 
 logging.getLogger("faker").setLevel(logging.INFO)
 logging.getLogger("factory").setLevel(logging.INFO)
@@ -22,7 +25,7 @@ SQLALCHEMY_DATABASE_URL = "sqlite://"
 
 @pytest.fixture(name="db_session")
 def db_session_fixture():
-    from domuwa.tests import factories  # noqa: F401
+    from tests import factories  # noqa: F401
 
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL,

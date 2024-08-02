@@ -7,13 +7,12 @@ from sqlmodel import Session
 
 from domuwa import database as db
 from domuwa.models.question import Question
-from domuwa.tests.factories import (
-    AnswerFactory,
-    GameTypeFactory,
-    PlayerFactory,
-    QnACategoryFactory,
-    QuestionFactory,
-)
+from tests.factories import AnswerFactory
+from tests.factories import GameTypeFactory
+from tests.factories import PlayerFactory
+from tests.factories import QnACategoryFactory
+from tests.factories import QuestionFactory
+
 
 QUESTIONS_PREFIX = "/api/questions/"
 

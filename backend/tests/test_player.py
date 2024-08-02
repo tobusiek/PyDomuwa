@@ -3,7 +3,8 @@ from typing import Any
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from domuwa.tests.factories import PlayerFactory
+from tests.factories import PlayerFactory
+
 
 PLAYERS_PREFIX = "/api/players/"
 
