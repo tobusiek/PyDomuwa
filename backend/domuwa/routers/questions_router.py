@@ -1,66 +1,60 @@
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import ValidationError
 from sqlmodel import Session
+from typing_extensions import override
 
 from domuwa.database import get_db_session
 from domuwa.models.question import (
     Question,
     QuestionCreate,
-    QuestionRead,
     QuestionUpdate,
     QuestionWithAnswersRead,
 )
-from domuwa.services import questions_services as services
-
-logger = logging.getLogger(__name__)
-
-router = APIRouter(prefix="/questions", tags=["Question"])
+from domuwa.routers.common_router import CommonRouter
+from domuwa.services.questions_services import QuestionServices
 
 
-@router.post("/", response_model=QuestionRead, status_code=status.HTTP_201_CREATED)
-async def create_question(
-    question_create: QuestionCreate, db_sess: Session = Depends(get_db_session)
-):
-    logger.debug("received Question(%s) to create", question_create)
-    try:
-        question = Question.model_validate(question_create, strict=True)
-    except ValidationError as exc:
-        logger.error(str(exc))
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc)) from exc
+class QuestionRouter(CommonRouter[QuestionCreate, QuestionUpdate, Question]):
+    prefix = "/questions"
+    tags = ["Question"]
+    response_model = QuestionWithAnswersRead
+    router = APIRouter(prefix=prefix, tags=tags)  # type: ignore
+    services = QuestionServices()
+    logger = logging.getLogger(__name__)
+    db_model_type_name = Question.__name__
 
-    return await services.create_question(question, db_sess)
+    @override
+    async def get_by_id(
+        self,
+        model_id: int,
+        session: Session = Depends(get_db_session),
+    ):
+        model = await super().get_by_id(model_id, session)
+        if not model.deleted:
+            return model
+
+        err_msg = f"Got Question(id={model_id}) to get, but it was deleted"
+        self.logger.warning(err_msg)
+        raise HTTPException(status.HTTP_404_NOT_FOUND, err_msg)
+
+    @override
+    async def create(
+        self,
+        create_model: QuestionCreate,
+        session: Session = Depends(get_db_session),
+    ):
+        return await super().create(create_model, session)
+
+    @override
+    async def update(
+        self,
+        model_id: int,
+        model_update: QuestionUpdate,
+        session: Session = Depends(get_db_session),
+    ):
+        return await super().update(model_id, model_update, session)
 
 
-@router.get("/{question_id}", response_model=QuestionWithAnswersRead)
-async def get_question_by_id(
-    question_id: int,
-    db_sess: Session = Depends(get_db_session),
-):
-    logger.debug("received Question(id=%d) to get", question_id)
-    return await services.get_question_by_id(question_id, db_sess)
-
-
-@router.get("/", response_model=list[QuestionWithAnswersRead])
-async def get_all_questions(db_sess: Session = Depends(get_db_session)):
-    return await services.get_all_questions(db_sess)
-
-
-@router.patch("/{question_id}", response_model=QuestionWithAnswersRead)
-async def update_question(
-    question_id: int,
-    question_update: QuestionUpdate,
-    db_sess: Session = Depends(get_db_session),
-):
-    logger.debug(
-        "received Question(%s) to update Question(id=%d)", question_update, question_id
-    )
-    question = await services.get_question_by_id(question_id, db_sess)
-    return await services.update_question(question_update, question, db_sess)
-
-
-@router.delete("/{question_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_question(question_id: int, db_sess: Session = Depends(get_db_session)):
-    logger.debug("received Question(id=%d) to remove", question_id)
-    await services.delete_question(question_id, db_sess)
+def get_questions_router():
+    return QuestionRouter().router
