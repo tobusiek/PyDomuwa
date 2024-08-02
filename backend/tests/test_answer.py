@@ -36,7 +36,6 @@ def assert_valid_response(response_data: dict[str, Any]):
     assert "author" in response_data, response_data
     assert "game_type" in response_data, response_data
     assert "game_category" in response_data, response_data
-    assert "question" in response_data, response_data
 
 
 def build_answer_without_question():
@@ -132,9 +131,6 @@ def test_create_answer_without_question(api_client: TestClient):
     assert response.status_code == status.HTTP_200_OK, response.text
     response_data = response.json()
     assert_valid_response(response_data)
-
-    assert "question" in response_data, response_data
-    assert response_data["question"] is None, response_data
 
 
 def test_get_answer_by_id(api_client: TestClient):

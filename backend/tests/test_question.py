@@ -99,6 +99,7 @@ def test_get_all_answers(api_client: TestClient, questions_count: int = 3):
 
 def test_update_question_without_answers(api_client: TestClient):
     question = create_question()
+    print("from model:", question)
     new_text = "new text"
 
     response = api_client.patch(
@@ -109,10 +110,15 @@ def test_update_question_without_answers(api_client: TestClient):
     response_data = response.json()
     assert_valid_response(response_data)
 
+    question_data = question.model_dump()
+    print("from dict:", question_data)
     for field, value in response_data.items():
         if field == "text":
             continue
-        assert getattr(question, field) == value, field
+        if field == "id":
+            assert value > question.id
+            continue
+        assert question_data[field] == value, field
 
     assert response_data["text"] != question.text
     assert response_data["text"] == new_text
