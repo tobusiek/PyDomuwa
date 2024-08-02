@@ -2,6 +2,7 @@
 show-fixes = true
 target-version = "py311"
 line-length = 88
+src = "domuwa"
 
 [tool.ruff.lint]
 extend-select = ["ANN", "C4", "COM", "I", "N", "PT", "RET", "SIM", "TCH", "TID"]
