@@ -4,6 +4,7 @@ from typing import Generic, final
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import SQLModel, Session
+from starlette.responses import Response
 
 from domuwa.database import get_db_session
 from domuwa.services.common_services import (
@@ -49,14 +50,15 @@ class CommonRouter(ABC, Generic[CreateModelT, UpdateModelT, DbModelT]):
         self.router.add_api_route(
             f"/{self.__lookup}",
             self.update,
-            methods=["PATCH"],
             response_model=self.response_model,
+            methods=["PATCH"],
         )
         self.router.add_api_route(
             f"/{self.__lookup}",
             self.delete,
+            status_code=status.HTTP_204_NO_CONTENT,
             methods=["DELETE"],
-            response_model=self.response_model,
+            response_class=Response,
         )
 
     @final
