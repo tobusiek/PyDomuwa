@@ -19,8 +19,8 @@ from domuwa.services.questions_services import QuestionServices
 class QuestionRouter(CommonRouter[QuestionCreate, QuestionUpdate, Question]):
     prefix = "/questions"
     tags = ["Question"]
-    response_model = QuestionWithAnswersRead
     router = APIRouter(prefix=prefix, tags=tags)  # type: ignore
+    response_model = QuestionWithAnswersRead
     services = QuestionServices()
     logger = logging.getLogger(__name__)
     db_model_type_name = Question.__name__
