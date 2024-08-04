@@ -22,7 +22,7 @@ class CommonServices(ABC, Generic[CreateModelT, UpdateModelT, DbModelT]):
         model = session.get(self.db_model_type, model_id)
         if model is None:
             self.logger.warning(
-                "%s(%d) not found",
+                "%s(id=%d) not found",
                 self.db_model_type.__name__,
                 model_id,
             )
@@ -62,4 +62,4 @@ class CommonServices(ABC, Generic[CreateModelT, UpdateModelT, DbModelT]):
     async def delete(self, model: DbModelT, session: Session):
         session.delete(model)
         session.commit()
-        self.logger.debug("removed %s(%d)", model.__class__.__name__, model.id)  # type: ignore
+        self.logger.debug("removed %s(id=%d)", model.__class__.__name__, model.id)  # type: ignore

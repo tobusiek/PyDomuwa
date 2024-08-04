@@ -47,4 +47,4 @@ class QuestionServices(CommonServices[QuestionCreate, QuestionUpdate, Question])
 
         session.add(model)
         session.commit()
-        self.logger.debug("marked %s(%d) as deleted", Question.__name__, model.id)
+        self.logger.debug("marked %s(id=%d) as deleted", Question.__name__, model.id)
