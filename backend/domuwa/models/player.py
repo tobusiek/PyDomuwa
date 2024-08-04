@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import Optional, TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -42,15 +42,8 @@ class PlayerCreate(PlayerBase):
     pass
 
 
-class PlayerLogin(PlayerBase):
-    pass
-
-
-class PlayerSession(PlayerBase):
+class PlayerRead(PlayerBase):
     id: int
-
-
-class PlayerRead(PlayerSession):
     games_played: int
     games_won: int
 
