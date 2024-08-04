@@ -11,7 +11,9 @@ class PlayerServices(CommonServices[PlayerCreate, PlayerUpdate, Player]):
         super().__init__(Player, logging.getLogger(__name__))
 
     async def create(self, model: PlayerCreate, session: Session):
-        db_player = session.exec(select(Player).where(Player.name == model.name)).first()
+        db_player = session.exec(
+            select(Player).where(Player.name == model.name)
+        ).first()
         if db_player is not None:
             self.logger.warning("Player(name=%s) already exists.", model.name)
             return None

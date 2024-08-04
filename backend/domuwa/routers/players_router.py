@@ -25,7 +25,11 @@ class PlayerRouter(CommonRouter[PlayerCreate, PlayerUpdate, Player]):
     db_model_type_name = Player.__name__
 
     @override
-    async def create(self, create_model: PlayerCreate, session: Session = Depends(get_db_session)):
+    async def create(
+        self,
+        create_model: PlayerCreate,
+        session: Session = Depends(get_db_session),
+    ):
         player = await super().create(create_model, session)
         if player is None:
             err_msg = f"Cannot create Player({create_model})."
@@ -34,7 +38,12 @@ class PlayerRouter(CommonRouter[PlayerCreate, PlayerUpdate, Player]):
         return player
 
     @override
-    async def update(self, model_id: int, model_update: PlayerUpdate, session: Session = Depends(get_db_session)):
+    async def update(
+        self,
+        model_id: int,
+        model_update: PlayerUpdate,
+        session: Session = Depends(get_db_session),
+    ):
         return await super().update(model_id, model_update, session)
 
 

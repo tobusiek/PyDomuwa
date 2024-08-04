@@ -14,7 +14,9 @@ class TestGameType(CommonTestCase[GameType]):
     def assert_valid_response(self, response_data: dict) -> None:
         assert "id" in response_data, response_data
         assert "name" in response_data, response_data
-        assert response_data["name"] in GameTypeChoices._value2member_map_, response_data
+        assert (
+                response_data["name"] in GameTypeChoices._value2member_map_
+        ), response_data
 
     def assert_valid_response_values(
         self,
@@ -31,11 +33,10 @@ class TestGameType(CommonTestCase[GameType]):
         return GameTypeFactory.create()
 
     def test_create_invalid_name(self, api_client: TestClient):
-        response = api_client.post(
-            self.path,
-            json={"name": "not from enum"}
-        )
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
+        response = api_client.post(self.path, json={"name": "not from enum"})
+        assert (
+                response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        ), response.text
 
     def test_get_all(self, api_client: TestClient, model_count: int = 3):
         GameTypeFactory.create(name=GameTypeChoices.EGO)
@@ -77,4 +78,6 @@ class TestGameType(CommonTestCase[GameType]):
             f"{self.path}{game_type.id}",
             json={"name": "not from enum"},
         )
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
+        assert (
+                response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        ), response.text

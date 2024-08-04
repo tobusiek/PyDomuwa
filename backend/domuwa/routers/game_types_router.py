@@ -31,12 +31,21 @@ class GameTypeRouter(CommonRouter[GameTypeCreate, GameTypeUpdate, GameType]):
         super().__init__()
 
     @override
-    async def create(self, create_model: GameTypeCreate, session: Session = Depends(get_db_session)):
+    async def create(
+        self,
+        create_model: GameTypeCreate,
+        session: Session = Depends(get_db_session),
+    ):
         return await super().create(create_model, session)
 
     # TODO: add auth user
     @override
-    async def update(self, model_id: int, model_update: GameTypeUpdate, session: Session = Depends(get_db_session)):
+    async def update(
+        self,
+        model_id: int,
+        model_update: GameTypeUpdate,
+        session: Session = Depends(get_db_session),
+    ):
         return await super().update(model_id, model_update, session)
 
     # TODO: add auth user
