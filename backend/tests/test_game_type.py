@@ -38,6 +38,11 @@ class TestGameType(CommonTestCase[GameType]):
             response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
         ), response.text
 
+    def test_create_non_unique_name(self, api_client: TestClient):
+        game_type = GameTypeFactory.create()
+        response = api_client.post(self.path, json={"name": game_type.name})
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+
     def test_get_all(self, api_client: TestClient, model_count: int = 3):
         GameTypeFactory.create(name=GameTypeChoices.EGO)
         GameTypeFactory.create(name=GameTypeChoices.WHOS_MOST_LIKELY)
@@ -81,3 +86,10 @@ class TestGameType(CommonTestCase[GameType]):
         assert (
             response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
         ), response.text
+
+    def test_update_non_unique_name(self, api_client: TestClient):
+        game_type1 = GameTypeFactory.create(name=GameTypeChoices.EGO)
+        game_type2 = GameTypeFactory.create(name=GameTypeChoices.WHOS_MOST_LIKELY)
+
+        response = api_client.patch(f"{self.path}{game_type1.id}", json={"name": game_type2.name})
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text

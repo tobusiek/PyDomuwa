@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
 from typing_extensions import override
 
@@ -36,9 +36,15 @@ class GameTypeRouter(CommonRouter[GameTypeCreate, GameTypeUpdate, GameType]):
         model: GameTypeCreate,
         session: Session = Depends(get_db_session),
     ):
-        return await super().create(model, session)
+        game_type = await super().create(model, session)
+        if game_type is None:
+            err_msg = f"Cannot create GameType({model})."
+            self.logger.warning(err_msg)
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, err_msg)
+        return game_type
 
     # TODO: add auth user
+    # noinspection DuplicatedCode
     @override
     async def update(
         self,
@@ -46,7 +52,13 @@ class GameTypeRouter(CommonRouter[GameTypeCreate, GameTypeUpdate, GameType]):
         model_update: GameTypeUpdate,
         session: Session = Depends(get_db_session),
     ):
-        return await super().update(model_id, model_update, session)
+        db_game_type = await self.get_instance(model_id, session)
+        game_type_update = await self.services.update(db_game_type, model_update, session)
+        if game_type_update is None:
+            err_msg = f"Cannot update GameType(id={model_id}) with GameType({model_id})."
+            self.logger.warning(err_msg)
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, err_msg)
+        return game_type_update
 
     # TODO: add auth user
     @override
