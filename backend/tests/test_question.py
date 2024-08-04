@@ -27,6 +27,7 @@ class TestQuestion(CommonTestCase[Question]):
         assert "game_type" in response_data, response_data
         assert "game_category" in response_data, response_data
 
+    # noinspection DuplicatedCode
     def assert_valid_response_values(self, response_data: dict, model: Question) -> None:
         assert response_data["id"] == model.id
         assert response_data["text"] == model.text
@@ -62,7 +63,12 @@ class TestQuestion(CommonTestCase[Question]):
             game_category_id=game_category.id,
         )
 
+    # noinspection DuplicatedCode
     def test_update(self, api_client: TestClient):
+        import warnings
+
+        warnings.filterwarnings("ignore", module="sqlmodel.orm.session")
+
         question = self.create_model()
         new_text = "new text"
 
@@ -76,8 +82,8 @@ class TestQuestion(CommonTestCase[Question]):
 
         assert response_data["id"] >= question.id, response_data
 
-        assert response_data["text"] != question.text
-        assert response_data["text"] == new_text
+        assert response_data["text"] != question.text, response_data
+        assert response_data["text"] == new_text, response_data
 
         assert response_data["excluded"] == question.excluded, response_data
 
@@ -95,6 +101,7 @@ class TestQuestion(CommonTestCase[Question]):
 
         assert not response_data["answers"], response_data
 
+    # noinspection DuplicatedCode
     @pytest.mark.asyncio
     async def test_delete_with_answers(self, api_client: TestClient, db_session: Session):
         model = self.create_model()
