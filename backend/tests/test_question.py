@@ -28,7 +28,11 @@ class TestQuestion(CommonTestCase[Question]):
         assert "game_category" in response_data, response_data
 
     # noinspection DuplicatedCode
-    def assert_valid_response_values(self, response_data: dict, model: Question) -> None:
+    def assert_valid_response_values(
+        self,
+        response_data: dict,
+        model: Question,
+    ) -> None:
         assert response_data["id"] == model.id
         assert response_data["text"] == model.text
         assert response_data["excluded"] == model.excluded
@@ -103,7 +107,11 @@ class TestQuestion(CommonTestCase[Question]):
 
     # noinspection DuplicatedCode
     @pytest.mark.asyncio
-    async def test_delete_with_answers(self, api_client: TestClient, db_session: Session):
+    async def test_delete_with_answers(
+        self,
+        api_client: TestClient,
+        db_session: Session,
+    ):
         model = self.create_model()
         model_id = model.id
         assert model_id is not None

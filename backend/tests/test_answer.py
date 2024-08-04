@@ -31,7 +31,9 @@ class TestAnswer(CommonTestCase[Answer]):
 
     # noinspection DuplicatedCode
     def assert_valid_response_values(
-        self, response_data: dict, model: Answer,
+        self,
+        response_data: dict,
+        model: Answer,
     ) -> None:
         assert response_data["id"] == model.id
         assert response_data["text"] == model.text
@@ -108,7 +110,7 @@ class TestAnswer(CommonTestCase[Answer]):
         warnings.filterwarnings("ignore", module="sqlmodel.orm.session")
 
         answer = self.create_model()
-        new_text = 'new text'
+        new_text = "new text"
 
         response = api_client.patch(
             f"{self.path}{answer.id}",
@@ -139,7 +141,11 @@ class TestAnswer(CommonTestCase[Answer]):
 
     # noinspection DuplicatedCode
     @pytest.mark.asyncio
-    async def test_create_answer_with_question(self, api_client: TestClient, db_session: Session):
+    async def test_create_answer_with_question(
+        self,
+        api_client: TestClient,
+        db_session: Session,
+    ):
         answer = self.build_model_with_question()
 
         response = api_client.post(self.path, json=answer.model_dump())
@@ -161,7 +167,11 @@ class TestAnswer(CommonTestCase[Answer]):
         assert answer == question.answers[0], question.answers
 
     @pytest.mark.asyncio
-    async def test_delete_answer_with_question(self, api_client: TestClient, db_session: Session):
+    async def test_delete_answer_with_question(
+        self,
+        api_client: TestClient,
+        db_session: Session,
+    ):
         answer = self.create_model_with_question()
         answer_id = answer.id
         assert answer_id is not None

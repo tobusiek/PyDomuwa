@@ -8,9 +8,10 @@ from sqlmodel import SQLModel, Session
 
 from domuwa.services.common_services import CommonServices
 
-DbModelT = TypeVar('DbModelT', bound=SQLModel)
+DbModelT = TypeVar("DbModelT", bound=SQLModel)
 
 
+# noinspection DuplicatedCode
 class CommonTestCase(ABC, Generic[DbModelT]):
     path: str
     services: CommonServices
@@ -21,7 +22,9 @@ class CommonTestCase(ABC, Generic[DbModelT]):
 
     @abstractmethod
     def assert_valid_response_values(
-        self, response_data: dict, model: DbModelT,
+        self,
+        response_data: dict,
+        model: DbModelT,
     ) -> None:
         pass
 
@@ -49,7 +52,9 @@ class CommonTestCase(ABC, Generic[DbModelT]):
         assert response.status_code == status.HTTP_200_OK, response.text
         self.assert_valid_response(response.json())
 
-        assert await self.services.get_by_id(response_data['id'], db_session) is not None
+        assert (
+                await self.services.get_by_id(response_data["id"], db_session) is not None
+        )
 
     def test_get_by_id(self, api_client: TestClient):
         model = self.create_model()
