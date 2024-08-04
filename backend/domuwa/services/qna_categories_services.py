@@ -13,7 +13,9 @@ class QnACategoryServices(
         super().__init__(QnACategory, logging.getLogger(__name__))
 
     async def create(self, model: QnACategoryCreate, session: Session):
-        db_qna_category = session.exec(select(QnACategory).where(QnACategory.name == model.name)).first()
+        db_qna_category = session.exec(
+            select(QnACategory).where(QnACategory.name == model.name)
+        ).first()
         if db_qna_category is not None:
             self.logger.warning("QnACategory(name=%s) already exists", model.name)
             return None
@@ -25,7 +27,9 @@ class QnACategoryServices(
         model_update: QnACategoryUpdate,
         session: Session,
     ):
-        db_qna_category = session.exec(select(QnACategory).where(QnACategory.name == model_update.name)).first()
+        db_qna_category = session.exec(
+            select(QnACategory).where(QnACategory.name == model_update.name)
+        ).first()
         if db_qna_category is not None:
             self.logger.warning("QnACategory(name=%s) already exists", model.name)
             return None
