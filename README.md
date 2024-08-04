@@ -46,15 +46,11 @@ Then go to http address printed in console
 - [x] add tests for question
     - [ ] understand `next_version` from questions and answers
     - [x] add tests for update and delete
-    - [ ] add user for update and post endpoints
 - [ ] add ep for questions view
 - [x] fix answer services - update and delete
 - [ ] on `get_all` in questions and answers filter for `deleted` and order by `excluded`
 - [x] update tests for answers
-- add game type
-    - [x] services
-    - [x] router
-    - [x] tests
+- [x] add game type
 - add qna category
     - [ ] services
     - [ ] router
