@@ -19,7 +19,7 @@ class AnswerServices(CommonServices[AnswerCreate, AnswerUpdate, Answer]):
         session: Session,
     ):
         update_data = model_update.model_dump(exclude_unset=True)
-        model_data = model.model_dump() | update_data
+        model_data = model.model_dump(exclude={"id"}) | update_data
         updated_model = Answer(**model_data)
 
         updated_model.prev_version = model
@@ -40,6 +40,6 @@ class AnswerServices(CommonServices[AnswerCreate, AnswerUpdate, Answer]):
     @override
     async def delete(self, model: Answer, session: Session):
         model.deleted = True
-        session.delete(model)
+        session.add(model)
         session.commit()
-        self.logger.debug("marked %s(%d) as deleted", Answer.__name__, model.id)  # type: ignore
+        self.logger.debug("marked %s(id=%d) as deleted", Answer.__name__, model.id)  # type: ignore
