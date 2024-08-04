@@ -2,6 +2,7 @@ import logging
 
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
+from typing_extensions import override
 
 from domuwa.database import get_db_session
 from domuwa.models.game_type import (
@@ -29,14 +30,17 @@ class GameTypeRouter(CommonRouter[GameTypeCreate, GameTypeUpdate, GameType]):
     def __init__(self) -> None:
         super().__init__()
 
+    @override
     async def create(self, create_model: GameTypeCreate, session: Session = Depends(get_db_session)):
         return await super().create(create_model, session)
 
     # TODO: add auth user
+    @override
     async def update(self, model_id: int, model_update: GameTypeUpdate, session: Session = Depends(get_db_session)):
         return await super().update(model_id, model_update, session)
 
     # TODO: add auth user
+    @override
     async def delete(self, model_id: int, session: Session = Depends(get_db_session)):
         return await super().delete(model_id, session)
 
