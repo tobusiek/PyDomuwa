@@ -31,12 +31,12 @@ class QnACategoriesRouter(
     @override
     async def create(
         self,
-        create_model: QnACategoryCreate,
+        model: QnACategoryCreate,
         session: Session = Depends(get_db_session),
     ):
-        qna_category = await super().create(create_model, session)
+        qna_category = await super().create(model, session)
         if qna_category is None:
-            err_msg = f"QnACategory({create_model}) could not be created."
+            err_msg = f"QnACategory({model}) could not be created."
             self.logger.warning(err_msg)
             raise HTTPException(status.HTTP_400_BAD_REQUEST, err_msg)
         return qna_category

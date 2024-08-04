@@ -87,15 +87,15 @@ class CommonRouter(ABC, Generic[CreateModelT, UpdateModelT, DbModelT]):
     @abstractmethod
     async def create(
         self,
-        create_model: CreateModelT,
+        model: CreateModelT,
         session: Session = Depends(get_db_session),
     ):
         self.logger.debug(
             "got %s(%s) to create",
             self.db_model_type_name,
-            create_model,
+            model,
         )
-        return await self.services.create(create_model, session)
+        return await self.services.create(model, session)
 
     @abstractmethod
     async def update(

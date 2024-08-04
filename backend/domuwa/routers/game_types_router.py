@@ -33,10 +33,10 @@ class GameTypeRouter(CommonRouter[GameTypeCreate, GameTypeUpdate, GameType]):
     @override
     async def create(
         self,
-        create_model: GameTypeCreate,
+        model: GameTypeCreate,
         session: Session = Depends(get_db_session),
     ):
-        return await super().create(create_model, session)
+        return await super().create(model, session)
 
     # TODO: add auth user
     @override

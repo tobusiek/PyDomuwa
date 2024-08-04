@@ -27,12 +27,12 @@ class PlayerRouter(CommonRouter[PlayerCreate, PlayerUpdate, Player]):
     @override
     async def create(
         self,
-        create_model: PlayerCreate,
+        model: PlayerCreate,
         session: Session = Depends(get_db_session),
     ):
-        player = await super().create(create_model, session)
+        player = await super().create(model, session)
         if player is None:
-            err_msg = f"Cannot create Player({create_model})."
+            err_msg = f"Cannot create Player({model})."
             self.logger.warning(err_msg)
             raise HTTPException(status.HTTP_400_BAD_REQUEST, err_msg)
         return player
