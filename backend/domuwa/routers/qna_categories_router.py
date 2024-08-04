@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from fastapi.routing import APIRouter
 from sqlmodel import Session
 from typing_extensions import override
@@ -13,7 +13,7 @@ from domuwa.models.qna_category import (
     QnACategoryUpdate,
 )
 from domuwa.routers.common_router import CommonRouter
-from domuwa.services.qna_categories_services import QnACategoriesServices
+from domuwa.services.qna_categories_services import QnACategoryServices
 
 
 class QnACategoriesRouter(
@@ -23,7 +23,7 @@ class QnACategoriesRouter(
     tags = ["QnA Category"]
     router = APIRouter(prefix=prefix, tags=tags)  # type: ignore
     response_model = QnACategoryRead
-    services = QnACategoriesServices()
+    services = QnACategoryServices()
     logger = logging.getLogger(__name__)
     db_model_type_name = QnACategory.__name__
 
@@ -34,7 +34,12 @@ class QnACategoriesRouter(
         create_model: QnACategoryCreate,
         session: Session = Depends(get_db_session),
     ):
-        return await super().create(create_model, session)
+        qna_category = await super().create(create_model, session)
+        if qna_category is None:
+            err_msg = f"QnACategory({create_model}) could not be created."
+            self.logger.warning(err_msg)
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, err_msg)
+        return qna_category
 
     # TODO: add admin auth
     @override
@@ -44,7 +49,12 @@ class QnACategoriesRouter(
         model_update: QnACategoryUpdate,
         session: Session = Depends(get_db_session),
     ):
-        return await super().update(model_id, model_update, session)
+        qna_category = await super().update(model_id, model_update, session)
+        if qna_category is None:
+            err_msg = f"QnACategory({model_update}) could not be created."
+            self.logger.warning(err_msg)
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, err_msg)
+        return qna_category
 
 
 def get_qna_categories_router():
