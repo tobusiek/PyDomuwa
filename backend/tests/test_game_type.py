@@ -91,5 +91,7 @@ class TestGameType(CommonTestCase[GameType]):
         game_type1 = GameTypeFactory.create(name=GameTypeChoices.EGO)
         game_type2 = GameTypeFactory.create(name=GameTypeChoices.WHOS_MOST_LIKELY)
 
-        response = api_client.patch(f"{self.path}{game_type1.id}", json={"name": game_type2.name})
+        response = api_client.patch(
+            f"{self.path}{game_type1.id}", json={"name": game_type2.name}
+        )
         assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text

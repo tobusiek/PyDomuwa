@@ -47,7 +47,7 @@ class TestPlayer(CommonTestCase[Player]):
 
         response = api_client.patch(
             f"{self.path}{player_old.id}",
-            json={'name': player_new.name},
+            json={"name": player_new.name},
         )
         assert response.status_code == status.HTTP_200_OK, response.text
         response_data = response.json()
@@ -64,5 +64,7 @@ class TestPlayer(CommonTestCase[Player]):
         player1 = PlayerFactory.create()
         player2 = PlayerFactory.create()
 
-        response = api_client.patch(f"{self.path}{player1.id}", json={"name": player2.name})
+        response = api_client.patch(
+            f"{self.path}{player1.id}", json={"name": player2.name}
+        )
         assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text

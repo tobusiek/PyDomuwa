@@ -20,7 +20,9 @@ class GameTypeServices(CommonServices[GameTypeCreate, GameTypeUpdate, GameType])
         return await super().create(model, session)
 
     # noinspection DuplicatedCode
-    async def update(self, model: GameType, model_update: GameTypeUpdate, session: Session):
+    async def update(
+        self, model: GameType, model_update: GameTypeUpdate, session: Session
+    ):
         db_game_type = session.exec(
             select(GameType).where(GameType.name == model_update.name)
         ).first()

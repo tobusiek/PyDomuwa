@@ -53,9 +53,13 @@ class GameTypeRouter(CommonRouter[GameTypeCreate, GameTypeUpdate, GameType]):
         session: Session = Depends(get_db_session),
     ):
         db_game_type = await self.get_instance(model_id, session)
-        game_type_update = await self.services.update(db_game_type, model_update, session)
+        game_type_update = await self.services.update(
+            db_game_type, model_update, session
+        )
         if game_type_update is None:
-            err_msg = f"Cannot update GameType(id={model_id}) with GameType({model_id})."
+            err_msg = (
+                f"Cannot update GameType(id={model_id}) with GameType({model_id})."
+            )
             self.logger.warning(err_msg)
             raise HTTPException(status.HTTP_400_BAD_REQUEST, err_msg)
         return game_type_update
