@@ -44,7 +44,13 @@ class PlayerRouter(CommonRouter[PlayerCreate, PlayerUpdate, Player]):
         model_update: PlayerUpdate,
         session: Session = Depends(get_db_session),
     ):
-        return await super().update(model_id, model_update, session)
+        db_player = await self.get_instance(model_id, session)
+        player_update = await self.services.update(db_player, model_update, session)
+        if player_update is None:
+            err_msg = f"Cannot update Player(id={model_id}) with Player({model_update})."
+            self.logger.warning(err_msg)
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, err_msg)
+        return player_update
 
 
 def get_players_router():

@@ -18,3 +18,13 @@ class PlayerServices(CommonServices[PlayerCreate, PlayerUpdate, Player]):
             self.logger.warning("Player(name=%s) already exists.", model.name)
             return None
         return await super().create(model, session)
+
+    # noinspection DuplicatedCode
+    async def update(self, model: Player, model_update: PlayerUpdate, session: Session):
+        db_player = session.exec(
+            select(Player).where(Player.name == model_update.name)
+        ).first()
+        if db_player is not None:
+            self.logger.warning("Player(name=%s) already exists.", model.name)
+            return None
+        return await super().update(model, model_update, session)
