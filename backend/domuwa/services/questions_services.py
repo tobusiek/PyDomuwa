@@ -6,8 +6,6 @@ from typing_extensions import override
 from domuwa.models.question import Question, QuestionCreate, QuestionUpdate
 from domuwa.services.common_services import CommonServices
 
-logger = logging.getLogger(__name__)
-
 
 class QuestionServices(CommonServices[QuestionCreate, QuestionUpdate, Question]):
     def __init__(self) -> None:
