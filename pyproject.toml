@@ -7,6 +7,7 @@ python_executable = "backend/.venv/bin/python"
 show-fixes = true
 target-version = "py311"
 line-length = 88
+src = ["backend/domuwa/*", "backend/tests/*"]
 
 [tool.ruff.lint]
 extend-select = ["ANN", "C4", "COM", "I", "N", "PT", "RET", "SIM", "TCH", "TID"]
@@ -14,7 +15,7 @@ ignore = ["ANN003", "ANN101", "ANN102", "ANN201", "ANN202", "COM812"]
 
 [tool.ruff.lint.isort]
 case-sensitive = true
-known-first-party = ['domuwa']
+known-first-party = ["domuwa", "tests"]
 
 [tool.pytest.ini_options]
 filterwarnings = ["ignore::DeprecationWarning"]

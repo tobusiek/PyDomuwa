@@ -41,18 +41,19 @@ Then go to http address printed in console
 
 #### TODO
 
-- [ ] raise 404 in routers
+- [ ] fix autoformatting in pycharm using ruff (probably paths)
+- [x] raise 404 in routers
 - [ ] add auth
   - [ ] add user model
   - [ ] update player to use user
 - [x] add tests for question
   - [ ] understand `next_version` from questions and answers
-  - [ ] add tests for update and delete
+  - [x] add tests for update and delete
   - [ ] add user for update and post endpoints
-- [ ] add ep for question view
-- [ ] fix answer services - update and delete
+- [ ] add ep for questions view
+- [x] fix answer services - update and delete
 - [ ] on `get_all` in questions and answers filter for `deleted` and order by `excluded`
-- [ ] update tests for answers
+- [x] update tests for answers
 - [ ] add game type services
 - [ ] add game type eps
 - [ ] add game type tests
