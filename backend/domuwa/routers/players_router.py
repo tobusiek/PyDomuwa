@@ -1,102 +1,42 @@
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.requests import Request
-from pydantic import ValidationError
 from sqlmodel import Session
+from typing_extensions import override
 
 from domuwa.database import get_db_session
 from domuwa.models.player import (
     Player,
     PlayerCreate,
-    PlayerLogin,
     PlayerRead,
-    PlayerSession,
     PlayerUpdate,
 )
-from domuwa.services import players_services as services
-
-logger = logging.getLogger(__name__)
-
-router = APIRouter(prefix="/players", tags=["Players"])
+from domuwa.routers.common_router import CommonRouter
+from domuwa.services.players_services import PlayerServices
 
 
-@router.post("/", response_model=PlayerRead, status_code=status.HTTP_201_CREATED)
-async def create_player(
-    player_create: PlayerCreate,
-    db_sess: Session = Depends(get_db_session),
-):
-    logger.debug("received Player(%s) to create", player_create)
-    try:
-        player = Player.model_validate(player_create, strict=True)
-    except ValidationError as exc:
-        logger.error(str(exc))
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc)) from exc
+class PlayerRouter(CommonRouter[PlayerCreate, PlayerUpdate, Player]):
+    prefix = "/players"
+    tags = ["Player"]
+    router = APIRouter(prefix=prefix, tags=tags)  # type: ignore
+    response_model = PlayerRead
+    services = PlayerServices()
+    logger = logging.getLogger(__name__)
+    db_model_type_name = Player.__name__
 
-    return await services.create_player(player, db_sess)
+    @override
+    async def create(self, create_model: PlayerCreate, session: Session = Depends(get_db_session)):
+        player = await super().create(create_model, session)
+        if player is None:
+            err_msg = f"Cannot create Player({create_model})."
+            self.logger.warning(err_msg)
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, err_msg)
+        return player
 
-
-@router.post("/login")
-async def login(
-    request: Request,
-    player_login: PlayerLogin,
-    db_sess: Session = Depends(get_db_session),
-):
-    logger.debug("received Player(%s) to login", player_login)
-    if request.session.get("player"):
-        logger.warning(f"Player({player_login}) already logged in")
-        return
-
-    try:
-        player = Player.model_validate(player_login, strict=True)
-    except ValidationError as exc:
-        err_msg = f"cannot parse PlayerLogin({player_login}) to Player"
-        logger.error(err_msg)
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, err_msg) from exc
-
-    db_player = await services.login_player(player, db_sess)
-    try:
-        player_session = PlayerSession.model_validate(db_player)
-    except ValidationError as exc:
-        err_msg = f"couldn't parse PlayerSession from Player({player})"
-        logger.error(err_msg)
-        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, err_msg) from exc
-
-    request.session["player"] = player_session.model_dump()
+    @override
+    async def update(self, model_id: int, model_update: PlayerUpdate, session: Session = Depends(get_db_session)):
+        return await super().update(model_id, model_update, session)
 
 
-@router.get("/{player_id}", response_model=PlayerRead)
-async def get_player_by_id(player_id: int, db_sess: Session = Depends(get_db_session)):
-    logger.debug("received Player(id=%d) to get", player_id)
-    return await services.get_player_by_id(player_id, db_sess)
-
-
-@router.get("/", response_model=list[PlayerRead])
-async def get_all_players(db_sess: Session = Depends(get_db_session)):
-    return await services.get_all_players(db_sess)
-
-
-@router.patch("/{player_id}", response_model=PlayerRead)
-async def update_player(
-    player_id: int,
-    player_update: PlayerUpdate,
-    db_sess: Session = Depends(get_db_session),
-):
-    logger.debug(
-        "received Player(%s) to update Player(id=%d)",
-        player_update,
-        player_id,
-    )
-    try:
-        player = Player.model_validate(player_update, strict=True)
-    except ValidationError as exc:
-        logger.error(str(exc))
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc)) from exc
-
-    return await services.update_player(player_id, player, db_sess)
-
-
-@router.delete("/{player_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_player(player_id: int, db_sess: Session = Depends(get_db_session)):
-    logger.debug("received Player(id=%d) to remove", player_id)
-    await services.delete_player(player_id, db_sess)
+def get_players_router():
+    return PlayerRouter().router
