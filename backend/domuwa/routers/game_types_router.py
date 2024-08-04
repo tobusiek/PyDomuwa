@@ -1,7 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import ValidationError
+from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
 from domuwa.database import get_db_session
@@ -11,71 +10,36 @@ from domuwa.models.game_type import (
     GameTypeRead,
     GameTypeUpdate,
 )
-from domuwa.services import game_type_services as services
+from domuwa.routers.common_router import CommonRouter
+from domuwa.services.game_type_services import GameTypeServices
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/game-types", tags=["Game Types"])
 
 
-@router.post(
-    "/",
-    response_model=GameTypeRead,
-    status_code=status.HTTP_201_CREATED,
-)
-async def create(
-    game_type_create: GameTypeCreate,
-    db_sess: Session = Depends(get_db_session),
-):
-    try:
-        logger.debug("received GameType(%s) to create", game_type_create)
-        game_type = GameType.model_validate(game_type_create, strict=True)
-    except ValidationError as exc:
-        logger.error(str(exc))
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, "Provided invalid data"
-        ) from exc
+class GameTypeRouter(CommonRouter[GameTypeCreate, GameTypeUpdate, GameType]):
+    prefix = "/game-types"
+    tags = ["Game Type"]
+    router = APIRouter(prefix=prefix, tags=tags)  # type: ignore
+    response_model = GameTypeRead
+    services = GameTypeServices()
+    logger = logging.getLogger(__name__)
+    db_model_type_name = GameType.__name__
 
-    return await services.create_game_type(game_type, db_sess)
+    def __init__(self) -> None:
+        super().__init__()
 
+    async def create(self, create_model: GameTypeCreate, session: Session = Depends(get_db_session)):
+        return await super().create(create_model, session)
 
-@router.get("/{game_type_id}", response_model=GameTypeRead)
-async def get_game_type_by_id(
-    game_type_id: int, db_sess: Session = Depends(get_db_session)
-):
-    logger.debug("received GameType(id=%d) to get", game_type_id)
-    return await services.get_game_type_by_id(game_type_id, db_sess)
+    # TODO: add auth user
+    async def update(self, model_id: int, model_update: GameTypeUpdate, session: Session = Depends(get_db_session)):
+        return await super().update(model_id, model_update, session)
+
+    # TODO: add auth user
+    async def delete(self, model_id: int, session: Session = Depends(get_db_session)):
+        return await super().delete(model_id, session)
 
 
-@router.get("/", response_model=list[GameTypeRead])
-async def get_all_players(db_sess: Session = Depends(get_db_session)):
-    return await services.get_all_game_types(db_sess)
-
-
-@router.patch("/{game_type_id}", response_model=GameTypeRead)
-async def update_game_type(
-    game_type_id: int,
-    game_type_update: GameTypeUpdate,
-    db_sess: Session = Depends(get_db_session),
-):
-    try:
-        logger.debug(
-            "received GameType(%s) to update GameType(id=%s)",
-            game_type_update,
-            game_type_id,
-        )
-        game_type = GameType.model_validate(game_type_update, strict=True)
-    except ValidationError as exc:
-        logger.error(str(exc))
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, "Provided invalid data"
-        ) from exc
-
-    return await services.update_game_type(game_type_id, game_type, db_sess)
-
-
-@router.delete("/{game_type_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_game_type(
-    game_type_id: int, db_sess: Session = Depends(get_db_session)
-):
-    logger.debug("received GameType(id=%d) to remove", game_type_id)
-    await services.delete_game_type(game_type_id, db_sess)
+def get_game_types_router():
+    return GameTypeRouter().router
