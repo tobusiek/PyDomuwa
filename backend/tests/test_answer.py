@@ -135,7 +135,7 @@ class TestAnswer(CommonTestCase[Answer]):
         assert response_data["game_type"]["name"] == answer.game_type.name  # type: ignore
 
         assert (
-                response_data["game_category"]["id"] == answer.game_category.id  # type: ignore
+            response_data["game_category"]["id"] == answer.game_category.id  # type: ignore
         ), response_data
         assert response_data["game_category"]["name"] == answer.game_category.name  # type: ignore
 

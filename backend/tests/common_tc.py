@@ -53,7 +53,7 @@ class CommonTestCase(ABC, Generic[DbModelT]):
         self.assert_valid_response(response.json())
 
         assert (
-                await self.services.get_by_id(response_data["id"], db_session) is not None
+            await self.services.get_by_id(response_data["id"], db_session) is not None
         )
 
     def test_get_by_id(self, api_client: TestClient):

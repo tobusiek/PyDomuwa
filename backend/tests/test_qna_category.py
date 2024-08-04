@@ -15,7 +15,7 @@ class TestQnACategory(CommonTestCase[QnACategory]):
         assert "id" in response_data, response_data
         assert "name" in response_data, response_data
         assert (
-                response_data["name"] in QnACategoryChoices._value2member_map_
+            response_data["name"] in QnACategoryChoices._value2member_map_
         ), response_data
 
     def assert_valid_response_values(
@@ -51,7 +51,7 @@ class TestQnACategory(CommonTestCase[QnACategory]):
     def test_create_invalid_name(self, api_client: TestClient):
         response = api_client.post(self.path, json={"name": "not from enum"})
         assert (
-                response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+            response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
         ), response.text
 
     def test_create_non_unique_name(self, api_client: TestClient):
@@ -68,7 +68,7 @@ class TestQnACategory(CommonTestCase[QnACategory]):
             json={"name": "not from enum"},
         )
         assert (
-                response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+            response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
         ), response.text
 
     def test_update_non_unique_name(self, api_client: TestClient):

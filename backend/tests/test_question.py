@@ -99,7 +99,7 @@ class TestQuestion(CommonTestCase[Question]):
         assert response_data["game_type"]["name"] == question.game_type.name  # type: ignore
 
         assert (
-                response_data["game_category"]["id"] == question.game_category.id  # type: ignore
+            response_data["game_category"]["id"] == question.game_category.id  # type: ignore
         ), response_data
         assert response_data["game_category"]["name"] == question.game_category.name  # type: ignore
 
