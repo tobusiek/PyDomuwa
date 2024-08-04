@@ -43,29 +43,48 @@ Then go to http address printed in console
 
 - [ ] fix autoformatting in pycharm using ruff (probably paths)
 - [x] raise 404 in routers
-- [ ] add auth
-  - [ ] add user model
-  - [ ] update player to use user
 - [x] add tests for question
-  - [ ] understand `next_version` from questions and answers
-  - [x] add tests for update and delete
-  - [ ] add user for update and post endpoints
+    - [ ] understand `next_version` from questions and answers
+    - [x] add tests for update and delete
+    - [ ] add user for update and post endpoints
 - [ ] add ep for questions view
 - [x] fix answer services - update and delete
 - [ ] on `get_all` in questions and answers filter for `deleted` and order by `excluded`
 - [x] update tests for answers
-- [ ] add game type services
-- [ ] add game type eps
-- [ ] add game type tests
-- [ ] add game category services
-- [ ] add game category eps
-- [ ] add game category tests
-- [ ] add game room services
-- [ ] add game room eps
-- [ ] add game room tests
-- [ ] add ranking services
-- [ ] add ranking eps
-- [ ] add ranking tests
+- add game type
+    - [x] services
+    - [x] router
+    - [x] tests
+- add qna category
+    - [ ] services
+    - [ ] router
+    - [ ] tests
+- add game category
+    - [ ] services
+    - [ ] router
+    - [ ] tests
+- add auth
+    - [ ] add user model
+    - [ ] update player to use user
+    - update allowed only by admin
+        - [ ] game type
+        - [ ] qna category
+        - [ ] game category
+    - delete allowed only by admin
+        - [ ] game type
+        - [ ] qna category
+        - [ ] game category
+    - update author on update
+        - [ ] question
+        - [ ] answer
+- add game room
+    - [ ] services
+    - [ ] router
+    - [ ] tests
+- add ranking
+    - [ ] services
+    - [ ] router
+    - [ ] tests
 
 ##### TODO later
 
