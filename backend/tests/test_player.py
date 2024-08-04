@@ -1,151 +1,61 @@
-from typing import Any
-
 from fastapi import status
 from fastapi.testclient import TestClient
 
+from domuwa.models import Player
+from domuwa.services.players_services import PlayerServices
+from tests.common_tc import CommonTestCase
 from tests.factories import PlayerFactory
 
-PLAYERS_PREFIX = "/api/players/"
 
+class TestPlayer(CommonTestCase[Player]):
+    path = "/api/players/"
+    services = PlayerServices()
 
-def assert_valid_response(response_data: dict[str, Any]):
-    assert "id" in response_data, response_data
-    assert "name" in response_data, response_data
-    assert "games_played" in response_data, response_data
-    assert "games_won" in response_data, response_data
+    def assert_valid_response(self, response_data: dict) -> None:
+        assert "id" in response_data, response_data
+        assert "name" in response_data, response_data
+        assert "games_played" in response_data, response_data
+        assert "games_won" in response_data, response_data
 
+    def assert_valid_response_values(
+        self,
+        response_data: dict,
+        model: Player,
+    ) -> None:
+        assert response_data["id"] == model.id
+        assert response_data["name"] == model.name
+        assert response_data["games_played"] == model.games_played
+        assert response_data["games_won"] == model.games_won
 
-def test_create_player(api_client: TestClient):
-    player = {"name": "Player 1"}
+    def build_model(self) -> Player:
+        return PlayerFactory.build()
 
-    response = api_client.post(
-        PLAYERS_PREFIX,
-        json=player,
-    )
-    assert response.status_code == status.HTTP_201_CREATED, response.text
-    response_data = response.json()
-    assert_valid_response(response_data)
-    assert player["name"] == response_data["name"], response.text
+    def create_model(self) -> Player:
+        return PlayerFactory.create()
 
-    response = api_client.get(f'{PLAYERS_PREFIX}{response_data["id"]}')
-    assert response.status_code == status.HTTP_200_OK, response.text
-    assert_valid_response(response.json())
+    def test_create_non_unique_name(self, api_client: TestClient):
+        player = PlayerFactory.create()
+        response = api_client.post(
+            self.path,
+            json={"name": player.name},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
 
+    def test_update(self, api_client: TestClient):
+        player_old = PlayerFactory.create()
+        player_new = PlayerFactory.build()
 
-def test_create_player_invalid_name(api_client: TestClient):
-    response = api_client.post(
-        PLAYERS_PREFIX,
-        json={"name": "x"},
-    )
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
+        response = api_client.patch(
+            f"{self.path}{player_old.id}",
+            json=player_new.model_dump(),
+        )
+        assert response.status_code == status.HTTP_200_OK, response.text
+        response_data = response.json()
+        self.assert_valid_response(response_data)
+        assert player_new.name == response_data["name"]
 
-
-def test_create_player_non_unique_name(api_client: TestClient):
-    player = PlayerFactory.create()
-    response = api_client.post(
-        PLAYERS_PREFIX,
-        json={"name": player.name},
-    )
-    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
-
-
-def test_login_existing_player(api_client: TestClient):
-    player = PlayerFactory.create()
-    response = api_client.post(
-        f"{PLAYERS_PREFIX}login",
-        json={"name": player.name},
-    )
-    assert response.status_code == status.HTTP_200_OK, response.text
-
-
-def test_login_non_existing_player(api_client: TestClient):
-    player = PlayerFactory.build()
-    response = api_client.post(
-        f"{PLAYERS_PREFIX}login",
-        json={"name": player.name},
-    )
-    assert response.status_code == status.HTTP_200_OK, response.text
-
-
-def test_login_player_invalid_name(api_client: TestClient):
-    response = api_client.post(
-        f"{PLAYERS_PREFIX}login",
-        json={"name": False},
-    )
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
-
-
-def test_get_player_by_id(api_client: TestClient):
-    player = PlayerFactory.create()
-    response = api_client.get(f"{PLAYERS_PREFIX}{player.id}")
-    assert response.status_code == status.HTTP_200_OK, response.text
-
-
-def test_get_non_existing_player_by_id(api_client: TestClient):
-    response = api_client.get(f"{PLAYERS_PREFIX}999")
-    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
-
-
-def test_get_all_players(api_client: TestClient, count: int = 3):
-    PlayerFactory.create_batch(count)
-
-    response = api_client.get(PLAYERS_PREFIX)
-    assert response.status_code == status.HTTP_200_OK
-    response_data = response.json()
-
-    assert isinstance(response_data, list), response.text
-    assert len(response_data) >= count, response.text
-
-    for player in response_data:
-        assert_valid_response(player)
-
-
-def test_update_player(api_client: TestClient):
-    player_old = PlayerFactory.create()
-    player_new = PlayerFactory.build()
-
-    response = api_client.patch(
-        f"{PLAYERS_PREFIX}{player_old.id}",
-        json=player_new.model_dump(),
-    )
-    assert response.status_code == status.HTTP_200_OK, response.text
-    response_data = response.json()
-    assert_valid_response(response_data)
-    assert player_new.name == response_data["name"]
-
-    response = api_client.get(f"{PLAYERS_PREFIX}{player_old.id}")
-    assert response.status_code == status.HTTP_200_OK, response.text
-    response_data = response.json()
-    assert_valid_response(response_data)
-    assert player_new.name == response_data["name"]
-
-
-def test_update_non_existing_player(api_client: TestClient):
-    response = api_client.patch(
-        f"{PLAYERS_PREFIX}{999}",
-        json={"name": "Player 1"},
-    )
-    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
-
-
-def test_update_player_invalid_name(api_client: TestClient):
-    player = PlayerFactory.create()
-    response = api_client.patch(
-        f"{PLAYERS_PREFIX}{player.id}",
-        json={"name": "x"},
-    )
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
-
-
-def test_delete_player(api_client: TestClient):
-    player = PlayerFactory.create()
-    response = api_client.delete(f"{PLAYERS_PREFIX}{player.id}")
-    assert response.status_code == status.HTTP_204_NO_CONTENT, response.text
-
-    response = api_client.get(f"{PLAYERS_PREFIX}{player.id}")
-    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
-
-
-def test_delete_non_existing_player(api_client: TestClient):
-    response = api_client.delete(f"{PLAYERS_PREFIX}{999}")
-    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text
+        response = api_client.get(f"{self.path}{player_old.id}")
+        assert response.status_code == status.HTTP_200_OK, response.text
+        response_data = response.json()
+        self.assert_valid_response(response_data)
+        assert player_new.name == response_data["name"]
