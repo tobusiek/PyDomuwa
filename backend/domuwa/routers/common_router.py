@@ -5,7 +5,6 @@ from typing import Generic, final
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import SQLModel, Session
 from starlette.responses import Response
-from typing_extensions import override
 
 from domuwa.database import get_db_session
 from domuwa.services.common_services import (

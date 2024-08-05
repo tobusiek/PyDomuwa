@@ -18,7 +18,9 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/game-types", tags=["Game Types"])
 
 
-class GameTypeRouter(CommonRouter400OnSaveError[GameTypeCreate, GameTypeUpdate, GameType]):
+class GameTypeRouter(
+    CommonRouter400OnSaveError[GameTypeCreate, GameTypeUpdate, GameType]
+):
     prefix = "/game-types"
     tags = ["Game Type"]
     router = APIRouter(prefix=prefix, tags=tags)  # type: ignore

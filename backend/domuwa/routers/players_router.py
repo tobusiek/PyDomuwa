@@ -25,11 +25,20 @@ class PlayerRouter(CommonRouter400OnSaveError[PlayerCreate, PlayerUpdate, Player
     db_model_type_name = Player.__name__
 
     @override
-    async def create(self, model: PlayerCreate, session: Session = Depends(get_db_session)):
+    async def create(
+        self,
+        model: PlayerCreate,
+        session: Session = Depends(get_db_session),
+    ):
         return await super().create(model, session)
 
     @override
-    async def update(self, model_id: int, model_update: PlayerUpdate, session: Session = Depends(get_db_session)):
+    async def update(
+        self,
+        model_id: int,
+        model_update: PlayerUpdate,
+        session: Session = Depends(get_db_session),
+    ):
         return await super().update(model_id, model_update, session)
 
 
