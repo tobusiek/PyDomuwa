@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.routing import APIRouter
 from sqlmodel import Session
 from typing_extensions import override
@@ -12,12 +12,12 @@ from domuwa.models.qna_category import (
     QnACategoryRead,
     QnACategoryUpdate,
 )
-from domuwa.routers.common_router import CommonRouter
+from domuwa.routers.common_router import CommonRouter400OnSaveError
 from domuwa.services.qna_categories_services import QnACategoryServices
 
 
 class QnACategoriesRouter(
-    CommonRouter[QnACategoryCreate, QnACategoryUpdate, QnACategory]
+    CommonRouter400OnSaveError[QnACategoryCreate, QnACategoryUpdate, QnACategory]
 ):
     prefix = "/qna-categories"
     tags = ["QnA Category"]
@@ -34,12 +34,7 @@ class QnACategoriesRouter(
         model: QnACategoryCreate,
         session: Session = Depends(get_db_session),
     ):
-        qna_category = await super().create(model, session)
-        if qna_category is None:
-            err_msg = f"QnACategory({model}) could not be created."
-            self.logger.warning(err_msg)
-            raise HTTPException(status.HTTP_400_BAD_REQUEST, err_msg)
-        return qna_category
+        return await super().create(model, session)
 
     # TODO: add admin auth
     @override
@@ -49,12 +44,12 @@ class QnACategoriesRouter(
         model_update: QnACategoryUpdate,
         session: Session = Depends(get_db_session),
     ):
-        qna_category = await super().update(model_id, model_update, session)
-        if qna_category is None:
-            err_msg = f"QnACategory({model_update}) could not be created."
-            self.logger.warning(err_msg)
-            raise HTTPException(status.HTTP_400_BAD_REQUEST, err_msg)
-        return qna_category
+        return await super().update(model_id, model_update, session)
+
+    # TODO: add admin auth
+    @override
+    async def delete(self, model_id: int, session: Session = Depends(get_db_session)):
+        return await super().delete(model_id, session)
 
 
 def get_qna_categories_router():

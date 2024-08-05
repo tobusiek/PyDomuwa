@@ -5,6 +5,7 @@ from typing import Generic, final
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import SQLModel, Session
 from starlette.responses import Response
+from typing_extensions import override
 
 from domuwa.database import get_db_session
 from domuwa.services.common_services import (
@@ -122,3 +123,33 @@ class CommonRouter(ABC, Generic[CreateModelT, UpdateModelT, DbModelT]):
         )
         model = await self.get_instance(model_id, session)
         return await self.services.delete(model, session)
+
+
+class CommonRouter400OnSaveError(CommonRouter[CreateModelT, UpdateModelT, DbModelT]):
+    @abstractmethod
+    async def create(
+        self,
+        model: CreateModelT,
+        session: Session = Depends(get_db_session),
+    ):
+        db_model = await super().create(model, session)
+        if db_model is None:
+            err_msg = f"{self.db_model_type_name}({model}) cannot be created"
+            self.logger.warning(err_msg)
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, err_msg)
+        return db_model
+
+    @abstractmethod
+    async def update(
+        self,
+        model_id: int,
+        model_update: UpdateModelT,
+        session: Session = Depends(get_db_session),
+    ):
+        db_model = await self.get_instance(model_id, session)
+        model_updated = await self.services.update(db_model, model_update, session)
+        if model_updated is None:
+            err_msg = f"{self.db_model_type_name}(id={model_id}) cannot be updated with {self.db_model_type_name}({model_update})"
+            self.logger.warning(err_msg)
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, err_msg)
+        return model_updated
