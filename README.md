@@ -51,14 +51,8 @@ Then go to http address printed in console
 - [ ] on `get_all` in questions and answers filter for `deleted` and order by `excluded`
 - [x] update tests for answers
 - [x] add game type
-- add qna category
-    - [ ] services
-    - [ ] router
-    - [ ] tests
-- add game category
-    - [ ] services
-    - [ ] router
-    - [ ] tests
+- [x] add qna category
+- [x] add game category
 - add auth
     - [ ] add user model
     - [ ] update player to use user
