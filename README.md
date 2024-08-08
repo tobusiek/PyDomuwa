@@ -19,7 +19,15 @@ Every player can modify question and answers database (initially empty):
 - mark questions as excluded
 - delete one by one
 
-### Run app (.env needs fix)
+### Create `.env` in root folder (checkout `.env.example`)
+
+`SECRET_KEY` can be created as:
+
+```console
+openssl rand -hex 32
+```
+
+### Run app
 
 ```console
 docker compose up -d --build
@@ -56,6 +64,7 @@ Then go to http address printed in console
 - add auth
     - [ ] add user model
     - [ ] update player to use user
+    - [ ] admin privileges
     - update allowed only by admin
         - [ ] game type
         - [ ] qna category
