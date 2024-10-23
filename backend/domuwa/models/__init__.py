@@ -12,8 +12,8 @@ from domuwa.models.question import *  # noqa: F403
 from domuwa.models.ranking import *  # noqa: F403
 
 
-def get_subclasses(cls: type[SQLModel]):
-    for subclass in cls.__subclasses__():
+def get_subclasses(kls: type[SQLModel]):
+    for subclass in kls.__subclasses__():
         yield from get_subclasses(subclass)
         yield subclass
 

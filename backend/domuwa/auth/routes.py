@@ -8,6 +8,7 @@ from sqlmodel import Session
 from domuwa.auth import authenticate_user, create_access_token, get_current_user
 from domuwa.auth.models import Token, User
 from domuwa.config import settings
+from domuwa.database import get_db_session
 
 router = APIRouter(prefix="auth")
 
@@ -15,7 +16,7 @@ router = APIRouter(prefix="auth")
 @router.post("/login")
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    session: Session = Depends(),
+    session: Session = Depends(get_db_session),
 ):
     user = authenticate_user(form_data.username, form_data.password, session)
     if not user:

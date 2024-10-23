@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 from sqlmodel import Session
 
 from domuwa.auth import services
-from domuwa.auth.models import TokenData
+from domuwa.auth.models import TokenData, User
 from domuwa.config import settings
 from domuwa.database import get_db_session
 
@@ -70,3 +70,10 @@ async def get_current_user(
     if user is None:
         raise CredentialsException
     return user
+
+
+async def get_current_active_user(current_user: User = Depends(get_current_user)):
+    if not current_user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
+        )
