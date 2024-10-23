@@ -5,5 +5,5 @@ from domuwa.services.common_services import CommonServices
 
 
 class GameTypeServices(CommonServices[GameTypeCreate, GameTypeUpdate, GameType]):
-    def __init__(self) -> None:
-        super().__init__(GameType, logging.getLogger(__name__))
+    db_model_type = GameType
+    logger = logging.getLogger(__name__)

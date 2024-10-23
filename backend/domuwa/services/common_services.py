@@ -11,9 +11,8 @@ DbModelT = TypeVar("DbModelT", bound=SQLModel)
 
 
 class CommonServices(ABC, Generic[CreateModelT, UpdateModelT, DbModelT]):
-    def __init__(self, db_model_type: type[DbModelT], logger: logging.Logger) -> None:
-        self.db_model_type = db_model_type
-        self.logger = logger
+    db_model_type: type[DbModelT]
+    logger: logging.Logger
 
     async def create(self, model: CreateModelT, session: Session):
         return await self.save(model, session)

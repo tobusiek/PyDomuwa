@@ -8,8 +8,8 @@ from domuwa.services.common_services import CommonServices
 
 
 class QuestionServices(CommonServices[QuestionCreate, QuestionUpdate, Question]):
-    def __init__(self) -> None:
-        super().__init__(Question, logging.getLogger(__name__))
+    db_model_type = Question
+    logger = logging.getLogger(__name__)
 
     @override
     async def update(
